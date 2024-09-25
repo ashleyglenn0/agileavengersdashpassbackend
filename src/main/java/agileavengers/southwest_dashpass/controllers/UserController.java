@@ -4,6 +4,8 @@ import agileavengers.southwest_dashpass.models.Customer;
 import agileavengers.southwest_dashpass.models.Employee;
 import agileavengers.southwest_dashpass.models.User;
 import agileavengers.southwest_dashpass.models.UserType;
+import agileavengers.southwest_dashpass.services.CustomerService;
+import agileavengers.southwest_dashpass.services.EmployeeService;
 import agileavengers.southwest_dashpass.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private EmployeeService employeeService;
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
@@ -33,9 +39,11 @@ public class UserController {
         if (userType.equals("EMPLOYEE")) {
             Employee employee = new Employee(firstName, lastName, username, email, password, role);
             userService.saveUser(employee);
+            employeeService.saveEmployee(employee);
         } else if (userType.equals("CUSTOMER")) {
             Customer customer = new Customer(firstName, lastName, username, email, password);
             userService.saveUser(customer);
+            customerService.saveCustomer(customer);
         }
         return "redirect:/login"; // Redirect to the login page after successful registration
     }
