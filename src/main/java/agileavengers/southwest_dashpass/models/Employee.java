@@ -1,0 +1,30 @@
+package agileavengers.southwest_dashpass.models;
+
+public class Employee extends User{
+    int employeeId;
+    String role;
+    boolean canSellDashPass;
+
+    public int getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    boolean canRedeemDashPass;
+    public Employee(String fname, String lname, String mail, String pword) {
+        super(fname, lname, mail, pword);
+        this.setUserType(UserType.EMPLOYEE);
+    }
+
+}
