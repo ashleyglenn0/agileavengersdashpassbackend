@@ -21,7 +21,7 @@
 <div class="container">
   <div class="signup-box">
     <h1>Signup for Southwest Airlines Dash Pass</h1>
-    <form>
+    <form action="/register" method="post">
       <label>First Name:</label><br />
       <input type="text" name="firstName" required><br />
       <label>Last Name:</label><br />
@@ -32,11 +32,13 @@
       <input type="email" name="email" required><br />
       <label>Password:</label><br />
       <input type="password" name="password" required><br /><br />
+      <label>Role(If employee):</label><br />
+      <input type="text" name="role"><br /><br />
       <div class="radio">
         <label>Customer</label>
-        <input type="radio" name="userType" value="customer" required>
+        <input type="radio" id="customer" name="userType" value="CUSTOMER" required>
         <label>Employee</label>
-        <input type="radio" name="userType" value="employee" required>
+        <input type="radio" id="employee" name="userType" value="EMPLOYEE" required>
       </div>
       <input class="button" type="submit" value="Sign Up">
     </form>

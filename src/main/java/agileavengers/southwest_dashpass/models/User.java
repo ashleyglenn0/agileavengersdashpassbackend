@@ -12,13 +12,15 @@ public class User {
     private Long id;
     private String firstName;
     private String lastName;
+    private String username;
     private String email;
     private String password;
     private UserType userType;
 
-    public User(String fname, String lname, String mail, String pword) {
+    public User(String fname, String lname, String uname, String mail, String pword) {
         this.firstName = fname;
         this.lastName = lname;
+        this.username = uname;
         this.email = mail;
         this.password = pword;
     }
@@ -59,6 +61,26 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public UserType getUserType() {
+        return userType;
     }
 
     protected void setUserType(UserType customer) {

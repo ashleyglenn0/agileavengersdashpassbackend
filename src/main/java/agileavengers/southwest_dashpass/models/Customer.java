@@ -29,8 +29,8 @@ public class Customer extends User {
         this.numberOfDashPassesUsed = numberOfDashPassesUsed;
     }
 
-    public Customer(String fname, String lname, String mail, String pword) {
-        super(fname, lname, mail, pword);
+    public Customer(String fname, String lname, String uname, String mail, String pword) {
+        super(fname, lname, uname, mail, pword);
         this.setUserType(UserType.CUSTOMER);
     }
 }

@@ -25,14 +25,16 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(@RequestParam String firstName,
                                @RequestParam String lastName,
+                               @RequestParam String username,
                                @RequestParam String email,
                                @RequestParam String password,
+                               @RequestParam String role,
                                @RequestParam UserType userType) {
         if (userType.equals("EMPLOYEE")) {
-            Employee employee = new Employee(firstName, lastName, email, password);
+            Employee employee = new Employee(firstName, lastName, username, email, password, role);
             userService.saveUser(employee);
         } else if (userType.equals("CUSTOMER")) {
-            Customer customer = new Customer(firstName, lastName, email, password);
+            Customer customer = new Customer(firstName, lastName, username, email, password);
             userService.saveUser(customer);
         }
         return "redirect:/login"; // Redirect to the login page after successful registration
