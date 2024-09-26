@@ -32,7 +32,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         // Permit access to these paths without authentication
-                        .requestMatchers("/", "/signup","/login","/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/signup.html","/login.html","/css/**", "/js/**", "/static/**").permitAll()
                         .requestMatchers("/employee/**").hasAuthority("ROLE_EMPLOYEE")  // Access based on UserType
                         .requestMatchers("/customer/**").hasAuthority("ROLE_CUSTOMER")
                         // Secure these paths and require authentication
@@ -40,7 +40,7 @@ public class SecurityConfig {
                 )
                 .csrf(csrf -> csrf.disable())  // Disable CSRF if you’re using non-HTML form submissions
                 .formLogin(form -> form
-                        .loginPage("/login")  // Custom login page
+                        .loginPage("/login.html")  // Custom login page
                         .successHandler(customLoginSuccessHandler)  // Redirect to dashboard on successful login
                         .permitAll()  // Allow everyone to access the login page
                 )

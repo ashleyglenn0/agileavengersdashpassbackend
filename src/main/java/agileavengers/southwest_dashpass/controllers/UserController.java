@@ -25,21 +25,21 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/register")
+    @GetMapping("/signup")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "signup";
+        return "signup.html";
     }
 
-    @PostMapping("/register")
+    @PostMapping("/signup")
     public String registerUser(@Validated @ModelAttribute("user") User user, BindingResult result, Model model) {
        if(result.hasErrors()){
            model.addAttribute("errorMessage", "Please correct the form errors");
-           return "signup";
+           return "signup.html";
        }
        if(userService.loadUserByUsername(user.getUsername()) != null){
            model.addAttribute("errorMessage", "Username already exists. Please select another name");
-           return "signup";
+           return "signup.html";
        }
 
        user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -52,6 +52,6 @@ public class UserController {
 
        userService.saveUser(user);
 
-       return "redirect:/login";
+       return "redirect:/login.html";
     }
 }
