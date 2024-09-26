@@ -8,9 +8,13 @@ import agileavengers.southwest_dashpass.services.CustomerService;
 import agileavengers.southwest_dashpass.services.EmployeeService;
 import agileavengers.southwest_dashpass.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -19,9 +23,8 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
-    private CustomerService customerService;
-    @Autowired
-    private EmployeeService employeeService;
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
@@ -29,18 +32,26 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam String firstName,
-                               @RequestParam String lastName,
-                               @RequestParam String username,
-                               @RequestParam String email,
-                               @RequestParam String password,
-                               @RequestParam String role,
-                               @RequestParam UserType userType) {
-        if (userType.equals("EMPLOYEE")) {
-            employeeService.registerEmployee(firstName, lastName, username, email, password, role);
-        } else if (userType.equals("CUSTOMER")) {
-            customerService.registerCustomer(firstName, lastName, username, email, password);
-        }
-        return "redirect:/login"; // Redirect to the login page after successful registration
+    public String registerUser(@Validated @ModelAttribute("user") User user, BindingResult result, Model model) {
+       if(result.hasErrors()){
+           model.addAttribute("errorMessage", "Please correct the form errors");
+           return "signup";
+       }
+       if(userService.loadUserByUsername(user.getUsername()) != null){
+           model.addAttribute("errorMessage", "Username already exists. Please select another name");
+           return "signup";
+       }
+
+       user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+       if(user.getUserType() == UserType.EMPLOYEE){
+           user.setUserType(UserType.EMPLOYEE);
+       } else {
+           user.setUserType(UserType.CUSTOMER);
+       }
+
+       userService.saveUser(user);
+
+       return "redirect:/login";
     }
 }

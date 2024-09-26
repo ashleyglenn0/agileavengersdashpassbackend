@@ -82,7 +82,7 @@ public class User {
         return userType;
     }
 
-    protected void setUserType(UserType customer) {
+    public void setUserType(UserType customer) {
     }
 
     public boolean isEnabled() {
