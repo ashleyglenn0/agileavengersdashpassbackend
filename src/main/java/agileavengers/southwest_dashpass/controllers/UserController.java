@@ -25,7 +25,7 @@ public class UserController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "register";
+        return "signup";
     }
 
     @PostMapping("/register")
@@ -37,13 +37,9 @@ public class UserController {
                                @RequestParam String role,
                                @RequestParam UserType userType) {
         if (userType.equals("EMPLOYEE")) {
-            Employee employee = new Employee(firstName, lastName, username, email, password, role);
-            userService.saveUser(employee);
-            employeeService.saveEmployee(employee);
+            employeeService.registerEmployee(firstName, lastName, username, email, password, role);
         } else if (userType.equals("CUSTOMER")) {
-            Customer customer = new Customer(firstName, lastName, username, email, password);
-            userService.saveUser(customer);
-            customerService.saveCustomer(customer);
+            customerService.registerCustomer(firstName, lastName, username, email, password);
         }
         return "redirect:/login"; // Redirect to the login page after successful registration
     }

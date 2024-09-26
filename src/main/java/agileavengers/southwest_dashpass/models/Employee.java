@@ -1,7 +1,12 @@
 package agileavengers.southwest_dashpass.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "employee")
 public class Employee extends User{
-    int employeeId;
+    int employeeId = 0;
     String role;
     boolean canSellDashPass;
 
@@ -26,6 +31,7 @@ public class Employee extends User{
         super(fname, lname, uname, mail, pword);
         this.role = role;
         this.setUserType(UserType.EMPLOYEE);
+        this.employeeId = this.employeeId + 1;
     }
 
 }
