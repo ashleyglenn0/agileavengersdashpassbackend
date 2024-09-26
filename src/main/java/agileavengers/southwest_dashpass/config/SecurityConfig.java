@@ -1,11 +1,10 @@
 package agileavengers.southwest_dashpass.config;
 
-import agileavengers.southwest_dashpass.security.CustomUserDetailsService;
-import agileavengers.southwest_dashpass.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,16 +16,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
     private final UserDetailsService userDetailsService;
+
+    @Autowired
+    private CustomLoginSuccessHandler customLoginSuccessHandler;
+
 
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-
-    @Autowired
-    private CustomLoginSuccessHandler customLoginSuccessHandler;
-    @Autowired
-    private UserService userService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,13 +33,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Permit access to these paths without authentication
                         .requestMatchers("/", "/signup","/login","/css/**", "/js/**").permitAll()
+                        .requestMatchers("/employee/**").hasAuthority("ROLE_EMPLOYEE")  // Access based on UserType
+                        .requestMatchers("/customer/**").hasAuthority("ROLE_CUSTOMER")
                         // Secure these paths and require authentication
-                        .requestMatchers("/" + customLoginSuccessHandler.toString()).authenticated()
+                        .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())  // Disable CSRF if you’re using non-HTML form submissions
                 .formLogin(form -> form
                         .loginPage("/login")  // Custom login page
-                        .defaultSuccessUrl("/" + customLoginSuccessHandler.toString(), true)  // Redirect to dashboard on successful login
+                        .successHandler(customLoginSuccessHandler)  // Redirect to dashboard on successful login
                         .permitAll()  // Allow everyone to access the login page
                 )
                 .logout(logout -> logout
@@ -57,14 +58,30 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); // Use BCrypt for password encoding
     }
 
-@Bean
-public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) throws Exception {
-    return http
-            .getSharedObject(AuthenticationManagerBuilder.class)
-            .userDetailsService(userDetailsService)
-            .passwordEncoder(passwordEncoder)
-            .and()
-            .build();
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);  // Inject your custom UserDetailsService
+        authProvider.setPasswordEncoder(passwordEncoder());  // Use BCrypt for password encoding
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
+        auth.authenticationProvider(authenticationProvider());  // Use DaoAuthenticationProvider
+        return auth.build();
+    }
+
+//@Bean
+//public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) throws Exception {
+//    return http
+//            .getSharedObject(AuthenticationManagerBuilder.class)
+//            .userDetailsService(userDetailsService)
+//            .passwordEncoder(passwordEncoder)
+//            .and()
+//            .build();
+//}
 }
-}
+
 

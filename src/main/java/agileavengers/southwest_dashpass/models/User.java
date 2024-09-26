@@ -84,4 +84,9 @@ public class User {
 
     protected void setUserType(UserType customer) {
     }
+
+    public boolean isEnabled() {
+        return true;
+    }
+
 }

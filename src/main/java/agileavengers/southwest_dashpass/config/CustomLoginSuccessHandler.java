@@ -1,41 +1,45 @@
 package agileavengers.southwest_dashpass.config;
 
-import agileavengers.southwest_dashpass.models.UserType;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Set;
+
+
 
 @Component
-public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
-    private UserType userType;
+public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        AuthenticationSuccessHandler.super.onAuthenticationSuccess(request, response, chain, authentication);
+    protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        String targetUrl = determineTargetUrl(authentication);
+
+        if (response.isCommitted()) {
+            return;
+        }
+
+        // Use the default redirect strategy provided by Spring Security
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
-        Set<String> userType = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+    // Determine the target URL based on user roles
+    protected String determineTargetUrl(Authentication authentication) {
+        boolean isEmployee = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYEE"));
+        boolean isCustomer = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CUSTOMER"));
 
-        // Check user's role and redirect accordingly
-        if (userType.contains("EMPLOYEE")) {
-            response.sendRedirect("/employeeDashboard");  // Employee dashboard
-        } else if (userType.contains("CUSTOMER")) {
-            response.sendRedirect("/customerDashboard");  // Customer dashboard
+        if (isEmployee) {
+            return "/employeeDashboard";
+        } else if (isCustomer) {
+            return "/customerDashboard";
         } else {
-            response.sendRedirect("/error");  // Default dashboard
+            throw new IllegalStateException("Unexpected user role");
         }
     }
-
 }
+
 
