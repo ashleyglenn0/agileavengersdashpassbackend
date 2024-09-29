@@ -27,34 +27,6 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests(authorize -> authorize
-//                        // Permit access to these paths without authentication
-//                        .requestMatchers("/").permitAll()
-//                        .requestMatchers("/login.html").permitAll()
-//                        .requestMatchers("/signup.html").permitAll()
-//                        .requestMatchers("/employeeDashboard.html/**").hasAuthority("ROLE_EMPLOYEE")  // Access based on UserType
-//                        .requestMatchers("/customerDashboard.html/**").hasAuthority("ROLE_CUSTOMER")
-//                        // Secure these paths and require authentication
-//                        .anyRequest().authenticated()
-//                )
-//                .csrf(csrf -> csrf.disable())  // Disable CSRF if you’re using non-HTML form submissions
-//                .formLogin(form -> form
-//                        .loginPage("/login.html")  // Custom login page
-//                        .successHandler(customLoginSuccessHandler)  // Redirect to dashboard on successful login
-//                        .permitAll()  // Allow everyone to access the login page
-//                )
-//                .logout(logout -> logout
-//                        .logoutUrl("/perform_logout")  // Logout URL
-//                        .logoutSuccessUrl("/login.html?logout=true")  // Redirect after logout
-//                        .permitAll()  // Allow everyone to access logout
-//                );
-//
-//        return http.build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -64,12 +36,21 @@ public class SecurityConfig {
                         .requestMatchers("/login.html").permitAll()
                         .requestMatchers("/styles/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/employeeDashboard.html/**").hasAuthority("ROLE_EMPLOYEE")
+                        .requestMatchers("/customerDashboard.html/**").hasAuthority("ROLE_CUSTOMER")
                         .anyRequest().authenticated() // Allow all requests temporarily for testing
                 )
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
                         .loginPage("/login.html")
+                        .successHandler(customLoginSuccessHandler)
                         .permitAll()
+                )
+                .logout( logout -> logout
+                        .logoutUrl("/perform_logout") // logout url
+                        .logoutSuccessUrl("/login.html?logout=true") //redirect after logout
+                        .permitAll() //Allow everyone to access logout
+
                 );
 
         return http.build();
