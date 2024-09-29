@@ -60,7 +60,11 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/landingpage.html").permitAll()
-                        .anyRequest().permitAll()  // Allow all requests temporarily for testing
+                        .requestMatchers("/signup.html").permitAll()
+                        .requestMatchers("/login.html").permitAll()
+                        .requestMatchers("/styles/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .anyRequest().authenticated() // Allow all requests temporarily for testing
                 )
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
