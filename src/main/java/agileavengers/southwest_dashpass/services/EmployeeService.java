@@ -11,8 +11,9 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public void registerEmployee(String firstName, String lastName, String username, String password, String email, String role) {
-        Employee employee = new Employee(firstName, lastName, username, password, email, role);
+    public void registerEmployee(Long id, String firstName, String lastName, String username, String password, String email, String role) {
+        Employee employee = new Employee(id, firstName, lastName, username, password, email, role);
+        employee.setEmployeeId(id);
         employee.setFirstName(firstName);
         employee.setLastName(lastName);
         employee.setUsername(username);

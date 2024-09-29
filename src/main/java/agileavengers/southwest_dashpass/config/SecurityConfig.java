@@ -27,27 +27,45 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests(authorize -> authorize
+//                        // Permit access to these paths without authentication
+//                        .requestMatchers("/").permitAll()
+//                        .requestMatchers("/login.html").permitAll()
+//                        .requestMatchers("/signup.html").permitAll()
+//                        .requestMatchers("/employeeDashboard.html/**").hasAuthority("ROLE_EMPLOYEE")  // Access based on UserType
+//                        .requestMatchers("/customerDashboard.html/**").hasAuthority("ROLE_CUSTOMER")
+//                        // Secure these paths and require authentication
+//                        .anyRequest().authenticated()
+//                )
+//                .csrf(csrf -> csrf.disable())  // Disable CSRF if you’re using non-HTML form submissions
+//                .formLogin(form -> form
+//                        .loginPage("/login.html")  // Custom login page
+//                        .successHandler(customLoginSuccessHandler)  // Redirect to dashboard on successful login
+//                        .permitAll()  // Allow everyone to access the login page
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/perform_logout")  // Logout URL
+//                        .logoutSuccessUrl("/login.html?logout=true")  // Redirect after logout
+//                        .permitAll()  // Allow everyone to access logout
+//                );
+//
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        // Permit access to these paths without authentication
-                        .requestMatchers("/", "/signup.html","/login.html","/css/**", "/js/**", "/static/**").permitAll()
-                        .requestMatchers("/employee/**").hasAuthority("ROLE_EMPLOYEE")  // Access based on UserType
-                        .requestMatchers("/customer/**").hasAuthority("ROLE_CUSTOMER")
-                        // Secure these paths and require authentication
-                        .anyRequest().authenticated()
+                        .requestMatchers("/landingpage.html").permitAll()
+                        .anyRequest().permitAll()  // Allow all requests temporarily for testing
                 )
-                .csrf(csrf -> csrf.disable())  // Disable CSRF if you’re using non-HTML form submissions
+                .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
-                        .loginPage("/login.html")  // Custom login page
-                        .successHandler(customLoginSuccessHandler)  // Redirect to dashboard on successful login
-                        .permitAll()  // Allow everyone to access the login page
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/perform_logout")  // Logout URL
-                        .logoutSuccessUrl("/login.html?logout=true")  // Redirect after logout
-                        .permitAll()  // Allow everyone to access logout
+                        .loginPage("/login.html")
+                        .permitAll()
                 );
 
         return http.build();
@@ -73,15 +91,6 @@ public class SecurityConfig {
         return auth.build();
     }
 
-//@Bean
-//public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) throws Exception {
-//    return http
-//            .getSharedObject(AuthenticationManagerBuilder.class)
-//            .userDetailsService(userDetailsService)
-//            .passwordEncoder(passwordEncoder)
-//            .and()
-//            .build();
-//}
 }
 
 

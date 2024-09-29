@@ -1,25 +1,60 @@
 package agileavengers.southwest_dashpass.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
-@Table(name = "Customer")
 public class Customer extends User {
-    private int numberOfDashPassesAvailable, numberOfDashPassesUsed;
-    private int customerId = 0;
+
+    private Long customerId;
+
+    private int maxNumberOfDashPasses;
+
+    private int numberOfDashPassesAvailable;
+
+    private int numberOfDashPassesUsed;
+
     private boolean canPurchaseDashPass;
+
     private boolean canRedeemDashPass;
 
-    private ArrayList<String> flights = new ArrayList<>();
+    private boolean canFly;
+    private boolean canPurchaseFlight;
 
-    public int getCustomerId() {
+    // Consider mapping this properly if flights are associated entities
+    private List<String> flights = new ArrayList<>();
+
+
+    // Default constructor
+    public Customer() {
+        super();
+        this.setUserType(UserType.CUSTOMER); // Set the user type to CUSTOMER
+        this.numberOfDashPassesAvailable = 0; // Default initialization
+        this.numberOfDashPassesUsed = 0; // Default initialization
+        this.canPurchaseDashPass = false; // Default value, adjust as needed
+        this.canRedeemDashPass = false; // Default value, adjust as needed
+    }
+
+    // Constructor with fields
+    public Customer(Long id, String fname, String lname, String uname, String mail, String pword) {
+        super(fname, lname, uname, mail, pword);
+        this.setUserType(UserType.CUSTOMER);
+        this.customerId = id;
+        this.numberOfDashPassesAvailable = 0; // Default value, adjust as needed
+        this.numberOfDashPassesUsed = 0; // Default value, adjust as needed
+        this.canPurchaseDashPass = false; // Default value, adjust as needed
+        this.canRedeemDashPass = false; // Default value, adjust as needed
+    }
+
+    // Getters and setters
+    public Long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 
@@ -39,9 +74,27 @@ public class Customer extends User {
         this.numberOfDashPassesUsed = numberOfDashPassesUsed;
     }
 
-    public Customer(String fname, String lname, String uname, String mail, String pword) {
-        super(fname, lname, uname, mail, pword);
-        this.setUserType(UserType.CUSTOMER);
-        this.customerId = this.customerId + 1;
+    public boolean isCanPurchaseDashPass() {
+        return canPurchaseDashPass;
+    }
+
+    public void setCanPurchaseDashPass(boolean canPurchaseDashPass) {
+        this.canPurchaseDashPass = canPurchaseDashPass;
+    }
+
+    public boolean isCanRedeemDashPass() {
+        return canRedeemDashPass;
+    }
+
+    public void setCanRedeemDashPass(boolean canRedeemDashPass) {
+        this.canRedeemDashPass = canRedeemDashPass;
+    }
+
+    public List<String> getFlights() {
+        return flights;
+    }
+
+    public void setFlights(List<String> flights) {
+        this.flights = flights;
     }
 }

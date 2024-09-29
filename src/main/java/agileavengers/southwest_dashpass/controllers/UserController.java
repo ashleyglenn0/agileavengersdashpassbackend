@@ -28,18 +28,16 @@ public class UserController {
     @GetMapping("/signup")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "signup.html";
+        return "redirect:/signup.html";
     }
 
     @PostMapping("/signup")
     public String registerUser(@Validated @ModelAttribute("user") User user, BindingResult result, Model model) {
        if(result.hasErrors()){
-           model.addAttribute("errorMessage", "Please correct the form errors");
-           return "signup.html";
+           return "redirect:/signup.html?error=username";
        }
        if(userService.loadUserByUsername(user.getUsername()) != null){
-           model.addAttribute("errorMessage", "Username already exists. Please select another name");
-           return "signup.html";
+           return "redirect:/signup.html?error=username";
        }
 
        user.setPassword(passwordEncoder.encode(user.getPassword()));
