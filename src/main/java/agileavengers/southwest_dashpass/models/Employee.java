@@ -5,22 +5,27 @@ import jakarta.persistence.*;
 
 
 @Entity
+@Table(name="EMPLOYEE")
 public class Employee extends User {
-
-
-    private Long employeeId;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(name="role")
+    private Role role;
+    @Column(name="canSellDashPass")
     private boolean canSellDashPass;
+    @Column(name="canAddCustomerFlight")
     private boolean canAddCustomerFlight;
+    @Column(name="canAddCustomer")
     private boolean canAddCustomer;
+    @Column(name="canRedeemDashPass")
     private boolean canRedeemDashPass;
+    @Column(name="canRemoveDashPass")
     private boolean canRemoveDashPass;
+    @Column(name="canEditFlightInformation")
     private boolean canEditFlightInformation;
 
     // Constructor with fields
-    public Employee(Long id, String fname, String lname, String uname, String mail, String pword, String role) {
+    public Employee(String fname, String lname, String uname, String mail, String pword, Role role) {
         super(fname, lname, uname, mail, pword);
-        this.employeeId = id;
         this.role = role;
         this.setUserType(UserType.EMPLOYEE); // Set the user type as EMPLOYEE
         this.canSellDashPass = false; // Default value, adjust as needed
@@ -31,30 +36,23 @@ public class Employee extends User {
     public Employee() {
         super(); // Calls the User default constructor
         this.setUserType(UserType.EMPLOYEE); // Set the user type to EMPLOYEE
+        this.setRole(Role.SALES);
     }
 
     // Getters and setters
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
-    }
-
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public boolean isCanSellDashPass() {
+    public boolean canSellDashPass() {
         return canSellDashPass;
     }
 
-    public boolean isCanAddCustomerFlight() {
+    public boolean canAddCustomerFlight() {
         return canAddCustomerFlight;
     }
 
@@ -62,7 +60,7 @@ public class Employee extends User {
         this.canAddCustomerFlight = canAddCustomerFlight;
     }
 
-    public boolean isCanAddCustomer() {
+    public boolean canAddCustomer() {
         return canAddCustomer;
     }
 
@@ -70,7 +68,7 @@ public class Employee extends User {
         this.canAddCustomer = canAddCustomer;
     }
 
-    public boolean isCanRemoveDashPass() {
+    public boolean canRemoveDashPass() {
         return canRemoveDashPass;
     }
 
@@ -78,7 +76,7 @@ public class Employee extends User {
         this.canRemoveDashPass = canRemoveDashPass;
     }
 
-    public boolean isCanEditFlightInformation() {
+    public boolean canEditFlightInformation() {
         return canEditFlightInformation;
     }
 
@@ -90,7 +88,7 @@ public class Employee extends User {
         this.canSellDashPass = canSellDashPass;
     }
 
-    public boolean isCanRedeemDashPass() {
+    public boolean canRedeemDashPass() {
         return canRedeemDashPass;
     }
 

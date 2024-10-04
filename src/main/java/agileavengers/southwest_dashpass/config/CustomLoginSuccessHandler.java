@@ -28,14 +28,14 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     // Determine the target URL based on user roles
     protected String determineTargetUrl(Authentication authentication) {
         boolean isEmployee = authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("employee"));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("EMPLOYEE"));
         boolean isCustomer = authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("Customer"));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("CUSTOMER"));
 
         if (isEmployee) {
-            return "/employeeDashboard.html";
+            return "/employeedashboard";
         } else if (isCustomer) {
-            return "/customerDashboard.html";
+            return "/customerdashboard";
         } else {
             throw new IllegalStateException("Unexpected user role");
         }

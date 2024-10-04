@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Sign Up</title>
+    <meta name="description" content="Sign up for Southwest Airlines Dash Pass">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/styles/signup.css}" rel="stylesheet">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Logo"/>
+        <ul>
+            <li><a th:href="@{/landingpage}">Home</a></li>
+            <li><a th:href="@{/login}">Log in</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <div class="signup-box">
+        <h1>Signup for Southwest Airlines Dash Pass</h1>
+        <div th:if="${error}">
+            <p class="error-message" th:text="${error}"></p>
+        </div>
+
+        <form th:action="@{/signup}" method="post">
+            <label>First Name:</label><br />
+            <input type="text" name="firstName" required><br />
+            <label>Last Name:</label><br />
+            <input type="text" name="lastName" required><br />
+            <label>Username:</label><br />
+            <input type="text" name="username" required><br />
+            <label>Email:</label><br />
+            <input type="email" name="email" required><br />
+            <label>Password:</label><br />
+            <input type="password" name="password" required><br /><br />
+
+            <!-- Role Select for Employee -->
+            <label>Role (If Employee):</label><br />
+            <select name="role" id="role">
+                <option value="">-- Select Role --</option>
+                <option value="SALES">Sales</option>
+                <option value="MANAGER">Manager</option>
+                <option value="SUPPORT">Support</option>
+            </select><br /><br />
+
+            <!-- User Type Radio Buttons -->
+            <div class="radio">
+                <label>Customer</label>
+                <input type="radio" id="customer" name="userType" value="CUSTOMER" required>
+                <label>Employee</label>
+                <input type="radio" id="employee" name="userType" value="EMPLOYEE" required>
+            </div>
+            <br />
+
+            <!-- Submit Button -->
+            <input class="button" type="submit" value="Sign Up">
+        </form>
+        <div>
+        </div>
+    </div>
+</div>
+<script src="" async defer></script>
+</body>
+</html>

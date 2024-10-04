@@ -70,12 +70,13 @@ public class UserService implements UserDetailsService {
         if (user.getUserType() == UserType.EMPLOYEE && user instanceof Employee) {
             // Call the employeeService's registerEmployee method for additional logic
             Employee employee = (Employee) user;
-            employeeService.registerEmployee(employee.getEmployeeId(), employee.getFirstName(), employee.getLastName(),
+            employeeService.registerEmployee(employee.getFirstName(), employee.getLastName(),
                     employee.getUsername(), employee.getPassword(), employee.getEmail(), employee.getRole());
+            employeeRepository.save(employee);
         } else if (user.getUserType() == UserType.CUSTOMER && user instanceof Customer) {
             // Call the customerService's registerCustomer method for additional logic
             Customer customer = (Customer) user;
-            customerService.registerCustomer(customer.getCustomerId(), customer.getFirstName(), customer.getLastName(), customer.getUsername(), customer.getEmail(), customer.getPassword());
+            customerService.registerCustomer(customer.getFirstName(), customer.getLastName(), customer.getUsername(), customer.getEmail(), customer.getPassword());
             customerRepository.save(customer); // Save to CustomerRepository
         } else {
             // Save to the general UserRepository if no specific type is found

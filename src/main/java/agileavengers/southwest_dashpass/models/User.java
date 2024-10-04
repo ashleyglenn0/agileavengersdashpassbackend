@@ -4,21 +4,30 @@ import jakarta.persistence.*;
 
 
 @Entity
+@Table(name="`user`")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Ensure this annotation is present
+    @Column(name="ID")
     private Long id;
+    @Column(name="first_name")
     private String firstName;
 
+    @Column(name="last_name")
     private String lastName;
 
+    @Column(name="username")
     private String username;
 
+    @Column(name="email")
     private String email;
 
+    @Column(name="password")
     private String password;
 
+    @Column(name="user_type")
+    @Enumerated(EnumType.STRING)
     private UserType userType = UserType.CUSTOMER;  // Defaulting to CUSTOMER
 
     // Constructor with parameters
@@ -42,6 +51,13 @@ public class User {
     }
 
     // Getters and Setters
+    public Long getId() {
+        return id;  // Getter for id
+    }
+
+    public void setId(Long id) {
+        this.id = id;  // Setter for id
+    }
     public String getFirstName() {
         return firstName;
     }

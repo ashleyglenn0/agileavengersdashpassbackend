@@ -31,24 +31,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/landingpage.html").permitAll()
-                        .requestMatchers("/signup.html").permitAll()
-                        .requestMatchers("/login.html").permitAll()
+                        .requestMatchers("/landingpage").permitAll()
+                        .requestMatchers("/signup").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/styles/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/employeeDashboard.html/**").hasAuthority("ROLE_EMPLOYEE")
-                        .requestMatchers("/customerDashboard.html/**").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers("/employeedashboard/**").hasAuthority("ROLE_EMPLOYEE")
+                        .requestMatchers("/customerdashboard/**").hasAuthority("ROLE_CUSTOMER")
                         .anyRequest().authenticated() // Allow all requests temporarily for testing
                 )
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
-                        .loginPage("/login.html")
+                        .loginPage("/login")
                         .successHandler(customLoginSuccessHandler)
                         .permitAll()
                 )
                 .logout( logout -> logout
                         .logoutUrl("/perform_logout") // logout url
-                        .logoutSuccessUrl("/login.html?logout=true") //redirect after logout
+                        .logoutSuccessUrl("/login?logout=true") //redirect after logout
                         .permitAll() //Allow everyone to access logout
 
                 );

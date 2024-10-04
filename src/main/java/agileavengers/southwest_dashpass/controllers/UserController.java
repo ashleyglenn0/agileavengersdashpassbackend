@@ -28,28 +28,37 @@ public class UserController {
     @GetMapping("/signup")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "redirect:/signup.html";
+        return "signup";
     }
 
     @PostMapping("/signup")
-    public String registerUser(@Validated @ModelAttribute("user") User user, BindingResult result, Model model) {
-       if(result.hasErrors()){
-           return "redirect:/signup.html?error=username";
-       }
-       if(userService.loadUserByUsername(user.getUsername()) != null){
-           return "redirect:/signup.html?error=username";
-       }
+    public String registerUser(@Validated @ModelAttribute("user") User user,
+                               @RequestParam String userType,
+                               BindingResult result,
+                               Model model) {
+        // Check for validation errors
+        if (result.hasErrors()) {
+            // Send the user back to the signup page with errors
+            model.addAttribute("error", "There was an error in the form submission.");
+            return "signup";  // This refers to the Thymeleaf template
+        }
 
-       user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Check if the username already exists
+        if (userService.loadUserByUsername(user.getUsername()) != null) {
+            model.addAttribute("error", "Username already exists.");
+            return "signup";  // Send back to the signup page with an error message
+        }
 
-       if(user.getUserType() == UserType.EMPLOYEE){
-           user.setUserType(UserType.EMPLOYEE);
-       } else {
-           user.setUserType(UserType.CUSTOMER);
-       }
+        // Encode the password before saving the user
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-       userService.saveUser(user);
+        // Set the user type based on the form submission
+        user.setUserType(UserType.valueOf(userType.toUpperCase()));  // Converts "CUSTOMER" or "EMPLOYEE" to the enum type
 
-       return "redirect:/login.html";
+        // Save the user via the UserService
+        userService.saveUser(user);
+
+        // Redirect to the login page upon successful registration
+        return "redirect:/login";  // Thymeleaf will resolve the login template
     }
 }

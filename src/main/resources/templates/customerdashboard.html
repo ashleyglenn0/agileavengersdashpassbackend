@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Customer Dashboard</title>
+    <meta name="description" content="Southwest Airlines Customer Dashboard">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Link to the custom CSS file -->
+    <link rel="stylesheet" th:href="@{/styles/customerDashboardCentered.css}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .dashboard-card {
+            margin-bottom: 20px;
+        }
+        .card {
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <nav>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </nav>
+    </header>
+
+    <!-- Display the company logo -->
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+
+    <!-- Welcome message with the customer's name -->
+    <h1>Welcome To The Dash Pass System, <span th:text="${customer.firstName}"></span>!</h1>
+
+    <!-- Upcoming Flight Card -->
+    <div class="dashboard-card card">
+        <h4>Upcoming Flight</h4>
+        <p><strong>Date:</strong> <span th:text="${upcomingFlight.departureDate}"></span></p>
+        <p><strong>Flight Number:</strong> <span th:text="${upcomingFlight.flightNumber}"></span></p>
+        <p th:if="${upcomingFlight.dashPassAttached}">
+            <strong>DashPass Attached:</strong> Yes
+        </p>
+        <p th:if="${!upcomingFlight.dashPassAttached}">
+            <strong>DashPass Attached:</strong> No
+        </p>
+        <a th:href="@{/reservations/view/{id}(id=${upcomingFlight.reservationId})}" class="btn btn-primary">View Reservation</a>
+    </div>
+
+    <!-- Card showing total DashPasses used -->
+    <div class="dashboard-card card">
+        <h4>Total Dash Pass Usage</h4>
+        <p>You have used <strong th:text="${customer.totalDashPassesUsed}"></strong> Dash Pass(es) total.</p>
+    </div>
+
+    <!-- Card showing current DashPasses available -->
+    <div class="dashboard-card card">
+        <h4>Available Dash Passes</h4>
+        <p>You currently have <strong th:text="${customer.availableDashPasses}"></strong> Dash Pass(es).</p>
+    </div>
+
+    <!-- Action cards -->
+    <div class="dashboard-card card">
+        <h4>Actions</h4>
+        <div class="button-container">
+            <button class="btn btn-success" th:onclick="'/dashpass/redeem?customerId=' + ${customer.id}">Redeem Dash Pass</button>
+            <button class="btn btn-primary" th:onclick="'/dashpass/purchase?customerId=' + ${customer.id}">Purchase Dash Pass</button>
+        </div>
+    </div>
+
+    <!-- Button to view previous DashPass trips -->
+    <div class="dashboard-card card">
+        <h4>Previous Dash Trips</h4>
+        <button class="btn btn-secondary" th:onclick="'/dashpass/trips?customerId=' + ${customer.id}">View Previous Dash Trips</button>
+    </div>
+</div>
+
+<!-- Footer section -->
+<footer>
+    For educational purposes only. All Trademarks are the property of their respective owners
+</footer>
+</body>
+</html>
