@@ -8,21 +8,25 @@ import java.util.List;
 
 @Entity
 @Table(name="customer")
-public class Customer extends User {
-    @Column(name="numberOfDashPassesAvailable")
-    private int numberOfDashPassesAvailable;
+public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;  // Add an ID field for the Customer
 
-    @Column(name="totalDashPasses")
-    private int totalDashPasses;
-    @Column(name="numberOfDashPassesUsed")
+    @Column(name="number_of_dash_passes_available_for_purchase")
+    private int numberOfDashPassesAvailableForPurchase;
+
+    @Column(name="total_dash_passes_for_use")
+    private int totalDashPassesForUse = 5;
+    @Column(name="number_of_dash_passes_used")
     private int numberOfDashPassesUsed;
 
-    @Column(name="canPurchaseDashPass")
+    @Column(name="can_purchase_dash_pass")
     private boolean canPurchaseDashPass;
 
-    @Column(name="canFly")
+    @Column(name="can_fly")
     private boolean canFly;
-    @Column(name="canPurchaseFlight")
+    @Column(name="can_purchase_flight")
     private boolean canPurchaseFlight;
 
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
@@ -32,13 +36,20 @@ public class Customer extends User {
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 
+    public void setDashPasses(List<DashPass> dashPasses) {
+        this.dashPasses = dashPasses;
+    }
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
     private List<DashPassReservation> dashPassReservations = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     // Default constructor
     public Customer() {
         super();
-        this.numberOfDashPassesAvailable = 0; // Default initialization
+        this.numberOfDashPassesAvailableForPurchase = 5; // Default initialization
         this.numberOfDashPassesUsed = 0; // Default initialization
         this.canPurchaseDashPass = false; // Default value, adjust as needed
         this.dashPasses = new ArrayList<>();  // Initialize lists to avoid null pointers
@@ -46,25 +57,28 @@ public class Customer extends User {
         this.dashPassReservations = new ArrayList<>();  // Initialize lists
     }
 
-    // Constructor with fields
-    public Customer(String fname, String lname, String uname, String mail, String pword) {
-        super(fname, lname, uname, mail, pword);
-        this.numberOfDashPassesAvailable = 0; // Default value, adjust as needed
-        this.numberOfDashPassesUsed = 0; // Default value, adjust as needed
-        this.canPurchaseDashPass = true; // Default value, adjust as needed
-        this.dashPasses = new ArrayList<>();  // Initialize lists to avoid null pointers
-        this.reservations = new ArrayList<>();  // Initialize lists
-        this.dashPassReservations = new ArrayList<>();  // Initialize lists
+    // Getters and setters
+    public User getUser() {
+        return user;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
     public int getTotalDashPasses() {
-        return totalDashPasses;
+        return totalDashPassesForUse;
     }
 
     public void setTotalDashPasses(int totalDashPasses) {
-        this.totalDashPasses = totalDashPasses;
+        this.totalDashPassesForUse = totalDashPasses;
     }
 
     public boolean isCanFly() {
@@ -99,12 +113,12 @@ public class Customer extends User {
         this.dashPassReservations = dashPassReservations;
     }
 
-    public int getNumberOfDashPassesAvailable() {
-        return numberOfDashPassesAvailable;
+    public int getNumberOfDashPassesAvailableForPurchase() {
+        return numberOfDashPassesAvailableForPurchase;
     }
 
-    public void setNumberOfDashPassesAvailable(int numberOfDashPassesAvailable) {
-        this.numberOfDashPassesAvailable = numberOfDashPassesAvailable;
+    public void setNumberOfDashPassesAvailableForPurchase() {
+        this.numberOfDashPassesAvailableForPurchase = totalDashPassesForUse - getNumberOfDashPassesUsed();
     }
 
     public int getNumberOfDashPassesUsed() {

@@ -25,36 +25,35 @@
             <p class="error-message" th:text="${error}"></p>
         </div>
 
-        <form th:action="@{/signup}" method="post">
+        <form th:action="@{/signup}" th:object="${user}" method="post">
             <label>First Name:</label><br />
-            <input type="text" name="firstName" required><br />
+            <input type="text" name="firstName" th:field="*{firstName}" required><br />
             <label>Last Name:</label><br />
-            <input type="text" name="lastName" required><br />
+            <input type="text" name="lastName" th:field="*{lastName}" required><br />
             <label>Username:</label><br />
-            <input type="text" name="username" required><br />
+            <input type="text" name="username" th:field="*{username}" required><br />
             <label>Email:</label><br />
-            <input type="email" name="email" required><br />
+            <input type="email" name="email" th:field="*{email}" required><br />
             <label>Password:</label><br />
-            <input type="password" name="password" required><br /><br />
-
-            <!-- Role Select for Employee -->
-            <label>Role (If Employee):</label><br />
-            <select name="role" id="role">
-                <option value="">-- Select Role --</option>
-                <option value="SALES">Sales</option>
-                <option value="MANAGER">Manager</option>
-                <option value="SUPPORT">Support</option>
-            </select><br /><br />
-
+            <input type="password" name="password" th:field="*{password}" required><br /><br />
             <!-- User Type Radio Buttons -->
             <div class="radio">
                 <label>Customer</label>
-                <input type="radio" id="customer" name="userType" value="CUSTOMER" required>
+                <input type="radio" id="customer" name="userType" value="CUSTOMER" th:field="*{userType}" required>
                 <label>Employee</label>
-                <input type="radio" id="employee" name="userType" value="EMPLOYEE" required>
+                <input type="radio" id="employee" name="userType" value="EMPLOYEE" th:field="*{userType}" required>
             </div>
             <br />
-
+            <!-- Role Select for Employee -->
+            <div th:if="*{userType} == 'EMPLOYEE'">
+                <label>Role (If Employee):</label><br />
+                <select name="role" id="role" th:field="*{role}">
+                    <option value="">-- Select Role --</option>
+                    <option value="SALES">Sales</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="SUPPORT">Support</option>
+                </select><br /><br />
+            </div>
             <!-- Submit Button -->
             <input class="button" type="submit" value="Sign Up">
         </form>

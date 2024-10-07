@@ -1,34 +1,46 @@
 package agileavengers.southwest_dashpass.models;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 @Entity
-@Table(name="`user`")
+@Table(name="users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Ensure this annotation is present
-    @Column(name="ID")
+    @Column(name="id")
     private Long id;
-    @Column(name="first_name")
+    @Column(name="firstName", nullable = false)
     private String firstName;
 
-    @Column(name="last_name")
+    @Column(name="lastName", nullable = false)
     private String lastName;
 
-    @Column(name="username")
+    @Column(name="username", nullable = false, unique = true)
     private String username;
 
-    @Column(name="email")
+    @Column(name="email", nullable = false)
     private String email;
 
-    @Column(name="password")
+    @Column(name="password", nullable = false)
     private String password;
 
-    @Column(name="user_type")
+    @Column(name="userType", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserType userType = UserType.CUSTOMER;  // Defaulting to CUSTOMER
+
+    @OneToOne(mappedBy = "user")
+    private Customer customer;
+
+    @OneToOne(mappedBy = "user")
+    private Employee employee;
 
     // Constructor with parameters
     public User(String fname, String lname, String uname, String mail, String pword) {
@@ -50,7 +62,43 @@ public class User {
         this.userType = UserType.CUSTOMER;  // Set a default value to avoid null
     }
 
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(userType.name()));  // Assuming userType is an enum or string representing role
+        return authorities;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+
+
     // Getters and Setters
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", userType=" + userType +
+                '}';
+    }
+
     public Long getId() {
         return id;  // Getter for id
     }

@@ -22,6 +22,9 @@ public class SecurityConfig {
     @Autowired
     private CustomLoginSuccessHandler customLoginSuccessHandler;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -56,16 +59,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Use BCrypt for password encoding
-    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);  // Inject your custom UserDetailsService
-        authProvider.setPasswordEncoder(passwordEncoder());  // Use BCrypt for password encoding
+        authProvider.setPasswordEncoder(passwordEncoder);  // Use BCrypt for password encoding
         return authProvider;
     }
 

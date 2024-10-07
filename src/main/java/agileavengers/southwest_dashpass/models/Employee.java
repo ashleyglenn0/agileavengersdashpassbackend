@@ -2,26 +2,27 @@ package agileavengers.southwest_dashpass.models;
 
 import jakarta.persistence.*;
 
-
-
 @Entity
 @Table(name="EMPLOYEE")
 public class Employee extends User {
     @Enumerated(EnumType.STRING)
     @Column(name="role")
     private Role role;
-    @Column(name="canSellDashPass")
+    @Column(name="can_sell_dash_pass")
     private boolean canSellDashPass;
-    @Column(name="canAddCustomerFlight")
+    @Column(name="can_add_customer_flight")
     private boolean canAddCustomerFlight;
-    @Column(name="canAddCustomer")
+    @Column(name="can_add_customer")
     private boolean canAddCustomer;
-    @Column(name="canRedeemDashPass")
+    @Column(name="can_redeem_dash_pass")
     private boolean canRedeemDashPass;
-    @Column(name="canRemoveDashPass")
+    @Column(name="can_remove_dash_pass")
     private boolean canRemoveDashPass;
-    @Column(name="canEditFlightInformation")
+    @Column(name="can_edit_flight_information")
     private boolean canEditFlightInformation;
+    @OneToOne
+    @JoinColumn(name = "user_id") // This defines the foreign key in the 'customer' table that references 'users'
+    private User user;
 
     // Constructor with fields
     public Employee(String fname, String lname, String uname, String mail, String pword, Role role) {
@@ -37,6 +38,38 @@ public class Employee extends User {
         super(); // Calls the User default constructor
         this.setUserType(UserType.EMPLOYEE); // Set the user type to EMPLOYEE
         this.setRole(Role.SALES);
+    }
+
+    public boolean isCanSellDashPass() {
+        return canSellDashPass;
+    }
+
+    public boolean isCanAddCustomerFlight() {
+        return canAddCustomerFlight;
+    }
+
+    public boolean isCanAddCustomer() {
+        return canAddCustomer;
+    }
+
+    public boolean isCanRedeemDashPass() {
+        return canRedeemDashPass;
+    }
+
+    public boolean isCanRemoveDashPass() {
+        return canRemoveDashPass;
+    }
+
+    public boolean isCanEditFlightInformation() {
+        return canEditFlightInformation;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     // Getters and setters

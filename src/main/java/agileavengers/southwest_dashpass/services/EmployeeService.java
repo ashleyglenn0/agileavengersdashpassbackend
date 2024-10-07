@@ -1,9 +1,8 @@
 package agileavengers.southwest_dashpass.services;
 
 import agileavengers.southwest_dashpass.models.Employee;
-import agileavengers.southwest_dashpass.models.Role;
-import agileavengers.southwest_dashpass.models.User;
 import agileavengers.southwest_dashpass.repository.EmployeeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +11,8 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public void registerEmployee(String firstName, String lastName, String username, String password, String email, Role role) {
-        Employee employee = new Employee(firstName, lastName, username, password, email, role);
-        employee.setFirstName(firstName);
-        employee.setLastName(lastName);
-        employee.setUsername(username);
-        employee.setPassword(password);
-        employee.setEmail(email);
-        employee.setRole(role);
-
+    @Transactional
+    public void registerEmployee(Employee employee) {
         employeeRepository.save(employee);
     }
 

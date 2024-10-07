@@ -6,5 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByUsername(String username);
+    Optional <User> findByUsername(String username);
+
+    // This method will check if a user with the given username exists in the database
+    boolean existsByUsername(String username);
 }

@@ -1,18 +1,22 @@
 package agileavengers.southwest_dashpass.services;
 
 import agileavengers.southwest_dashpass.models.Customer;
-import agileavengers.southwest_dashpass.models.Employee;
 import agileavengers.southwest_dashpass.models.User;
 import agileavengers.southwest_dashpass.models.UserType;
 import agileavengers.southwest_dashpass.repository.CustomerRepository;
 import agileavengers.southwest_dashpass.repository.EmployeeRepository;
 import agileavengers.southwest_dashpass.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,62 +29,76 @@ public class UserService implements UserDetailsService {
     private final EmployeeRepository employeeRepository;
     private final CustomerRepository customerRepository;
     private final EmployeeService employeeService;
-    private final CustomerService customerService;
+    private PasswordEncoder passwordEncoder;
+    private ApplicationEventPublisher eventPublisher;
 
     // Constructor injection is preferred
     @Autowired
     public UserService(UserRepository userRepository, EmployeeRepository employeeRepository,
                        CustomerRepository customerRepository, EmployeeService employeeService,
-                       CustomerService customerService) {
+                       PasswordEncoder passwordEncoder, ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.employeeRepository = employeeRepository;
         this.customerRepository = customerRepository;
         this.employeeService = employeeService;
-        this.customerService = customerService;
+        this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Find the user by username
-        User user = userRepository.findByUsername(username);
+        // Find the user by username using Optional
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username " + username));
 
-        // Throw exception if the user is not found
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username " + username);
-        }
-
-        // Assign authorities based on the UserType
+        // Optionally, you can initialize the user to ensure lazy-loaded entities are not fetched
+        Hibernate.initialize(user); // Initializes only the user, not related entities like Employee or Customer
+         //Assign authorities based on the UserType
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getUserType().name()));  // Convert UserType to ROLE_
-
-        // Create a Spring Security User object with the user's credentials and authorities
+        if (user.getUserType() == UserType.CUSTOMER) {
+            if (user.getCustomer() == null) {
+                throw new UsernameNotFoundException("Customer profile not found for username: " + username);
+            }
+            authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+        }
+//        else if (user.getUserType() == UserType.EMPLOYEE) {
+//            if (user.getEmployee() == null) {
+//                throw new UsernameNotFoundException("Employee profile not found for username: " + username);
+//            }
+//            authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+//        }
+        // Create and return a Spring Security User object
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                user.isEnabled(),  // Set enabled status
-                true,  // accountNonExpired
-                true,  // credentialsNonExpired
-                true,  // accountNonLocked
                 authorities
         );
     }
 
     // Save or update the user based on the UserType
-    public void saveUser(User user) {
-        if (user.getUserType() == UserType.EMPLOYEE && user instanceof Employee) {
-            // Call the employeeService's registerEmployee method for additional logic
-            Employee employee = (Employee) user;
-            employeeService.registerEmployee(employee.getFirstName(), employee.getLastName(),
-                    employee.getUsername(), employee.getPassword(), employee.getEmail(), employee.getRole());
-            employeeRepository.save(employee);
-        } else if (user.getUserType() == UserType.CUSTOMER && user instanceof Customer) {
-            // Call the customerService's registerCustomer method for additional logic
-            Customer customer = (Customer) user;
-            customerService.registerCustomer(customer.getFirstName(), customer.getLastName(), customer.getUsername(), customer.getEmail(), customer.getPassword());
-            customerRepository.save(customer); // Save to CustomerRepository
-        } else {
-            // Save to the general UserRepository if no specific type is found
-            userRepository.save(user);
+    @Transactional
+    public User saveUser(User user) {
+        // Check if the username already exists
+        if (userRepository.existsByUsername(user.getUsername())) {
+            System.out.println("Duplicate username found: " + user.getUsername());
+            throw new RuntimeException("Username already exists");
         }
+
+        // Encode the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        System.out.println("Saving user: " + user.getUsername() + " inside save user method");
+
+        // Save the user
+        return userRepository.save(user);
     }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username " + username));
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
 }
