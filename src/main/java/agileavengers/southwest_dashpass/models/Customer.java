@@ -14,12 +14,15 @@ public class Customer {
     private Long id;  // Add an ID field for the Customer
 
     @Column(name="number_of_dash_passes_available_for_purchase")
-    private int numberOfDashPassesAvailableForPurchase;
+    private Integer numberOfDashPassesAvailableForPurchase;
 
-    @Column(name="total_dash_passes_for_use")
-    private int totalDashPassesForUse = 5;
+    @Column(name="max_number_of_dashpasses")
+    private Integer maxNumberOfDashPasses = 5;
+
+    @Column(name="total_dash_passes_customer_has")
+    private Integer totalDashPassesCustomerHas = 0;
     @Column(name="number_of_dash_passes_used")
-    private int numberOfDashPassesUsed;
+    private Integer numberOfDashPassesUsed;
 
     @Column(name="can_purchase_dash_pass")
     private boolean canPurchaseDashPass;
@@ -43,7 +46,7 @@ public class Customer {
     private List<DashPassReservation> dashPassReservations = new ArrayList<>();
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     // Default constructor
@@ -73,12 +76,12 @@ public class Customer {
     public void setId(Long id) {
         this.id = id;
     }
-    public int getTotalDashPasses() {
-        return totalDashPassesForUse;
+    public Integer getTotalDashPassesCustomerHas() {
+        return totalDashPassesCustomerHas;
     }
 
-    public void setTotalDashPasses(int totalDashPasses) {
-        this.totalDashPassesForUse = totalDashPasses;
+    public void setTotalDashPassesCustomerHas(int totalDashPasses) {
+        this.totalDashPassesCustomerHas = totalDashPasses;
     }
 
     public boolean isCanFly() {
@@ -113,15 +116,27 @@ public class Customer {
         this.dashPassReservations = dashPassReservations;
     }
 
-    public int getNumberOfDashPassesAvailableForPurchase() {
+    public void setNumberOfDashPassesAvailableForPurchase(int numberOfDashPassesAvailableForPurchase) {
+        this.numberOfDashPassesAvailableForPurchase = numberOfDashPassesAvailableForPurchase;
+    }
+
+    public Integer getMaxNumberOfDashPasses() {
+        return maxNumberOfDashPasses;
+    }
+
+    public void setMaxNumberOfDashPasses(int maxNumberOfDashPasses) {
+        this.maxNumberOfDashPasses = maxNumberOfDashPasses;
+    }
+
+    public Integer getNumberOfDashPassesAvailableForPurchase() {
         return numberOfDashPassesAvailableForPurchase;
     }
 
     public void setNumberOfDashPassesAvailableForPurchase() {
-        this.numberOfDashPassesAvailableForPurchase = totalDashPassesForUse - getNumberOfDashPassesUsed();
+        this.numberOfDashPassesAvailableForPurchase = totalDashPassesCustomerHas - getNumberOfDashPassesUsed();
     }
 
-    public int getNumberOfDashPassesUsed() {
+    public Integer getNumberOfDashPassesUsed() {
         return numberOfDashPassesUsed;
     }
 

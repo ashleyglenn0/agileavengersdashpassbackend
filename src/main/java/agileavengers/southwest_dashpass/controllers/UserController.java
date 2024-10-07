@@ -63,7 +63,6 @@ public class UserController {
         customer.setCanFly(true);  // Default values
         customer.setCanPurchaseDashPass(true);
         customer.setCanPurchaseFlight(true);
-        customer.setTotalDashPasses(5);
         customer.setNumberOfDashPassesAvailableForPurchase();
         customer.setNumberOfDashPassesUsed(0);
 

@@ -51,7 +51,7 @@ public class SecurityConfig {
                 )
                 .logout( logout -> logout
                         .logoutUrl("/perform_logout") // logout url
-                        .logoutSuccessUrl("/login?logout=true") //redirect after logout
+                        .logoutSuccessUrl("/landingpage") //redirect after logout
                         .permitAll() //Allow everyone to access logout
 
                 );

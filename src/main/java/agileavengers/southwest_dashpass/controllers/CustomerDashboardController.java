@@ -1,7 +1,10 @@
 package agileavengers.southwest_dashpass.controllers;
 
 import agileavengers.southwest_dashpass.models.Customer;
+import agileavengers.southwest_dashpass.models.DashPass;
+import agileavengers.southwest_dashpass.models.Reservation;
 import agileavengers.southwest_dashpass.services.CustomerService;
+import agileavengers.southwest_dashpass.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,21 +12,28 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 public class CustomerDashboardController {
     private final CustomerService customerService;
+    private final ReservationService reservationService;
 
     // Constructor Injection
     @Autowired
-    public CustomerDashboardController(CustomerService customerService) {
+    public CustomerDashboardController(CustomerService customerService, ReservationService reservationService) {
         this.customerService = customerService;
+        this.reservationService = reservationService;
     }
 
     @GetMapping("/customer/{customerID}/customerdashboard")
     public String showCustomerDashboard(@PathVariable Long customerID, Model model, Principal principal) {
         // Fetch customer by ID
         Customer customer = customerService.findCustomerById(customerID);
+        Integer numberOfDashPassesInUse = customerService.getNumberOfDashPassesInUse(customerID);
+        Integer numberOfDashPassesAvailableForPurchase = customerService.getNumberOfDashPassesAvailableForPurchase(customerID);
+        Integer numberOfDashPassesAvailableToAddToReservation = customerService.getNumberOfDashPassesAvailableToRedeem(customerID);
+        Integer totalNumberOfDashPassesOwned = customerService.getTotalNumberOfDashPasses(customerID);
 
         // If customer is not found, show a custom error page
         if (customer == null) {
@@ -38,6 +48,12 @@ public class CustomerDashboardController {
 
         // Add customer information to the model
         model.addAttribute("customer", customer);
+        model.addAttribute("numberOfDashPassesInUse", numberOfDashPassesInUse);
+        model.addAttribute("numberOfDashPassesAvailableForPurchase", numberOfDashPassesAvailableForPurchase);
+        model.addAttribute("numberOfDashPassesAvailableToAddToReservation", numberOfDashPassesAvailableToAddToReservation);
+        model.addAttribute("totalNumberOfDashPassesOwned", totalNumberOfDashPassesOwned);
+
+
         return "customerdashboard";  // Return the dashboard view
     }
 

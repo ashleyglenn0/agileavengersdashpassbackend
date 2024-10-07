@@ -1,0 +1,144 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(0, 51, 153);
+}
+
+/* Navbar styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgb(255, 204, 0);
+}
+
+.logo {
+    width: 150px;
+}
+
+.navbar .button {
+    background-color: rgb(0, 51, 153);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.navbar .button:hover {
+    background-color: #ff9900;
+    color: white;
+}
+
+/* Center the form inside a card */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 100px); /* Adjusting for header and footer */
+}
+
+.container .card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #00338D;
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+    padding: 40px;
+}
+
+/* Form input styling */
+input.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Styling for the table inside the card */
+.table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Total price styling */
+#totalPrice {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Button styling */
+.submitButton, .cancelButton {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.3s;
+}
+
+/* Submit button style */
+.submitButton {
+    background-color: rgb(255, 204, 0);
+    color: rgb(0, 51, 153);
+    border: none;
+}
+
+.submitButton:hover {
+    background-color: rgb(255, 204, 0);
+}
+
+/* Cancel button style (blue outline) */
+.cancelButton {
+    background-color: transparent;
+    color: white;
+    border: 2px solid rgb(255, 204, 0);
+}
+
+.cancelButton:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #00338D;
+    color: white;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}

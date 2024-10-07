@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase DashPass</title>
+    <link rel="stylesheet" th:href="@{/styles/purchasedashpass.css}">
+    <script>
+        // JavaScript to dynamically calculate the total based on DashPass quantity and a fixed price
+        const pricePerDashPass = 50;  // Example price
+
+        function calculateTotal() {
+            let quantity = document.getElementById("dashPassQuantity").value;
+            let totalPrice = pricePerDashPass * quantity;
+            document.getElementById("totalPrice").value = '$' + totalPrice.toFixed(2);
+        }
+         // Function to auto-populate the purchase date with today's date
+        function setPurchaseDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const formattedDate = year + '-' + month + '-' + day;
+            document.getElementById("purchaseDate").value = formattedDate;
+        }
+
+        // Call the function once on page load to set the initial total price
+        window.onload = function() {
+            calculateTotal();
+            setPurchaseDate();
+        };
+    </script>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+        <form action="/perform_logout" method="post">
+            <button type="submit" class="button">Logout</button>
+        </form>
+    </nav>
+</header>
+<form th:action="@{/customer/{customerID}/purchasedashpass}" th:object="${dashPass}" method="post">
+    <div class="container">
+        <h2>Purchase DashPass</h2>
+
+        <!-- Number of DashPasses to Purchase -->
+        <div class="form-group">
+            <label for="dashPassQuantity">Number of DashPasses</label>
+            <input type="number" class="form-control" id="dashPassQuantity" name="dashPassQuantity"
+                   value="1" min="1" max="10" required
+                   onchange="calculateTotal()"> <!-- Adjust max based on logic -->
+        </div>
+        <!-- Purchase Date Auto-Populated -->
+        <div class="form-group">
+            <label for="purchaseDate">Purchase Date</label>
+            <input type="date" class="form-control" id="purchaseDate" name="purchaseDate" th:value="${dateOfPurchase}" readonly>
+        </div>
+
+        <!-- Conditional display of reservations or message -->
+        <div class="form-group">
+            <label for="reservationTable">Select a Reservation to Add the DashPass</label>
+            <div th:if="${#lists.isEmpty(reservations)}">
+                <p>You don't have any available reservations to add a DashPass to.</p>
+            </div>
+            <div th:if="${!#lists.isEmpty(reservations)}">
+                <table class="table table-hover" id="reservationTable">
+                    <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Reservation ID</th>
+                        <th>Flight Date</th>
+                        <th>Destination</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="reservation : ${reservations}">
+                        <td>
+                            <input type="radio" name="selectedReservationId" th:value="${reservation.id}" />
+                        </td>
+                        <td th:text="${reservation.id}"></td>
+                        <td th:text="${#dates.format(reservation.flightDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${reservation.destination}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Total Cost Display -->
+        <div class="form-group">
+            <label for="totalPrice">Total Price</label>
+            <input type="text" class="form-control" id="totalPrice" name="totalPrice" readonly>
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <button type="submit" class="submitButton">Purchase DashPass</button>
+        <button type="button" class="cancelButton" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">
+            Cancel
+        </button>
+    </div>
+</form>
+<!-- Footer section -->
+<footer>
+    For educational purposes only. All Trademarks are the property of their respective owners
+</footer>
+</body>
+</html>
