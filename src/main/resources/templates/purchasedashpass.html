@@ -40,7 +40,7 @@
         </form>
     </nav>
 </header>
-<form th:action="@{/customer/{customerID}/purchasedashpass}" th:object="${dashPass}" method="post">
+<form th:action="@{/customer/{customerID}/purchasedashpass(customerID=${customerID})}" th:object="${dashPass}" method="post">
     <div class="container">
         <h2>Purchase DashPass</h2>
 

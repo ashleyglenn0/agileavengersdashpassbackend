@@ -49,13 +49,19 @@ public class CustomerService {
 
     public Integer getNumberOfDashPassesAvailableForPurchase(Long customerId) {
         Customer customer = findCustomerById(customerId);
-        // Number of DashPasses that are not attached to any reservation
-        return customer.getMaxNumberOfDashPasses() - customer.getDashPasses().size();
+        // Filter out redeemed DashPasses
+        long unredeemedDashPasses = customer.getDashPasses().stream()
+                .filter(dashPass -> !dashPass.isRedeemed())
+                .count();
+        return customer.getMaxNumberOfDashPasses() - (int) unredeemedDashPasses;
     }
 
     public Integer getNumberOfDashPassesAvailableToRedeem(Long customerId) {
         Customer customer = findCustomerById(customerId);
-        return customer.getDashPasses().size();
+        // Return only DashPasses that are not yet redeemed
+        return (int) customer.getDashPasses().stream()
+                .filter(dashPass -> !dashPass.isRedeemed())
+                .count();
     }
 
     public Integer getNumberOfDashPassesInUse(Long customerId) {
@@ -66,9 +72,14 @@ public class CustomerService {
 
     public Integer getTotalNumberOfDashPasses(Long customerId) {
         Customer customer = findCustomerById(customerId);
-        // Some logic to get total number of dash passes
-        return customer.getDashPassReservations().size() + customer.getDashPasses().size();
+        // Ensure that DashPasses are only counted once
+        long dashPassesInReservations = customer.getDashPassReservations().size();
+        long dashPassesNotInReservations = customer.getDashPasses().stream()
+                .filter(dashPass -> !dashPass.isRedeemed())
+                .count();
+        return (int) (dashPassesInReservations + dashPassesNotInReservations);
     }
+
     public Integer getMaxNumberOfDashPasses(Long customerId) {
         Customer customer = findCustomerById(customerId);
         // Some logic to get total number of dash passes

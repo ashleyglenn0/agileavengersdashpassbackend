@@ -20,6 +20,20 @@ public class DashPassReservation {
     @Column(name="bookingDate")
     private LocalDate bookingDate;
 
+    @ManyToOne
+    @JoinColumn(name = "flight_id")
+    private Flight flight;
+
+    // Many-to-One relationship with Reservation
+    @ManyToOne
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
+    // Other fields and methods...
+
+    // Getter and setter for Reservation
+
+
     public DashPassReservation(){
         this.bookingDate = LocalDate.now();
     }
@@ -60,6 +74,14 @@ public class DashPassReservation {
 
     public DashPass getDashPass() {
         return dashPass;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
 }

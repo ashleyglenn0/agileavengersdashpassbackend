@@ -13,16 +13,16 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // Add an ID field for the Customer
 
-    @Column(name="number_of_dash_passes_available_for_purchase")
-    private Integer numberOfDashPassesAvailableForPurchase;
-
     @Column(name="max_number_of_dashpasses")
     private Integer maxNumberOfDashPasses = 5;
 
     @Column(name="total_dash_passes_customer_has")
     private Integer totalDashPassesCustomerHas = 0;
     @Column(name="number_of_dash_passes_used")
-    private Integer numberOfDashPassesUsed;
+    private Integer numberOfDashPassesUsed = 0;
+
+    @Column(name="total_dash_passes_for_use")
+    private Integer totalDashPassesForUse = 0;
 
     @Column(name="can_purchase_dash_pass")
     private boolean canPurchaseDashPass;
@@ -39,9 +39,6 @@ public class Customer {
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 
-    public void setDashPasses(List<DashPass> dashPasses) {
-        this.dashPasses = dashPasses;
-    }
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
     private List<DashPassReservation> dashPassReservations = new ArrayList<>();
 
@@ -52,7 +49,6 @@ public class Customer {
     // Default constructor
     public Customer() {
         super();
-        this.numberOfDashPassesAvailableForPurchase = 5; // Default initialization
         this.numberOfDashPassesUsed = 0; // Default initialization
         this.canPurchaseDashPass = false; // Default value, adjust as needed
         this.dashPasses = new ArrayList<>();  // Initialize lists to avoid null pointers
@@ -76,12 +72,28 @@ public class Customer {
     public void setId(Long id) {
         this.id = id;
     }
-    public Integer getTotalDashPassesCustomerHas() {
-        return totalDashPassesCustomerHas;
+    public void setMaxNumberOfDashPasses(Integer maxNumberOfDashPasses) {
+        this.maxNumberOfDashPasses = maxNumberOfDashPasses;
     }
 
-    public void setTotalDashPassesCustomerHas(int totalDashPasses) {
-        this.totalDashPassesCustomerHas = totalDashPasses;
+    public void setTotalDashPassesCustomerHas(Integer totalDashPassesCustomerHas) {
+        this.totalDashPassesCustomerHas = totalDashPassesCustomerHas;
+    }
+
+    public void setNumberOfDashPassesUsed(Integer numberOfDashPassesUsed) {
+        this.numberOfDashPassesUsed = numberOfDashPassesUsed;
+    }
+
+    public Integer getTotalDashPassesForUse() {
+        return totalDashPassesForUse;
+    }
+
+    public void setTotalDashPassesForUse(Integer totalDashPassesForUse) {
+        this.totalDashPassesForUse = totalDashPassesForUse;
+    }
+
+    public Integer getTotalDashPassesCustomerHas() {
+        return totalDashPassesCustomerHas;
     }
 
     public boolean isCanFly() {
@@ -104,9 +116,10 @@ public class Customer {
         return dashPasses;
     }
 
-    public void setDashPass(List<DashPass> dashPasses) {
-        this.dashPasses = dashPasses;
+    public int getNumberOfDashPasses(){
+        return dashPasses.size();
     }
+
 
     public List<DashPassReservation> getDashPassReservations() {
         return dashPassReservations;
@@ -116,9 +129,7 @@ public class Customer {
         this.dashPassReservations = dashPassReservations;
     }
 
-    public void setNumberOfDashPassesAvailableForPurchase(int numberOfDashPassesAvailableForPurchase) {
-        this.numberOfDashPassesAvailableForPurchase = numberOfDashPassesAvailableForPurchase;
-    }
+
 
     public Integer getMaxNumberOfDashPasses() {
         return maxNumberOfDashPasses;
@@ -129,11 +140,7 @@ public class Customer {
     }
 
     public Integer getNumberOfDashPassesAvailableForPurchase() {
-        return numberOfDashPassesAvailableForPurchase;
-    }
-
-    public void setNumberOfDashPassesAvailableForPurchase() {
-        this.numberOfDashPassesAvailableForPurchase = totalDashPassesCustomerHas - getNumberOfDashPassesUsed();
+        return maxNumberOfDashPasses - totalDashPassesCustomerHas;
     }
 
     public Integer getNumberOfDashPassesUsed() {
@@ -158,5 +165,16 @@ public class Customer {
 
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    // Add method to handle adding DashPassReservation
+    public void addDashPassReservation(DashPassReservation dashPassReservation) {
+        dashPassReservations.add(dashPassReservation);
+        dashPassReservation.setCustomer(this);  // Set the customer reference in DashPassReservation
+    }
+
+    public void addDashPass(DashPass dashPass) {
+        dashPasses.add(dashPass);
+        dashPass.setCustomer(this);
     }
 }

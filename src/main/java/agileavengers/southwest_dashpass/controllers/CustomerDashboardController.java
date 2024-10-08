@@ -30,12 +30,8 @@ public class CustomerDashboardController {
     public String showCustomerDashboard(@PathVariable Long customerID, Model model, Principal principal) {
         // Fetch customer by ID
         Customer customer = customerService.findCustomerById(customerID);
-        Integer numberOfDashPassesInUse = customerService.getNumberOfDashPassesInUse(customerID);
-        Integer numberOfDashPassesAvailableForPurchase = customerService.getNumberOfDashPassesAvailableForPurchase(customerID);
-        Integer numberOfDashPassesAvailableToAddToReservation = customerService.getNumberOfDashPassesAvailableToRedeem(customerID);
-        Integer totalNumberOfDashPassesOwned = customerService.getTotalNumberOfDashPasses(customerID);
-
         // If customer is not found, show a custom error page
+
         if (customer == null) {
             model.addAttribute("error", "Customer not found with ID: " + customerID);
             return "error/customer-not-found";  // You should have a custom error page
@@ -45,6 +41,12 @@ public class CustomerDashboardController {
         if (!customer.getUser().getUsername().equals(principal.getName())) {
             return "error/403";  // Show a 403 error page if access is unauthorized
         }
+
+        Integer numberOfDashPassesInUse = customer.getNumberOfDashPassesUsed();
+        Integer numberOfDashPassesAvailableForPurchase = customer.getNumberOfDashPassesAvailableForPurchase();
+        Integer numberOfDashPassesAvailableToAddToReservation = customer.getNumberOfDashPasses();
+        Integer totalNumberOfDashPassesOwned = customer.getTotalDashPassesCustomerHas();
+
 
         // Add customer information to the model
         model.addAttribute("customer", customer);

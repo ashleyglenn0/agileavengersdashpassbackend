@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -44,5 +46,39 @@ public class DashPassController {
         model.addAttribute("reservations", reservations);
 
         return "purchasedashpass";  // This should map to the Thymeleaf template 'purchasedashpass.html'
+    }
+
+    @PostMapping("/customer/{customerID}/purchasedashpass")
+    public String purchaseDashPass(@PathVariable Long customerID,
+                                   @RequestParam(value = "selectedReservationId", required = false) Long reservationId,
+                                   @RequestParam("dashPassQuantity") int dashPassQuantity,
+                                   @RequestParam(value = "addToReservation",
+                                           required = false, defaultValue = "false")
+                                       boolean addToReservation, Model model) {
+
+        // Fetch customer and reservation as needed
+        Customer customer = customerService.findCustomerById(customerID);
+
+        Reservation reservation = null;
+        if (reservationId != null) {
+            reservation = reservationService.findById(reservationId);
+        }
+
+        // Call service to handle DashPass purchase
+        dashPassService.purchaseDashPass(customer, reservation, addToReservation, dashPassQuantity);
+
+        // Fetch updated customer data
+        Customer updatedCustomer = customerService.findCustomerById(customerID);
+
+        // Update the model with the latest customer data
+        model.addAttribute("customer", updatedCustomer);
+        model.addAttribute("numberOfDashPassesInUse", updatedCustomer.getNumberOfDashPassesUsed());
+        model.addAttribute("numberOfDashPassesAvailableForPurchase", updatedCustomer.getNumberOfDashPassesAvailableForPurchase());
+        model.addAttribute("numberOfDashPassesAvailableToAddToReservation", updatedCustomer.getTotalDashPassesForUse());
+        model.addAttribute("totalNumberOfDashPassesOwned", updatedCustomer.getTotalDashPassesCustomerHas());
+
+
+        // Redirect to the dashboard or any other appropriate view
+        return "redirect:/customer/" + customerID + "/customerdashboard";
     }
 }
