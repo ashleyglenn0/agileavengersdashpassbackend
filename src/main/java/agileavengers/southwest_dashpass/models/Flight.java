@@ -2,33 +2,118 @@ package agileavengers.southwest_dashpass.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
-@Table(name="flight")
 public class Flight {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="flightID")
-    private Long flightId;
-    @ManyToOne
-    @JoinColumn(name = "flightDepartureAirport", referencedColumnName = "airportID")
-    private Airport flightDepartureAirport;
-    @ManyToOne
-    @JoinColumn(name = "flightArrivalAirport", referencedColumnName = "airportID")
-    private Airport flightArrivalAirport;
-    @Column(name="numberOfSeatsAvailable")
-    private int numberOfSeatsAvailable;
-    @Column(name="numberOfSeatsSold")
-    private int numberOfSeatsSold;
+    private Long flightID;
 
     @Column(name="flightNumber")
     private String flightNumber;
 
+    @Column(name="departureDate")
+    private LocalDate departureDate;
+    @Column(name="arrivalDate")
+    private LocalDate arrivalDate;
+    @Column(name="departureTime")
+    private LocalTime departureTime;
+    @Column(name="arrivalTime")
+    private LocalTime arrivalTime;
+    @Column(name="price")
+    private double price;
+
+    @Column(name="departureAirportCode")
+    private String departureAirportCode; // Use code instead of ID
+
+    @Column(name="arrivalAirportCode")
+    private String arrivalAirportCode; // Use code instead of ID
+
+    @Column(name="availableSeats")
+    private int availableSeats;
+
+    @Column(name="canAddNewDashPass")
+    private boolean canAddNewDashPass;
+
+    @Column(name="canUseExistingDashPass")
+    private boolean canUseExistingDashPass;
+
+    @Column(name="maxNumberOfDashPassesForFlight")
+    private int maxNumberOfDashPassesForFlight;
+
+    @Column(name="numberOfDashPassesAvailable")
+    private int numberOfDashPassesAvailable;
+
+    @Column(name="numberOfSeatsAvailable")
+    private int numberOfSeatsAvailable;
+
+    @Column(name="seatsSold")
+    private int seatsSold;
+
+    @Column(name="returnDate")
+    private LocalDate returnDate;
+
+    @OneToOne
+    @JoinColumn(name = "return_flight_id")
+    private Flight returnFlight;
+
     @ManyToOne
-    @JoinColumn(name = "reservation_id") // Use appropriate foreign key column name
+    @JoinColumn(name = "reservation_id", referencedColumnName = "reservationId") // Use appropriate foreign key column name
     private Reservation reservation;  // Add this field
+    @OneToMany(mappedBy = "flight")
+    private List<DashPassReservation> dashPassReservations;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="trip_type")
+    private TripType tripType;  // New trip type field
+
+    public Flight(){
+        //empty for hibernate
+    }
+
+    public Flight(String flightNumber,
+                  LocalDate departureDate,
+                  LocalDate arrivalDate,
+                  LocalDateTime departureTime,
+                  LocalDateTime arrivalTime,
+                  double price,
+                  String departureAirportCode,
+                  String arrivalAirportCode,
+                  int numberOfSeatsAvailable,
+                  int numberOfSeatsSold,
+                  boolean canAddDashPass,
+                  int maxNumberOfDashPassesForFlight,
+                  int numberOfDashPassesAvailable,
+                  TripType tripType) {
+
+        this.flightNumber = flightNumber;
+        this.departureDate = departureDate;
+        this.arrivalDate = arrivalDate;
+        this.departureTime = LocalTime.from(departureTime);
+        this.arrivalTime = LocalTime.from(arrivalTime);
+        this.price = price;
+        this.departureAirportCode = departureAirportCode;
+        this.arrivalAirportCode = arrivalAirportCode;
+        this.numberOfSeatsAvailable = numberOfSeatsAvailable;
+        this.seatsSold = numberOfSeatsSold;
+        this.canAddNewDashPass = canAddDashPass;
+        this.maxNumberOfDashPassesForFlight = maxNumberOfDashPassesForFlight;
+        this.numberOfDashPassesAvailable = numberOfDashPassesAvailable;
+        this.tripType = tripType;
+    }
+
+    public Long getFlightID() {
+        return flightID;
+    }
+
+    public void setFlightID(Long flightID) {
+        this.flightID = flightID;
+    }
 
     public String getFlightNumber() {
         return flightNumber;
@@ -38,101 +123,84 @@ public class Flight {
         this.flightNumber = flightNumber;
     }
 
-    @Column(name="numberOfSeatsRemaining")
-    private int numberOfSeatsRemaining;
-    @Column(name="maxNumberOfDashPassesForFlight")
-    private int maxNumberOfDashPassesForFlight;
-    @Column(name="numberOfDashPassesAvailable")
-    private int numberOfDashPassesAvailable;
-    @Column(name="DashPassAllowed")
-    private boolean isDashPassAllowed;
-    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DashPassReservation> dashPassReservations;
-    @Column(name="canUseDashPassForFlight")
-    private boolean canUseDashPassForFlight;
-    @Column(name="flightDepartureTime")
-    private LocalDateTime flightDepartureTime;
-    @Column(name="flightArrivalTime")
-    private LocalDateTime flightArrivalTime;
-
-    public Flight() {
-        this.numberOfSeatsAvailable = 50;
-        this.numberOfSeatsSold = 0;
-        this.numberOfSeatsRemaining = 50;
-        this.canUseDashPassForFlight = true;
+    public LocalDate getDepartureDate() {
+        return departureDate;
     }
 
-    public Flight(Airport dAirport, Airport aAirport, int numSeatsAvailable, int numSeatsSold, boolean canUsePass) {
-        this.flightDepartureAirport = dAirport;
-        this.flightArrivalAirport = aAirport;
-        this.numberOfSeatsAvailable = numSeatsAvailable;
-        this.numberOfSeatsSold = numSeatsSold;
-        this.canUseDashPassForFlight = canUsePass;
-        this.numberOfSeatsRemaining = numSeatsAvailable - numSeatsSold; // Automatically calculate remaining seats
-        this.isDashPassAllowed = true; // Default value (can be updated later)
+    public void setDepartureDate(LocalDate departureDate) {
+        this.departureDate = departureDate;
     }
 
-    public Long getFlightId() {
-        return flightId;
+    public LocalDate getArrivalDate() {
+        return arrivalDate;
     }
 
-    public void setFlightId(Long flightId) {
-        this.flightId = flightId;
+    public void setArrivalDate(LocalDate arrivalDate) {
+        this.arrivalDate = arrivalDate;
     }
 
-    public Airport getFlightDepartureAirport() {
-        return flightDepartureAirport;
+    public LocalTime getDepartureTime() {
+        return departureTime;
     }
 
-    public void setFlightDepartureAirport(Airport flightDepartureAirport) {
-        this.flightDepartureAirport = flightDepartureAirport;
-    }
-    public Reservation getReservation() {
-        return reservation;
+    public void setDepartureTime(LocalTime departureTime) {
+        this.departureTime = departureTime;
     }
 
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
+    public LocalTime getArrivalTime() {
+        return arrivalTime;
     }
 
-    public List<DashPassReservation> getDashPassReservations() {
-        return dashPassReservations;
+    public void setArrivalTime(LocalTime arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
 
-    public void setDashPassReservations(List<DashPassReservation> dashPassReservations) {
-        this.dashPassReservations = dashPassReservations;
+    public double getPrice() {
+        return price;
     }
 
-    public Airport getFlightArrivalAirport() {
-        return flightArrivalAirport;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public void setFlightArrivalAirport(Airport flightArrivalAirport) {
-        this.flightArrivalAirport = flightArrivalAirport;
+    public String getDepartureAirportCode() {
+        return departureAirportCode;
     }
 
-    public int getNumberOfSeatsAvailable() {
-        return numberOfSeatsAvailable;
+    public void setDepartureAirportCode(String departureAirportCode) {
+        this.departureAirportCode = departureAirportCode;
     }
 
-    public void setNumberOfSeatsAvailable(int numberOfSeatsAvailable) {
-        this.numberOfSeatsAvailable = numberOfSeatsAvailable;
+    public String getArrivalAirportCode() {
+        return arrivalAirportCode;
     }
 
-    public int getNumberOfSeatsSold() {
-        return numberOfSeatsSold;
+    public void setArrivalAirportCode(String arrivalAirportCode) {
+        this.arrivalAirportCode = arrivalAirportCode;
     }
 
-    public void setNumberOfSeatsSold(int numberOfSeatsSold) {
-        this.numberOfSeatsSold = numberOfSeatsSold;
+    public int getAvailableSeats() {
+        return availableSeats;
     }
 
-    public int getNumberOfSeatsRemaining() {
-        return numberOfSeatsRemaining;
+    public void setAvailableSeats(int availableSeats) {
+        this.availableSeats = availableSeats;
     }
 
-    public void setNumberOfSeatsRemaining(int numberOfSeatsRemaining) {
-        this.numberOfSeatsRemaining = numberOfSeatsRemaining;
+    public boolean isCanAddNewDashPass() {
+        return canAddNewDashPass;
+    }
+
+    public void setCanAddNewDashPass(boolean canAddDashPass) {
+        this.canAddNewDashPass = canAddDashPass;
+    }
+
+    public boolean isCanUseExistingDashPass() {
+        return canUseExistingDashPass;
+    }
+
+    public void setCanUseExistingDashPass(boolean canUseExistingDashPass) {
+        this.canUseExistingDashPass = canUseExistingDashPass;
     }
 
     public int getMaxNumberOfDashPassesForFlight() {
@@ -151,44 +219,64 @@ public class Flight {
         this.numberOfDashPassesAvailable = numberOfDashPassesAvailable;
     }
 
-    public boolean isDashPassAllowed() {
-        return isDashPassAllowed;
+    public int getNumberOfSeatsAvailable() {
+        return numberOfSeatsAvailable;
     }
 
-    public void setDashPassAllowed(boolean dashPassAllowed) {
-        isDashPassAllowed = dashPassAllowed;
+    public void setNumberOfSeatsAvailable(int numberOfSeatsAvailable) {
+        this.numberOfSeatsAvailable = numberOfSeatsAvailable;
     }
 
-
-    public boolean isCanUseDashPassForFlight() {
-        return canUseDashPassForFlight;
+    public int getSeatsSold() {
+        return seatsSold;
     }
 
-    public void setCanUseDashPassForFlight(boolean canUseDashPassForFlight) {
-        this.canUseDashPassForFlight = canUseDashPassForFlight;
+    public void setSeatsSold(int seatsSold) {
+        this.seatsSold = seatsSold;
     }
 
-    public LocalDateTime getFlightDepartureTime() {
-        return flightDepartureTime;
+    public int getSeatsRemaining() {
+        return this.numberOfSeatsAvailable - this.seatsSold;
     }
 
-    public void setFlightDepartureTime(LocalDateTime flightDepartureTime) {
-        this.flightDepartureTime = flightDepartureTime;
+    public Reservation getReservation() {
+        return reservation;
     }
 
-    public LocalDateTime getFlightArrivalTime() {
-        return flightArrivalTime;
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
-    public void setFlightArrivalTime(LocalDateTime flightArrivalTime) {
-        this.flightArrivalTime = flightArrivalTime;
-    }
-    public void updateSeatsRemaining() {
-        this.numberOfSeatsRemaining = this.numberOfSeatsAvailable - this.numberOfSeatsSold;
-    }
-    public boolean canIssueDashPass() {
-        return this.numberOfDashPassesAvailable > 0 && this.isDashPassAllowed;
+    public List<DashPassReservation> getDashPassReservations() {
+        return dashPassReservations;
     }
 
+    public void setDashPassReservations(List<DashPassReservation> dashPassReservations) {
+        this.dashPassReservations = dashPassReservations;
+    }
 
+    public TripType getTripType() {
+        return tripType;
+    }
+
+    public void setTripType(TripType tripType) {
+        this.tripType = tripType;
+    }
+
+    public LocalDate getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(LocalDate returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public Flight getReturnFlight() {
+        return returnFlight;
+    }
+
+    public void setReturnFlightID(Flight returnFlight) {
+        this.returnFlight = returnFlight;
+    }
 }
+

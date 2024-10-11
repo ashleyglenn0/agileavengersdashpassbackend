@@ -3,6 +3,7 @@ package agileavengers.southwest_dashpass.services;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.CustomerRepository;
 import agileavengers.southwest_dashpass.repository.DashPassRepository;
+import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,18 +11,28 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DashPassService {
     private DashPassRepository dashPassRepository;
     private CustomerService customerService;
     private CustomerRepository customerRepository;
+    private DashPassReservationRepository dashPassReservationRepository;
+
+    private static final Double DASH_PASS_PRICE = 50.0;
+
+    public Double getDashPassPrice() {
+        return DASH_PASS_PRICE;
+    }
 
     @Autowired
-    public DashPassService(DashPassRepository dashPassRepository, CustomerService customerService, CustomerRepository customerRepository){
+    public DashPassService(DashPassRepository dashPassRepository, CustomerService customerService, CustomerRepository customerRepository,
+                           DashPassReservationRepository dashPassReservationRepository){
         this.dashPassRepository = dashPassRepository;
         this.customerService = customerService;
         this.customerRepository = customerRepository;
+        this.dashPassReservationRepository = dashPassReservationRepository;
     }
 
     @Transactional
@@ -98,4 +109,38 @@ public class DashPassService {
             customerRepository.save(customer);
         }
     }
+    public DashPass createAndAssignDashPassDuringPurchase(Customer customer, Flight flight) {
+        DashPass newDashPass = new DashPass();
+        newDashPass.setRedeemed(true);
+        newDashPass.setCustomer(customer);
+        dashPassRepository.save(newDashPass);
+
+        DashPassReservation reservation = new DashPassReservation();
+        reservation.setDashPass(newDashPass);
+        reservation.setFlight(flight);
+        reservation.setCustomer(customer);
+        dashPassReservationRepository.save(reservation);
+
+        return newDashPass;
+    }
+
+    public DashPass save(DashPass dashPass) {
+        return dashPassRepository.save(dashPass);  // This is where repository interaction happens
+    }
+
+    public DashPass findDashPassById(Long dashPassId) {
+        // Optional is used to avoid exceptions if the DashPass doesn't exist
+        return dashPassRepository.findById(dashPassId)
+                .orElseThrow(() -> new RuntimeException("DashPass not found for id: " + dashPassId));
+    }
+
+    public Optional<DashPass> findAvailableDashPass(Customer customer) {
+        // Fetch the list of DashPasses for the customer and filter those that are not redeemed
+        return customer.getDashPasses()
+                .stream()
+                .filter(dashPass -> !dashPass.isRedeemed()) // Find DashPasses that are not redeemed
+                .findFirst(); // Return the first available DashPass (if any)
+    }
+
+
 }

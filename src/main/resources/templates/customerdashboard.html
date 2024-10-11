@@ -123,7 +123,7 @@
 
         <!-- Card showing current DashPasses available -->
         <div class="dashboard-card card">
-            <h4>Available Dash Passes</h4>
+            <h4>Available Dash Passes For Purchase</h4>
             <p>You currently have <strong th:text="${numberOfDashPassesAvailableForPurchase}"></strong> Dash Pass(es) available for purchase.</p>
         </div>
 
@@ -131,14 +131,15 @@
         <div class="dashboard-card card">
             <h4>Available Dash Passes</h4>
             <p>You currently have <strong th:text="${numberOfDashPassesAvailableToAddToReservation}"></strong> Dash Pass(es) available to add to a reservation.</p>
+            <button class="button" th:onclick="'/dashpass/redeem?customerId=' + ${customer.user.id}">Redeem Dash Pass</button>
         </div>
 
     </div>
     <!-- Action cards -->
     <div class="dashboard-card card card-actions">
-        <h4>DashPass Actions</h4>
+        <h4>Dashboard Actions</h4>
         <div class="button-container">
-            <button class="button" th:onclick="'/dashpass/redeem?customerId=' + ${customer.user.id}">Redeem Dash Pass</button>
+            <button class="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchaseflight\''">Purchase Flight</button>
             <button class="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchasedashpass\''">
                 Purchase Dash Pass
             </button>

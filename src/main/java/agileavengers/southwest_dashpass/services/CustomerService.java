@@ -1,8 +1,8 @@
 package agileavengers.southwest_dashpass.services;
-import agileavengers.southwest_dashpass.models.Customer;
-import agileavengers.southwest_dashpass.models.User;
-import agileavengers.southwest_dashpass.models.UserType;
+import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.CustomerRepository;
+import agileavengers.southwest_dashpass.repository.DashPassRepository;
+import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
 import agileavengers.southwest_dashpass.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -16,6 +16,8 @@ import java.util.Optional;
 @Service
 public class CustomerService {
     private CustomerRepository customerRepository;
+    private DashPassReservationRepository dashPassReservationRepository;
+    private DashPassRepository dashPassRepository;
     private UserService userService;
     private UserRepository userRepository;
 
@@ -24,12 +26,15 @@ public class CustomerService {
     private SessionFactory sessionFactory;
     @Autowired
     public CustomerService(CustomerRepository customerRepository, UserService userService, UserRepository userRepository,
-                           EntityManager entityManager, SessionFactory sessionFactory) {
+                           EntityManager entityManager, SessionFactory sessionFactory,
+                           DashPassRepository dashPassRepository, DashPassReservationRepository dashPassReservationRepository) {
         this.customerRepository = customerRepository;
         this.userService = userService;
         this.userRepository = userRepository;
         this.entityManager = entityManager;
         this.sessionFactory = sessionFactory;
+        this.dashPassReservationRepository = dashPassReservationRepository;
+        this.dashPassRepository = dashPassRepository;
     }
 
     public Customer findCustomerById(Long customerId) {
@@ -92,6 +97,26 @@ public class CustomerService {
 
         // Clear second-level cache (shared cache for the session factory)
         sessionFactory.getCache().evictAllRegions();
+    }
+
+    public void useExistingDashPass(Customer customer, Flight flight) {
+        DashPass availableDashPass = customer.getDashPasses().stream()
+                .filter(dashPass -> !dashPass.isRedeemed())
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No available DashPass"));
+
+        availableDashPass.setRedeemed(true);
+        dashPassRepository.save(availableDashPass);
+
+        DashPassReservation reservation = new DashPassReservation();
+        reservation.setDashPass(availableDashPass);
+        reservation.setFlight(flight);
+        reservation.setCustomer(customer);
+        dashPassReservationRepository.save(reservation);
+    }
+
+    public void save(Customer customer) {
+        customerRepository.save(customer);
     }
 
 }

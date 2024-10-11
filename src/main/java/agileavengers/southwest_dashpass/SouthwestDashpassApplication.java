@@ -1,6 +1,5 @@
 package agileavengers.southwest_dashpass;
 
-
 import agileavengers.southwest_dashpass.tools.FlightDataPopulator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class SouthwestDashpassApplication implements CommandLineRunner {
 
 	@Autowired
-	private FlightDataPopulator flightDataPopulator;
+    private FlightDataPopulator flightDataPopulator;
 
 	public static void main(String[] args) {
 

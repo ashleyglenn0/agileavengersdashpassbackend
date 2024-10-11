@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Book Flight</title>
+  <link rel="stylesheet" href="/styles/flights.css" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form class="navForm" action="/perform_logout" method="post">
+      <button type="submit" class="logoutbutton">Logout</button>
+    </form>
+  </nav>
+</header>
+<!-- Flight Search Card -->
+<div class="card">
+  <h2>Book Flight</h2>
+
+  <form th:action="@{/customer/{customerID}/searchFlightsByDate(customerID=${customerID}, selectedDate=${selectedDate},
+  departureAirport=${departureAirport}, arrivalAirport=${arrivalAirport}, tripType=${tripType}, returnDate=${returnDate})}" th:object="${flight}" method="GET">
+    <input type="hidden" name="customerID" th:value="${customerID}" />
+    <!-- Date Field -->
+    <label for="selectedDate">Select Date:</label>
+    <input type="date" id="selectedDate" name="selectedDate" th:value="${selectedDate}" required />
+
+    <!-- Departure Airport Dropdown -->
+    <label for="departureAirport">Departure Airport:</label>
+    <select id="departureAirport" name="departureAirport"  th:value="${departureAirport}" required>
+      <option th:each="airport : ${airports}"
+              th:value="${airport.airportCode}"
+              th:text="${airport.airportCode}">Select Departure Airport</option>
+    </select>
+
+    <!-- Arrival Airport Dropdown -->
+    <label for="arrivalAirport">Arrival Airport:</label>
+    <select id="arrivalAirport" name="arrivalAirport" required  th:value="${arrivalAirport}">
+      <option th:each="airport : ${airports}"
+              th:value="${airport.airportCode}"
+              th:text="${airport.airportCode}">Select Arrival Airport</option>
+    </select>
+
+    <!-- One-Way or Round-Trip -->
+    <div>
+      <select name="tripType" id="tripType" onchange="toggleReturnDate()" required>
+        <option value="ONE_WAY">One Way</option>
+        <option value="ROUND_TRIP">Round Trip</option>
+      </select>
+    </div>
+
+    <!-- Return Date input, hidden by default -->
+    <div id="returnDateDiv" style="display: none;">
+      <label for="returnDate">Return Date:</label>
+      <input type="date" name="returnDate" id="returnDate" th:value="${returnDate}">
+    </div>
+
+    <!-- Find Flights Button -->
+    <button type="submit">Find Flight</button>
+  </form>
+</div>
+  <!-- Back Button -->
+  <button onclick="window.history.back();">Back</button>
+</div>
+<script>
+  function toggleReturnDate() {
+    const tripType = document.getElementById("tripType").value;
+    const returnDateDiv = document.getElementById("returnDateDiv");
+
+    if (tripType === "ROUND_TRIP") {
+      returnDateDiv.style.display = "block"; // Show the return date input
+    } else {
+      returnDateDiv.style.display = "none";  // Hide the return date input
+    }
+  }
+</script>
+</body>
+</html>

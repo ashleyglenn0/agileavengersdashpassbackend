@@ -38,10 +38,11 @@ public class DashPassReservation {
         this.bookingDate = LocalDate.now();
     }
 
-    public DashPassReservation(Customer customer, DashPass dashpass, LocalDate bookingDate){
+    public DashPassReservation(Customer customer, DashPass dashpass, Flight flight, LocalDate bookingDate){
         this.customer = customer;
         this.dashPass = dashpass;
         this.bookingDate = bookingDate;
+        this.flight = flight;
     }
 
     public Long getId() {
@@ -54,6 +55,14 @@ public class DashPassReservation {
 
     public void setDashPass(DashPass dashPass) {
         this.dashPass = dashPass;
+    }
+
+    public Flight getFlight() {
+        return flight;
+    }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
     }
 
     public Customer getCustomer() {

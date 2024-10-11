@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Available Flights</title>
+    <link rel="stylesheet" href="/styles/flights.css" />
+</head>
+<body>
+
+<!-- Available Flights Table -->
+<div th:if="${outboundFlights != null || roundTripFlights != null}">
+    <div th:if="${#lists.isEmpty(outboundFlights) && #lists.isEmpty(roundTripFlights)}" class="no-flights-message">
+        <p>No flights match your search criteria.</p>
+        <button onclick="window.history.back();">Back</button>
+    </div>
+
+    <!-- Outbound Flights for Round Trip or One-Way Flights -->
+    <div th:if="${outboundFlights != null && !#lists.isEmpty(outboundFlights)}">
+        <h3>Available Flights</h3>
+        <button onclick="window.history.back();">Back</button>
+        <table>
+            <thead>
+            <tr>
+                <th>Flight Number</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Arrival Time</th>
+                <th>Departure Airport</th>
+                <th>Arrival Airport</th>
+                <th>Price</th>
+                <th>DashPass Option</th>
+                <th>Total Price</th>
+                <th>Select Flight</th> <!-- New column for selecting flight -->
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="flight : ${outboundFlights}">
+                <td th:text="${flight.flightNumber}">Flight Number</td>
+                <td th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Departure Date</td>
+                <td th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Departure Time</td>
+                <td th:text="${#temporals.format(flight.arrivalTime, 'hh:mm a')}">Arrival Time</td>
+                <td th:text="${flight.departureAirportCode}">Departure Airport Code</td>
+                <td th:text="${flight.arrivalAirportCode}">Arrival Airport Code</td>
+                <td th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}">Flight Price</td> <!-- Formatted Price -->
+                <td>
+                    <!-- DashPass Option -->
+                    <form th:action="@{/confirmFlight}" method="POST">
+                        <input type="hidden" name="flightID" th:value="${flight.flightID}" />
+                        <input type="hidden" name="flightPrice" th:value="${flight.price}" />
+
+                        <!-- Show option to use existing DashPass if customer has any available -->
+                        <div th:if="${customer != null}">
+                            <div th:if="${customer.availableDashPasses > 0}">
+                                <input type="radio" name="dashPassOption" value="existing" id="useExistingDashPass-${flight.flightID}" onchange="calculateTotalExisting(this, [[${flight.price}]])">
+                                <label for="useExistingDashPass-${flight.flightID}">Use Existing DashPass</label><br>
+                            </div>
+                        </div>
+
+                        <!-- Option to purchase a new DashPass -->
+                        <div th:if="${flight.numberOfDashPassesAvailable > 0}">
+                            <input type="radio" name="dashPassOption" value="purchase" id="purchaseNewDashPass-${flight.flightID}" onchange="calculateTotalPurchase(this, [[${flight.price}]])">
+                            <label for="purchaseNewDashPass-${flight.flightID}">Purchase New DashPass ($50.00)</label><br>
+                        </div>
+
+                        <!-- Option to not use a DashPass -->
+                        <input type="radio" name="dashPassOption" value="none" id="noDashPass-${flight.flightID}" onchange="calculateTotalNone(this, [[${flight.price}]])">
+                        <label for="noDashPass-${flight.flightID}">Do not use DashPass</label><br>
+
+                        <!-- If DashPasses are not available, disable the purchase option -->
+                        <div th:if="${flight.numberOfDashPassesAvailable == 0}">
+                            <input type="radio" name="dashPassOption" value="none" disabled>
+                            <label for="addDashPass" style="color: gray;">DashPass Unavailable</label>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <!-- Total Price Calculation -->
+                    <span id="totalPrice-${flight.flightID}">$<span th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                </td>
+                <td>
+                    <!-- Select Flight Button -->
+                    <form th:action="@{/selectFlight}" method="POST">
+                        <input type="hidden" name="flightID" th:value="${flight.flightID}" />
+                        <button type="submit">Select Flight</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Return Flights for Round Trip -->
+    <div th:if="${roundTripFlights != null && !#lists.isEmpty(roundTripFlights.returnFlights)}">
+        <h3>Return Flights</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Flight Number</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Arrival Time</th>
+                <th>Departure Airport</th>
+                <th>Arrival Airport</th>
+                <th>Price</th>
+                <th>DashPass Option</th>
+                <th>Total Price</th>
+                <th>Select Flight</th> <!-- New column for selecting return flight -->
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="flight : ${roundTripFlights.returnFlights}">
+                <td th:text="${flight.flightNumber}">Flight Number</td>
+                <td th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Departure Date</td>
+                <td th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Departure Time</td>
+                <td th:text="${#temporals.format(flight.arrivalTime, 'hh:mm a')}">Arrival Time</td>
+                <td th:text="${flight.departureAirportCode}">Departure Airport Code</td>
+                <td th:text="${flight.arrivalAirportCode}">Arrival Airport Code</td>
+                <td th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}">Flight Price</td> <!-- Formatted Price -->
+                <td>
+                    <!-- DashPass Option -->
+                    <form th:action="@{/confirmFlight}" method="POST">
+                        <input type="hidden" name="flightID" th:value="${flight.flightID}" />
+                        <input type="hidden" name="flightPrice" th:value="${flight.price}" />
+
+                        <!-- Show option to use existing DashPass if customer has any available -->
+                        <div th:if="${customer != null}">
+                            <div th:if="${customer.availableDashPasses > 0}">
+                                <input type="radio" name="dashPassOption" id="canUseExistingDashPass" value="existing" onchange="calculateTotalExisting(this, [[${flight.price}]])">
+                                <label for="canUseExistingDashPass">Use Existing DashPass</label><br>
+                            </div>
+                        </div>
+
+                        <!-- Option to purchase a new DashPass if they don't have enough -->
+                        <div th:if="${flight.numberOfDashPassesAvailable > 0}">
+                            <input type="radio" name="dashPassOption" id="canAddNewDashPass" value="purchasing" onchange="calculateTotalPurchase(this, [[${flight.price}]])">
+                            <label for="canAddNewDashPass">Purchase New DashPass ($50.00)</label><br>
+                        </div>
+
+                        <!-- If DashPasses are not available, disable the purchase option -->
+                        <div th:if="${flight.numberOfDashPassesAvailable == 0}">
+                            <input type="radio" name="dashPassOption"  id="addDashPass" value="none" disabled>
+                            <label for="addDashPass" style="color: gray;">DashPass Unavailable</label>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <!-- Total Price Calculation -->
+                    <span th:id="totalPrice-${flight.flightID}">$<span th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                </td>
+                <td>
+                    <!-- Select Return Flight Button -->
+                    <form th:action="@{/selectReturnFlight}" method="POST">
+                        <input type="hidden" name="flightID" th:value="${flight.flightID}" />
+                        <button type="submit">Select Return Flight</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+  function calculateTotalExisting(radioButton, basePrice) {
+        if (radioButton.checked) {
+            document.getElementById('totalPrice-' + radioButton.value).textContent = '$' + basePrice;
+        }
+    }
+
+    function calculateTotalPurchase(radioButton, basePrice) {
+        if (radioButton.checked) {
+            const dashPassPrice = 50; // Assume DashPass is $50
+            document.getElementById('totalPrice-' + radioButton.value).textContent = '$' + (basePrice + dashPassPrice);
+        }
+    }
+
+    function calculateTotalNone(radioButton, basePrice) {
+        if (radioButton.checked) {
+            document.getElementById('totalPrice-' + radioButton.value).textContent = '$' + basePrice;
+        }
+    }
+</script>
+</body>
+</html>
