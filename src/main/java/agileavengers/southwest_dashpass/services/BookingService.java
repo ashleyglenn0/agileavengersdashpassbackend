@@ -32,14 +32,17 @@ public class BookingService {
         reservation.setCustomer(currentCustomer); // Use the passed customer
         reservation.setTripType(TripType.valueOf(tripType));
 
+        // Save the reservation first to persist it in the database
+        reservationService.save(reservation);
+
         // Initialize the list of flights in the reservation if it doesn't exist
         if (reservation.getFlights() == null) {
             reservation.setFlights(new ArrayList<>());
         }
 
-        // Associate the flight with the reservation
-        outboundFlight.setReservation(reservation);  // Add this line to associate the flight with the reservation
-        reservation.getFlights().add(outboundFlight); // Add outbound flight to the list
+        // Now associate the flight with the saved reservation
+        outboundFlight.setReservation(reservation);  // Associate flight with reservation
+        reservation.getFlights().add(outboundFlight); // Add outbound flight to the reservation's flight list
 
         reservation.setFlightDepartureDate(outboundFlight.getDepartureDate());
         reservation.setAirportCode(outboundFlight.getDepartureAirportCode());
@@ -61,12 +64,12 @@ public class BookingService {
         if (dashPassOption.equals("new")) {
             DashPass newDashPass = new DashPass();
             newDashPass.setCustomer(currentCustomer);
-            dashPassService.save(newDashPass);
+            dashPassService.save(newDashPass);  // Save new DashPass before associating
 
             DashPassReservation dashPassReservation = new DashPassReservation();
             dashPassReservation.setDashPass(newDashPass);
             dashPassReservation.setReservation(reservation);
-            dashPassReservationService.save(dashPassReservation);
+            dashPassReservationService.save(dashPassReservation);  // Save DashPassReservation
 
             finalPrice += 50.0; // Add DashPass price (adjust as needed)
         } else if (dashPassOption.equals("existing")) {
@@ -74,13 +77,13 @@ public class BookingService {
             DashPassReservation dashPassReservation = new DashPassReservation();
             dashPassReservation.setDashPass(existingDashPass);
             dashPassReservation.setReservation(reservation);
-            dashPassReservationService.save(dashPassReservation);
+            dashPassReservationService.save(dashPassReservation);  // Save DashPassReservation
         }
 
         // Set the final price for the reservation
         reservation.setTotalPrice(finalPrice);
 
-        // Save the reservation, this will cascade and save the associated flights as well
+        // Save the reservation again to ensure flights and DashPasses are associated
         reservationService.save(reservation);
 
         return reservation;

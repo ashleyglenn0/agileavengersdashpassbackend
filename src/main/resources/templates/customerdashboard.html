@@ -93,12 +93,8 @@
 <div class="container">
     <!-- Welcome message with the customer's name -->
     <h1>Welcome To The Dash Pass System, <span th:text="${customer.user.firstName}"></span>!</h1>
-
     <!-- Upcoming Flight Card -->
     <!-- Check if upcomingFlight is null -->
-    <div>
-        <pre th:text="${upcomingFlight}">No data</pre>
-    </div>
     <div class="dashboard-card card">
         <h4>Upcoming Flight</h4>
         <!-- If there is an upcoming flight, show the details -->
@@ -116,6 +112,7 @@
         </div>
         <div th:if="${#lists.isEmpty(upcomingFlight)}">
             <p>No upcoming flights found.</p>
+        </div>
         </div>
 
     <!-- Card showing total DashPasses owned -->

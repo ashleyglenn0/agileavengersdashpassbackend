@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Method</title>
+  <link rel="stylesheet" th:href="@{/styles/paymentMethodForm.css}" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form action="/perform_logout" method="post">
+      <button type="submit" class="button">Logout</button>
+    </form>
+  </nav>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Payment Details</h2>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/customer/{customerID}/purchasecomplete(customerID=${customerID})}"
+            method="post">
+
+        <!-- Hidden inputs for Customer ID, Outbound Flight, and DashPass -->
+        <input type="hidden" name="customerId" th:value="${customer.id}" />
+        <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}" />
+        <input type="hidden" name="dashPassOption" th:value="${dashPassOption}" />
+        <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
+        <input type="hidden" name="tripType" th:value="${tripType}" />
+
+        <!-- Outbound Flight Details -->
+        <div>
+          <p><strong>Outbound Flight:</strong> <span th:text="${outboundFlight.flightNumber}"></span></p>
+          <p><strong>Departure:</strong> <span th:text="${outboundFlight.departureAirportCode}"></span></p>
+          <p><strong>Arrival:</strong> <span th:text="${outboundFlight.arrivalAirportCode}"></span></p>
+          <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outboundFlight.departureTime, 'dd MMM yyyy HH:mm')}"></span></p>
+        </div>
+
+        <!-- Return Flight Details (if applicable) -->
+        <div th:if="${returnFlight != null}">
+          <p><strong>Return Flight:</strong> <span th:text="${returnFlight.flightNumber}"></span></p>
+          <p><strong>Departure:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
+          <p><strong>Arrival:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
+          <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'dd MMM yyyy HH:mm')}"></span></p>
+        </div>
+
+        <!-- DashPass Option (if purchased) -->
+        <div th:if="${dashPassOption.equals('new')}">
+          <p><strong>DashPass:</strong> Purchased (Additional $50.00)</p>
+        </div>
+
+        <!-- Total Cost -->
+        <div>
+          <p><strong>Total Cost:</strong> $<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
+        </div>
+
+        <!-- Payment Method Fields -->
+        <div class="form-group">
+          <label for="cardNumber">Credit Card Number</label>
+          <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="Enter 16-digit card number" required />
+        </div>
+
+        <div class="form-group">
+          <label for="expirationDate">Expiration Date</label>
+          <input type="text" id="expirationDate" name="expirationDate" class="form-control" placeholder="MM/YY" required />
+        </div>
+
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="text" id="cvv" name="cvv" class="form-control" placeholder="Enter 3-digit CVV" required />
+        </div>
+
+        <div class="form-group">
+          <label for="billingZip">Billing Zip Code</label>
+          <input type="text" id="billingZip" name="billingZip" class="form-control" placeholder="Enter billing zip code" required />
+        </div>
+
+        <div class="form-group">
+          <label for="nameOnCard">Name on Card</label>
+          <input type="text" id="nameOnCard" name="nameOnCard" class="form-control" placeholder="Enter name as shown on card" required />
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Process Payment</button>
+          <a th:href="@{/customer/{customerId}/confirmation(customerId=${customerID})}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

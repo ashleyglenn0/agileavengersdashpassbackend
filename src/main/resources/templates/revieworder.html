@@ -10,7 +10,8 @@
 <div class="card">
     <h2>Confirm Your Flight</h2>
 
-    <form th:action="@{/customer/{customerID}/finalconfirmation(customerID=${customer.id})}" method="POST">
+    <form th:action="@{/customer/{customerID}/paymentmethoddetails(customerID=${customer.id})}"
+          method="POST">
         <input type="hidden" name="tripType" th:value="${tripType}"> <!-- Add this -->
         <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}">
         <input type="hidden" name="returnFlightId" th:value="${returnFlight != null ? returnFlight.flightId : null}">
@@ -44,7 +45,7 @@
 
         <div th:if="${dashPassOption == 'purchase'}">
             <p>Purchasing New DashPass:</p>
-            <p>DashPass Price: $<span th:text="${dashPass.price}"></span></p>
+            <p>DashPass Price: $<span th:text="${#numbers.format(dashPass.price, 1, 'COMMA', 2, 'POINT')}"></span></p>
         </div>
 
         <!-- Hidden fields to pass the necessary data -->
@@ -54,7 +55,7 @@
 
         <!-- Total Price (optional) -->
         <p>Total Price: $<span th:text="${totalPrice}"></span></p>
-        <input type="hidden" name="totalPrice" th:value="${totalPrice}">
+        <input type="hidden" name="totalPrice" th:value="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}">
 
         <!-- Submit and Cancel Buttons -->
         <button type="submit">Confirm Booking</button>

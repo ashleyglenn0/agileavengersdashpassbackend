@@ -38,7 +38,7 @@
   </div>
 
   <h2>Total Price</h2>
-  <p>$<span th:text="${reservation.totalPrice}"></span></p>
+  <p>$<span th:text="${#numbers.formatDecimal(reservation.totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
 
   <a th:href="@{customer/{customerID}/customerdashboard}">Return to Dashboard</a>
 </div>
