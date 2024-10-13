@@ -142,5 +142,18 @@ public class DashPassService {
                 .findFirst(); // Return the first available DashPass (if any)
     }
 
+    public DashPass findAvailableDashPassForCustomer(Customer customer) {
+        // Iterate through the list of DashPasses for the customer
+        for (DashPass dashPass : customer.getDashPasses()) {
+            // Check if the DashPass is not redeemed
+            if (!dashPass.isRedeemed()) {
+                return dashPass; // Return the first available (non-redeemed) DashPass
+            }
+        }
+        // Return null if no available DashPass is found
+        return null;
+    }
+
+
 
 }

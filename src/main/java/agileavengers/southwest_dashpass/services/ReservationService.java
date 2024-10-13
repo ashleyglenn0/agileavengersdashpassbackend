@@ -1,7 +1,6 @@
 package agileavengers.southwest_dashpass.services;
 
 import agileavengers.southwest_dashpass.models.*;
-import agileavengers.southwest_dashpass.repository.DashPassRepository;
 import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
 import agileavengers.southwest_dashpass.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +60,14 @@ public class ReservationService {
     public Reservation save(Reservation reservation){
         return reservationRepository.save(reservation);
     }
+
+    public List<Reservation> getUpcomingReservationsForCustomer(Long customerId) {
+        // Ensure this returns a List, not a single Reservation
+        return reservationRepository.findByCustomer_Id(customerId);
+    }
+
+
+
+
 
 }
