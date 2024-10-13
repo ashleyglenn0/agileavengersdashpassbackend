@@ -30,6 +30,9 @@ public class CustomerDashboardController {
     public String showCustomerDashboard(@PathVariable Long customerID, Model model, Principal principal) {
         // Fetch customer by ID
         Customer customer = customerService.findCustomerById(customerID);
+
+        List<Reservation> upcomingFlight = reservationService.getUpcomingReservationsForCustomer(customerID);
+
         // If customer is not found, show a custom error page
 
         if (customer == null) {
@@ -47,6 +50,12 @@ public class CustomerDashboardController {
         Integer numberOfDashPassesAvailableToAddToReservation = customer.getNumberOfDashPasses();
         Integer totalNumberOfDashPassesOwned = customer.getTotalDashPassesCustomerHas();
 
+//        System.out.println("Upcoming Flight: " + (upcomingFlight != null ? upcomingFlight.getFlightDepartureDate() : "None"));
+        for (Reservation reservation : upcomingFlight) {
+            System.out.println("Reservation ID: " + reservation.getReservationId());
+            System.out.println("Flights: " + reservation.getFlights());  // Check if flights are populated
+        }
+
 
         // Add customer information to the model
         model.addAttribute("customer", customer);
@@ -54,6 +63,7 @@ public class CustomerDashboardController {
         model.addAttribute("numberOfDashPassesAvailableForPurchase", numberOfDashPassesAvailableForPurchase);
         model.addAttribute("numberOfDashPassesAvailableToAddToReservation", numberOfDashPassesAvailableToAddToReservation);
         model.addAttribute("totalNumberOfDashPassesOwned", totalNumberOfDashPassesOwned);
+        model.addAttribute("upcomingFlight", upcomingFlight);
 
 
         return "customerdashboard";  // Return the dashboard view
