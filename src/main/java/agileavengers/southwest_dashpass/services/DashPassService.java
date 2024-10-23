@@ -109,20 +109,27 @@ public class DashPassService {
             customerRepository.save(customer);
         }
     }
+    @Transactional
     public DashPass createAndAssignDashPassDuringPurchase(Customer customer, Flight flight) {
         DashPass newDashPass = new DashPass();
         newDashPass.setRedeemed(true);
         newDashPass.setCustomer(customer);
+
+        // Save the DashPass first to persist it in the database
         dashPassRepository.save(newDashPass);
 
+        // Now associate the DashPass with the DashPassReservation
         DashPassReservation reservation = new DashPassReservation();
         reservation.setDashPass(newDashPass);
         reservation.setFlight(flight);
         reservation.setCustomer(customer);
+
+        // Save the DashPassReservation after the DashPass has been persisted
         dashPassReservationRepository.save(reservation);
 
         return newDashPass;
     }
+
 
     public DashPass save(DashPass dashPass) {
         return dashPassRepository.save(dashPass);  // This is where repository interaction happens
@@ -154,6 +161,23 @@ public class DashPassService {
         return null;
     }
 
+    private void incrementDashPassesInUse(Customer customer) {
+        customer.setNumberOfDashPassesUsed(customer.getNumberOfDashPassesUsed() + 1);
+    }
 
+    private void incrementTotalDashPassesOwned(Customer customer) {
+        customer.setTotalDashPassesCustomerHas(customer.getTotalDashPassesCustomerHas() + 1);
+    }
+
+    private void incrementDashPassesAvailableForPurchase(Customer customer) {
+        int availableForPurchase = customer.getMaxNumberOfDashPasses() - customer.getTotalDashPassesCustomerHas();
+        customer.setNumberOfDashPassesAvailableForPurchase(availableForPurchase);
+    }
+
+
+    // Check if customer has available DashPasses
+    private boolean customerHasAvailableDashPasses(Customer customer) {
+        return customer.getNumberOfDashPassesAvailableForPurchase() < customer.getMaxNumberOfDashPasses();
+    }
 
 }

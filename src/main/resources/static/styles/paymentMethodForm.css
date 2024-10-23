@@ -127,3 +127,7 @@ strong {
     color: #333;
 }
 
+.error {
+    color: red;
+    font-weight: bold;
+}

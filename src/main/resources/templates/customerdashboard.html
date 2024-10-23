@@ -98,22 +98,18 @@
     <div class="dashboard-card card">
         <h4>Upcoming Flight</h4>
         <!-- If there is an upcoming flight, show the details -->
-        <div th:if="${not #lists.isEmpty(upcomingFlight)}">
-            <div th:each="reservation : ${upcomingFlight}">
-                <div th:if="${not #lists.isEmpty(reservation.flights)}">
-                    <div th:each="flight : ${reservation.flights}">
-                        <p>Flight Number: <span th:text="${flight.flightNumber}">Flight number missing</span></p>
-                        <p>Departure: <span th:text="${flight.departureAirportCode}">Departure missing</span></p>
-                        <p>Arrival: <span th:text="${flight.arrivalAirportCode}">Arrival missing</span></p>
-                        <p>Departure Time: <span th:text="${#temporals.format(flight.departureTime, 'dd MMM yyyy HH:mm')}">Time missing</span></p>
-                    </div>
-                </div>
-            </div>
+        <div th:if="${soonestReservation != null}">
+            <p>Flight Number: <span th:text="${soonestReservation.flights[0].flightNumber}"></span></p>
+            <p>Departure Airport: <span th:text="${soonestReservation.flights[0].departureAirportCode}"></span></p>
+            <p>Departure Date: <span th:text="${soonestReservation.flights[0].departureDate}"></span></p>
+            <p>Departure Time: <span th:text="${soonestReservation.flights[0].departureTime}"></span></p>
+            <p>Status: <span th:text="${soonestReservation.status}"></span></p>
+            <button>View All Reservations</button>
         </div>
-        <div th:if="${#lists.isEmpty(upcomingFlight)}">
-            <p>No upcoming flights found.</p>
+        <div th:if="${soonestReservation == null}">
+            <p>No upcoming reservations at this time.</p>
         </div>
-        </div>
+    </div>
 
     <!-- Card showing total DashPasses owned -->
     <div class="card-grid">

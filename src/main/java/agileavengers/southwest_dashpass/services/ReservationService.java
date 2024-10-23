@@ -3,10 +3,12 @@ package agileavengers.southwest_dashpass.services;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
 import agileavengers.southwest_dashpass.repository.ReservationRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +17,14 @@ public class ReservationService {
     private ReservationRepository reservationRepository;
     private DashPassReservationRepository dashPassReservationRepository;
 
+    private CustomerService customerService;
+
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository, DashPassReservationRepository dashPassReservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository, DashPassReservationRepository dashPassReservationRepository,
+                              CustomerService customerService) {
         this.reservationRepository = reservationRepository;
         this.dashPassReservationRepository = dashPassReservationRepository;
+        this.customerService = customerService;
     }
 
     public List<Reservation> getReservationsForCustomer(Long customerId) {
@@ -66,8 +72,31 @@ public class ReservationService {
         return reservationRepository.findByCustomer_Id(customerId);
     }
 
+    @Transactional
+    public void deleteReservation(Reservation reservation) {
+        reservationRepository.delete(reservation);
+    }
 
+    public Reservation findLatestPaidReservationForCustomer(Customer customer) {
+        return reservationRepository.findTopByCustomerAndPaymentStatusOrderByDateBookedDesc(customer, PaymentStatus.PAID);
+    }
 
+    public List<Reservation> getValidReservationsForCustomer(Long customerId) {
+        // Fetch reservations that are only VALID
+        return reservationRepository.findByCustomerIdAndStatus(customerId, ReservationStatus.VALID);
+    }
+
+    public Reservation findSoonestReservationForCustomer(Long customerId) {
+        Customer customer = customerService.findCustomerById(customerId);
+
+        return customer.getReservations().stream()
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.VALID)
+                .flatMap(reservation -> reservation.getFlights().stream()) // Flattening flights
+                .sorted(Comparator.comparing(Flight::getDepartureDate)) // Sorting by soonest departure date
+                .map(Flight::getReservation) // Mapping back to the reservation
+                .findFirst() // Get the first result
+                .orElse(null); // Return null if no valid reservation is found
+    }
 
 
 }

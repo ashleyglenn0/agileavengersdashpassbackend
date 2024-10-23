@@ -119,4 +119,9 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
+    public Customer findByUser(User user) {
+        return customerRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Customer not found for user: " + user.getUsername()));
+    }
+
 }

@@ -42,6 +42,9 @@ public class Customer {
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
     private List<DashPassReservation> dashPassReservations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentDetails> paymentDetails;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -129,8 +132,6 @@ public class Customer {
         this.dashPassReservations = dashPassReservations;
     }
 
-
-
     public Integer getMaxNumberOfDashPasses() {
         return maxNumberOfDashPasses;
     }
@@ -140,8 +141,10 @@ public class Customer {
     }
 
     public Integer getNumberOfDashPassesAvailableForPurchase() {
-        return maxNumberOfDashPasses - totalDashPassesCustomerHas;
+        // Use the non-redeemed count instead of manipulating the list
+        return maxNumberOfDashPasses - getNonRedeemedDashPassCount();
     }
+
 
     public Integer getNumberOfDashPassesUsed() {
         return numberOfDashPassesUsed;
@@ -177,4 +180,27 @@ public class Customer {
         dashPasses.add(dashPass);
         dashPass.setCustomer(this);
     }
+
+    public List<PaymentDetails> getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public void setPaymentDetails(List<PaymentDetails> paymentDetails) {
+        this.paymentDetails = paymentDetails;
+    }
+
+    public void setNumberOfDashPassesAvailableForPurchase(int dashPassesAvailable) {
+        // This should directly set the number of dash passes available for purchase
+        // based on maxNumberOfDashPasses minus what the customer already owns
+        this.totalDashPassesForUse = dashPassesAvailable;
+    }
+
+    public int getNonRedeemedDashPassCount() {
+        return (int) dashPasses.stream()
+                .filter(dashPass -> !dashPass.isRedeemed())
+                .count();
+    }
+
+
+
 }

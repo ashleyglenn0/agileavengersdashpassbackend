@@ -56,6 +56,9 @@ public class CustomerDashboardController {
             System.out.println("Flights: " + reservation.getFlights());  // Check if flights are populated
         }
 
+        Reservation soonestReservation = reservationService.findSoonestReservationForCustomer(customerID);
+        model.addAttribute("soonestReservation", soonestReservation);
+
 
         // Add customer information to the model
         model.addAttribute("customer", customer);

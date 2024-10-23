@@ -12,7 +12,7 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="customerID", referencedColumnName = "ID", nullable = false)
     private Customer customer;
 
@@ -36,6 +36,13 @@ public class Reservation {
 
     @Column(name = "flight_departure_date")
     private LocalDate flightDepartureDate;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status = ReservationStatus.VALID; // Default to VALID
+
 
     public Reservation(Customer customer, LocalDate bookingDate){
         this.customer = customer;
@@ -119,6 +126,22 @@ public class Reservation {
 
     public void setAirportCode(String airportCode) {
         this.airportCode = airportCode;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public ReservationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
     }
 }
 

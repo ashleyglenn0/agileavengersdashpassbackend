@@ -76,11 +76,11 @@
                     <tbody>
                     <tr th:each="reservation : ${reservations}">
                         <td>
-                            <input type="radio" name="selectedReservationId" th:value="${reservation.id}" />
+                            <input type="radio" name="selectedReservationId" th:value="${reservation.reservationId}" />
                         </td>
-                        <td th:text="${reservation.id}"></td>
-                        <td th:text="${#dates.format(reservation.flightDate, 'yyyy-MM-dd')}"></td>
-                        <td th:text="${reservation.destination}"></td>
+                        <td th:text="${reservation.reservationId}"></td>
+                        <td th:text="${#temporals.format(reservation.flightDepartureDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${reservation.airportCode}"></td>
                     </tr>
                     </tbody>
                 </table>
