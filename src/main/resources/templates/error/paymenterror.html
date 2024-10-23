@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Error</title>
+    <link rel="stylesheet" th:href="@{/styles/error.css}" /> <!-- Add your own styles -->
+</head>
+<body>
+<div class="container">
+    <h1>Payment Error</h1>
+    <p>There was an issue with processing your payment. Please try again.</p>
+
+    <!-- Button to retry payment by redirecting to the payment method details page -->
+    <a th:href="@{/paymentmethoddetails}" class="btn btn-primary">Try Again</a>
+
+    <!-- Add any additional info you'd like to provide to the user -->
+</div>
+</body>
+</html>

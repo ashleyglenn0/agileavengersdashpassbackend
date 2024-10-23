@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Method</title>
+  <link rel="stylesheet" th:href="@{/styles/paymentMethodForm.css}" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form action="/perform_logout" method="post">
+      <button type="submit" class="button">Logout</button>
+    </form>
+  </nav>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Payment Details</h2>
+    </div>
+    <div th:if="${errorMessage}" class="error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/customer/{customerID}/purchasecomplete(customerID=${customerID})}"
+            th:object="${paymentDetailsDTO}" method="post">
+
+        <!-- Hidden inputs for Customer ID, Outbound Flight, and DashPass -->
+        <input type="hidden" th:value="${customer != null ? customer.id : ''}" name="customerId">
+        <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}" />
+        <input type="hidden" name="dashPassOption" th:value="${dashPassOption}" />
+        <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
+        <input type="hidden" name="tripType" th:value="${tripType}" />
+<!--        <input type="hidden" name="userSelectedStatus" value="${userSelectedStatus}" />-->
+
+        <!-- Outbound Flight Details -->
+        <div>
+          <p><strong>Outbound Flight:</strong> <span th:text="${outboundFlight.flightNumber}"></span></p>
+          <p><strong>Departure:</strong> <span th:text="${outboundFlight.departureAirportCode}"></span></p>
+          <p><strong>Arrival:</strong> <span th:text="${outboundFlight.arrivalAirportCode}"></span></p>
+          <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outboundFlight.departureTime, 'dd MMM yyyy HH:mm')}"></span></p>
+        </div>
+
+        <!-- Return Flight Details (if applicable) -->
+        <div th:if="${returnFlight != null}">
+          <p><strong>Return Flight:</strong> <span th:text="${returnFlight.flightNumber}"></span></p>
+          <p><strong>Departure:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
+          <p><strong>Arrival:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
+          <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'dd MMM yyyy HH:mm')}"></span></p>
+        </div>
+
+        <!-- DashPass Option (if purchased) -->
+        <div th:if="${dashPassOption.equals('new')}">
+          <p><strong>DashPass:</strong> Purchased (Additional $50.00)</p>
+        </div>
+
+        <!-- Total Cost -->
+        <div>
+          <p><strong>Total Cost:</strong> $<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
+        </div>
+
+        <!-- Payment Method Fields -->
+        <!-- Card Number -->
+        <div class="form-group">
+          <label for="cardNumber">Card Number</label>
+          <input type="text" id="cardNumber" th:field="*{cardNumber}" />
+          <span class="error" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}">Card number error</span>
+        </div>
+
+        <!-- CVV -->
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="text" id="cvv" th:field="*{cvv}" />
+          <span class="error" th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}">CVV error</span>
+        </div>
+
+        <!-- Expiration Date -->
+        <div class="form-group">
+          <label for="expirationDate">Expiration Date (MM/YY)</label>
+          <input type="text" id="expirationDate" th:field="*{expirationDate}" />
+          <span class="error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}">Expiration date error</span>
+        </div>
+
+        <!-- Name on Card -->
+        <div class="form-group">
+          <label for="cardName">Name on Card</label>
+          <input type="text" id="cardName" th:field="*{cardName}" />
+          <span class="error" th:if="${#fields.hasErrors('cardName')}" th:errors="*{cardName}">Name on card error</span>
+        </div>
+
+        <!-- ZIP Code -->
+        <div class="form-group">
+          <label for="zipCode">ZIP Code</label>
+          <input type="text" id="zipCode" th:field="*{zipCode}" />
+          <span class="error" th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}">ZIP code error</span>
+        </div>
+
+        <!-- Save Payment Method -->
+        <div class="form-group">
+          <input type="checkbox" id="savePaymentDetails" th:field="*{savePaymentDetails}" />
+          <label for="savePaymentDetails">Save this payment method for future use</label>
+        </div>
+
+        <label for="userSelectedStatus">Payment Result:</label>
+        <select name="userSelectedStatus" id="userSelectedStatus">
+          <option value="RANDOMIZE">Randomize</option>
+          <option value="PAID">Paid</option>
+          <option value="PENDING">Pending</option>
+          <option value="FAILED">Failed</option>
+        </select>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Process Payment</button>
+          <a th:href="@{/customer/{customerId}/confirmation(customerId=${customerID})}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

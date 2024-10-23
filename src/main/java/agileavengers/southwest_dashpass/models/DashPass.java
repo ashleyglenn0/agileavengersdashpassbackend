@@ -18,7 +18,7 @@ public class DashPass {
     LocalDate expirationDate;
     @Column(name="isRedeemed", nullable = false)
     boolean isRedeemed;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customerID", referencedColumnName = "ID")
     private Customer customer;
     @OneToOne(mappedBy = "dashPass", cascade = CascadeType.ALL, optional = true)

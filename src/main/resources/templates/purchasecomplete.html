@@ -32,15 +32,22 @@
     <h2>DashPass Reservations:</h2>
     <ul>
       <li th:each="dashPassReservation : ${reservation.dashPassReservations}">
-        DashPass: <span th:text="${dashPassReservation.detail}"></span>
+        DashPass ID: <span th:text="${dashPassReservation.dashPass.dashpassId}"></span> <br/>
+        Reservation ID: <span th:text="${dashPassReservation.id}"></span> <br/>
+        Date of Purchase: <span th:text="${dashPassReservation.bookingDate}"></span> <br/>
+        Flight ID: <span th:text="${dashPassReservation.flight.flightID}"></span> <!-- Assuming flight info is needed too -->
       </li>
     </ul>
   </div>
 
   <h2>Total Price</h2>
-  <p>$<span th:text="${reservation.totalPrice}"></span></p>
+  <p>$<span th:text="${#numbers.formatDecimal(reservation.totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
 
-  <a th:href="@{customer/{customerID}/customerdashboard}">Return to Dashboard</a>
+  <button type="button"
+          th:onclick="'window.location.href=\'/customer/' + ${reservation.customer.id} + '/customerdashboard\''">
+   Return to Dashboard
+  </button>
+
 </div>
 </body>
 </html>

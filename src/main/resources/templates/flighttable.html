@@ -22,7 +22,7 @@
 
     <!-- Form for selecting flights -->
     <div class="table-container"> <!-- Updated container class -->
-        <form th:action="@{/customer/{customerID}/confirmFlight(customerID=${customerID})}" method="POST">
+        <form th:action="@{/customer/{customerID}/revieworder(customerID=${customer.id})}" method="POST">
             <input type="hidden" name="customerID" th:value="${customerID}" />
             <input type="hidden" name="tripType" th:value="${tripType}"/>
 
@@ -57,13 +57,13 @@
                         <td>
                             <!-- DashPass Option -->
                             <div th:if="${customer != null}">
-                                <div th:if="${customer.dashPasses > 0}">
+                                <div th:if="${customer.dashPasses.size() > 0}">
                                     <input type="radio" name="dashPassOption" value="existing">
                                     <label>Use Existing DashPass</label><br>
                                 </div>
                             </div>
                             <div th:if="${flight.numberOfDashPassesAvailable > 0}">
-                                <input type="radio" name="dashPassOption" value="purchase">
+                                <input type="radio" name="dashPassOption" value="new">
                                 <label>Purchase New DashPass ($50.00)</label><br>
                             </div>
                             <input type="radio" name="dashPassOption" value="none">
