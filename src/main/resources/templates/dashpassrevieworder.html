@@ -3,43 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <title>Review DashPass Order</title>
+    <link rel="stylesheet" href="/styles/confirmpurchase.css" />
 </head>
 <body>
-<h1>Review Your DashPass Order</h1>
 
-<div>
-    <h2>Customer Information</h2>
-    <p>Name: <span th:text="${customer.user.firstName} + ' ' + ${customer.user.lastName}"></span></p>
-    <p>Email: <span th:text="${customer.user.email}"></span></p>
+<!-- Review Order Card -->
+<div class="container">
+    <h1>Review Your DashPass Order</h1>
+
+    <!-- Customer Information -->
+    <div class="section">
+        <h2>Customer Information</h2>
+        <p><strong>Name:</strong> <span th:text="${customer.user.firstName} + ' ' + ${customer.user.lastName}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${customer.user.email}"></span></p>
+    </div>
+
+    <!-- DashPass Details -->
+    <div class="section">
+        <h2>DashPass Details</h2>
+        <p><strong>Quantity:</strong> <span th:text="${dashPassQuantity}"></span></p>
+        <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
+    </div>
+
+    <!-- Conditional rendering for reservation -->
+    <div class="section" th:if="${reservation != null}">
+        <h2>Reservation Details</h2>
+        <p><strong>Reservation ID:</strong> <span th:text="${reservation.reservationId}"></span></p>
+        <p><strong>Flight Date:</strong> <span th:text="${#temporals.format(reservation.flightDepartureDate, 'yyyy-MM-dd')}"></span></p>
+        <p><strong>Airport Code:</strong> <span th:text="${reservation.airportCode}"></span></p>
+    </div>
+
+    <div class="section" th:if="${reservation == null}">
+        <h2>Reservation</h2>
+        <p>No reservation attached.</p>
+    </div>
+
+    <!-- Continue to payment method details -->
+    <form th:action="@{/customer/{customerID}/dashpasspaymentmethoddetails(customerID=${customer.id})}" method="get">
+        <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}">
+        <input type="hidden" name="totalPrice" th:value="${totalPrice}">
+        <input type="hidden" name="selectedReservationId" th:value="${reservation != null ? reservation.reservationId : null}">
+
+        <!-- Proceed and Cancel Buttons -->
+        <div class="button-group">
+            <button type="submit" class="confirm-button">Proceed to Payment</button>
+            <button type="button" class="cancel-button" onclick="window.history.back();">Cancel</button>
+        </div>
+    </form>
 </div>
 
-<div>
-    <h2>DashPass Details</h2>
-    <p>Quantity: <span th:text="${dashPassQuantity}"></span></p>
-    <p>Total Price: $<span th:text="${totalPrice}"></span></p>
-</div>
-
-<!-- Conditional rendering for reservation -->
-<div th:if="${reservation != null}">
-    <h2>Reservation Details</h2>
-    <p>Reservation ID: <span th:text="${reservation.reservationId}"></span></p>
-    <p>Flight Date: <span th:text="${#temporals.format(reservation.flightDepartureDate, 'yyyy-MM-dd')}"></span></p>
-    <p>Airport Code: <span th:text="${reservation.airportCode}"></span></p>
-</div>
-<div th:if="${reservation == null}">
-    <h2>Reservation</h2>
-    <p>No reservation attached.</p>
-</div>
-
-<!-- Continue to payment method details -->
-<form th:action="@{/customer/{customerID}/dashpasspaymentmethoddetails(customerID=${customer.id})}" method="get">
-    <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}">
-    <input type="hidden" name="totalPrice" th:value="${totalPrice}">
-    <input type="hidden" name="selectedReservationId" th:value="${reservation != null ? reservation.reservationId : null}">
-
-    <button type="submit">Proceed to Payment</button>
-</form>
-
-<button type="button" onclick="window.history.back();">Cancel</button>
 </body>
 </html>

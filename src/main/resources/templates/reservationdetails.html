@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Reservation Details</title>
+  <link rel="stylesheet" th:href="@{/styles/reservationDetails.css}" />
+</head>
+<body>
+<button type="button" onclick="window.history.back();">Back</button>
+<div class="container">
+  <h2>Reservation Details</h2>
+
+  <!-- Display Reservation Information -->
+  <div th:each="flight : ${reservation.flights}" class="reservation-info">
+    <p><strong>Reservation ID:</strong> <span th:text="${reservation.reservationId}">12345</span></p>
+    <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">FL1234</span></p>
+    <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}">JFK</span></p>
+    <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}">LAX</span></p>
+  </div>
+
+  <!-- DashPass Information -->
+  <div th:if="${!#lists.isEmpty(reservation.dashPassReservations)}">
+    <h3>DashPass Information</h3>
+    <div th:each="dashPassReservation : ${reservation.dashPassReservations}">
+      <p><strong>DashPass Confirmation Number:</strong> <span th:text="${dashPassReservation.dashPass.confirmationNumber}">ABC123</span></p>
+      <p><strong>DashPass Redeemed:</strong> <span th:text="${dashPassReservation.dashPass.redeemed ? 'Yes' : 'No'}">Yes</span></p>
+    </div>
+  </div>
+  <div th:if="${#lists.isEmpty(reservation.dashPassReservations)}">
+    <h3>No Dash Pass Information to Show</h3>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <a th:href="@{/customer/{customerId}/reservation/edit/{reservationId}(customerId=${reservation.customer.id}, reservationId=${reservation.reservationId})}">
+      <button class="button">Edit Reservation</button>
+    </a>
+    <!-- Delete Reservation Button -->
+    <form th:action="@{/customer/{customerId}/reservation/delete/{reservationId}(customerId=${reservation.customer.id}, reservationId=${reservation.reservationId})}" method="post">
+      <button type="submit" class="button delete-button">Delete Reservation</button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>

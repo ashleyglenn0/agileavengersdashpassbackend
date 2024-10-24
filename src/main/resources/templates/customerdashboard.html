@@ -104,7 +104,8 @@
             <p>Departure Date: <span th:text="${soonestReservation.flights[0].departureDate}"></span></p>
             <p>Departure Time: <span th:text="${soonestReservation.flights[0].departureTime}"></span></p>
             <p>Status: <span th:text="${soonestReservation.status}"></span></p>
-            <button>View All Reservations</button>
+            <button onclick="window.location.href='/customer/15/reservations'">View All Reservations</button>
+
         </div>
         <div th:if="${soonestReservation == null}">
             <p>No upcoming reservations at this time.</p>

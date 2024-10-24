@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Redeem DashPass</title>
+  <link rel="stylesheet" href="/styles/redeemDashPass.css" />
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form action="/perform_logout" method="post">
+      <button type="submit" class="button">Logout</button>
+    </form>
+  </nav>
+</header>
+
+<div class="content-container">
+  <!-- Success Alert -->
+  <div class="alert success" th:if="${dashPassAdded}">
+    DashPass successfully redeemed for reservation!
+  </div>
+
+  <!-- Title -->
+  <h2>Redeem DashPass</h2>
+
+  <form th:action="@{/customer/{customerID}/redeemDashPass(customerID=${customer.id})}" method="POST">
+    <table class="reservation-table">
+      <thead>
+      <tr>
+        <th>Reservation ID</th>
+        <th>Flight Number</th>
+        <th>Departure Date</th>
+        <th>Departure Airport</th>
+        <th>Arrival Airport</th>
+        <th>Select DashPass</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="reservation : ${reservationsWithoutDashPass}">
+        <td th:text="${reservation.id}">Reservation ID</td>
+        <td th:text="${reservation.flight.flightNumber}">Flight Number</td>
+        <td th:text="${#temporals.format(reservation.flight.departureDate, 'yyyy-MM-dd')}">Departure Date</td>
+        <td th:text="${reservation.flight.departureAirportCode}">Departure Airport</td>
+        <td th:text="${reservation.flight.arrivalAirportCode}">Arrival Airport</td>
+        <td>
+          <input type="checkbox" name="dashPassId" th:value="${customer.dashPasses[0].dashpassId}" required>
+          Redeem DashPass
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Redeem Button -->
+    <button class="button" type="submit">Redeem DashPass</button>
+  </form>
+
+  <!-- Return to Dashboard Button -->
+  <button class="button" onclick="window.location.href='/customer/' + ${customer.id} + '/customerdashboard';">Return to Dashboard</button>
+</div>
+
+</body>
+</html>

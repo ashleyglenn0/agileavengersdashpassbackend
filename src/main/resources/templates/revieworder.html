@@ -2,64 +2,62 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Confirm Flight</title>
-    <link rel="stylesheet" href="/styles/yourStyleSheet.css" />
+    <link rel="stylesheet" href="/styles/confirmpurchase.css" />
 </head>
 <body>
 
 <!-- Confirmation Card -->
-<div class="card">
+<div class="container">
     <h2>Confirm Your Flight</h2>
 
-    <form th:action="@{/customer/{customerID}/paymentmethoddetails(customerID=${customer.id})}"
-          method="POST">
-        <input type="hidden" name="tripType" th:value="${tripType}"> <!-- Add this -->
+    <form th:action="@{/customer/{customerID}/paymentmethoddetails(customerID=${customer.id})}" method="POST">
+        <!-- Hidden Fields -->
+        <input type="hidden" name="tripType" th:value="${tripType}">
         <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}">
         <input type="hidden" name="returnFlightId" th:value="${returnFlight != null ? returnFlight.flightId : null}">
         <input type="hidden" name="dashPassOption" th:value="${dashPassOption}">
         <input type="hidden" name="totalPrice" th:value="${totalPrice}">
-        <!-- Outbound Flight Details -->
-        <h3>Outbound Flight</h3>
-        <p th:text="${outboundFlight.flightNumber}">Flight Number</p>
-        <p th:text="${outboundFlight.departureAirportCode}">Departure Airport</p>
-        <p th:text="${outboundFlight.arrivalAirportCode}">Arrival Airport</p>
-        <!-- More outbound flight details -->
-        <!-- Trip Type (hidden field or select based on user's choice) -->
 
+        <!-- Outbound Flight Details -->
+        <div class="section">
+            <h3>Outbound Flight</h3>
+            <p><strong>Flight Number:</strong> <span th:text="${outboundFlight.flightNumber}"></span></p>
+            <p><strong>Departure Airport:</strong> <span th:text="${outboundFlight.departureAirportCode}"></span></p>
+            <p><strong>Arrival Airport:</strong> <span th:text="${outboundFlight.arrivalAirportCode}"></span></p>
+            <!-- More outbound flight details if needed -->
+        </div>
 
         <!-- Return Flight Details (if applicable) -->
-        <div th:if="${returnFlight != null}">
+        <div class="section" th:if="${returnFlight != null}">
             <h3>Return Flight</h3>
-            <p th:text="${returnFlight.flightNumber}">Return Flight Number</p>
-            <p th:text="${returnFlight.departureAirportCode}">Return Departure Airport</p>
-            <p th:text="${returnFlight.arrivalAirportCode}">Return Arrival Airport</p>
+            <p><strong>Return Flight Number:</strong> <span th:text="${returnFlight.flightNumber}"></span></p>
+            <p><strong>Return Departure Airport:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
+            <p><strong>Return Arrival Airport:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
             <!-- More return flight details -->
         </div>
 
         <!-- DashPass Option -->
-        <h3>DashPass Option</h3>
-        <div th:if="${dashPassOption == 'existing'}">
-            <p>Using Existing DashPass:</p>
-            <p>DashPass ID: <span th:text="${dashPass.id}"></span></p>
-            <p>Valid Until: <span th:text="${dashPass.expirationDate}"></span></p>
+        <div class="section">
+            <h3>DashPass Option</h3>
+            <div th:if="${dashPassOption == 'existing'}">
+                <p><strong>Using Existing DashPass:</strong></p>
+                <p><strong>DashPass ID:</strong> <span th:text="${dashPass.id}"></span></p>
+                <p><strong>Valid Until:</strong> <span th:text="${dashPass.expirationDate}"></span></p>
+            </div>
+            <div th:if="${dashPassOption == 'purchase'}">
+                <p><strong>Purchasing New DashPass:</strong></p>
+                <p><strong>DashPass Price:</strong> $<span th:text="${#numbers.format(dashPass.price, 1, 'COMMA', 2, 'POINT')}"></span></p>
+            </div>
         </div>
 
-        <div th:if="${dashPassOption == 'purchase'}">
-            <p>Purchasing New DashPass:</p>
-            <p>DashPass Price: $<span th:text="${#numbers.format(dashPass.price, 1, 'COMMA', 2, 'POINT')}"></span></p>
+        <!-- Total Price -->
+        <div class="section">
+            <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
         </div>
 
-        <!-- Hidden fields to pass the necessary data -->
-        <input type="hidden" name="outboundFlightID" th:value="${outboundFlight.flightID}">
-        <input type="hidden" name="returnFlightID" th:value="${returnFlight != null ? returnFlight.flightID : null}">
-        <input type="hidden" name="dashPassOption" th:value="${dashPassOption}">
-
-        <!-- Total Price (optional) -->
-        <p>Total Price: $<span th:text="${totalPrice}"></span></p>
-        <input type="hidden" name="totalPrice" th:value="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}">
-
-        <!-- Submit and Cancel Buttons -->
+        <!-- Buttons -->
         <button type="submit">Confirm Booking</button>
-        <button type="button" onclick="window.history.back();">Cancel</button>
+        <button type="button" class="cancel-button" onclick="window.history.back();">Cancel</button>
     </form>
 </div>
 

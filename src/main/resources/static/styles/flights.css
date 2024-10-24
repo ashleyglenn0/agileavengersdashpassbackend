@@ -1,149 +1,148 @@
-/* General Styles */
+/* General styling */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    background-color: rgb(0, 51, 153);
 }
 
 h2, h3 {
     color: #333;
-    text-align: center;
-    margin-top: 20px;
 }
 
-label {
-    font-weight: bold;
-    margin-top: 10px;
+p {
+    font-size: 16px;
+    color: #555;
 }
 
-form {
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Input Styles */
-input[type="text"],
-input[type="date"],
-input[type="number"],
-select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0 20px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-/* Button Styles */
-.button {
-    background-color: rgb(255, 204, 0);
-    color: rgb(0, 51, 153);
-    padding: 10px 20px;
-    text-align: center;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.button:hover {
-    background-color: rgb(255, 204, 0);
-}
-
-.form-button {
-    width: 75%;
-}
-
-.navbar-button {
-    background-color: rgb(255, 204, 0);
-    color: rgb(0, 51, 153);
-    padding: 10px 20px;
-    border-radius: 4px;
-}
-
-.navbar-button:hover {
-    background-color: #ff9900;
-    color: white;
-}
-
-.cancelButton {
-    background-color: transparent;
-    color: white;
-    border: 2px solid rgb(255, 204, 0);
-}
-
-/* Table Styles */
-.table-container {
-    width: 100%;
-    max-width: 1600px; /* Increase max-width further for more space */
-    margin: 0 auto;
-    padding: 20px;
-    overflow-x: auto;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    table-layout: auto; /* Let columns adjust their widths based on content */
-}
-
-table th, table td {
-    padding: 15px; /* Increase padding for better spacing */
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-table th {
-    background-color: rgb(255, 204, 0);
-    color: rgb(0, 51, 153);
-}
-
-table td {
-    background-color: #f9f9f9;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/* Card Styles */
-.card {
-    background-color: white;
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-}
-
-/* No Flights Message */
-.no-flights-message {
-    text-align: center;
-    font-size: 1.2em;
-    color: #ff0000;
-    margin-top: 20px;
-}
-
-/* Logo */
-.logo {
-    height: 100px;
-    width: 150px;
-}
-
-/* Nav styles */
+/* Navbar */
 .navbar {
+    background-color: #004785;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.navbar img.logo {
+    height: 50px;
+}
+
+.navbar form .button {
+    background-color: #ffa500;
+    color: white;
+    border: none;
     padding: 10px 20px;
-    background-color: rgb(255, 204, 0);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.navbar form .button:hover {
+    background-color: #e69500;
+}
+
+/* Container for table */
+.table-container {
+    background-color: white;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+}
+
+h2, h3 {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Styling for table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table thead th {
+    background-color: #004785;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+table tbody td label {
+    display: block;
+}
+
+/* Button styling */
+.button {
+    background-color: #004785;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.button:hover {
+    background-color: #003366;
+}
+
+/* No flights message styling */
+.no-flights-message {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.no-flights-message p {
+    color: #555;
+    font-size: 16px;
+}
+
+.no-flights-message .button {
+    margin-top: 20px;
+}
+
+/* DashPass Option Styling */
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+input[type="radio"]:not(:checked) + label {
+    color: #333;
+}
+
+input[type="radio"]:checked + label {
+    color: #004785;
+    font-weight: bold;
+}
+
+/* Form Buttons */
+form button[type="submit"] {
+    display: block;
+    margin: 20px auto;
+    background-color: #ffa500;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+form button[type="submit"]:hover {
+    background-color: #e69500;
 }

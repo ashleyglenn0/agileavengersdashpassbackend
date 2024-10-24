@@ -1,24 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>DashPass Purchase Complete</title>
+    <link rel="stylesheet" href="/styles/purchasecomplete.css" />
 </head>
 <body>
-<h1>DashPass Purchase Complete</h1>
 
-<div>
-    <h2>Thank you for your purchase <span th:text="${customer.user.firstName}"></span>!</h2>
+<!-- Confirmation Card -->
+<div class="confirmation-container">
+    <h1>DashPass Purchase Complete</h1>
 
-    <!-- Display confirmation number -->
-    <p><strong>Confirmation Number:</strong> <span th:text="${confirmationNumber}"></span></p>
+    <div class="confirmation-details">
+        <!-- Thank you message with the customer's first name -->
+        <h2>Thank you for your purchase, <span th:text="${customer.user.firstName}"></span>!</h2>
 
-    <!-- Show DashPass quantity and total price -->
-    <p><strong>DashPasses Purchased:</strong> <span th:text="${dashPassQuantity}"></span></p>
-    <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
+        <!-- Display confirmation number -->
+        <p><strong>Confirmation Number:</strong> <span th:text="${confirmationNumber}"></span></p>
 
-    <button type="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">
-        Return to Dashboard
-    </button>
+        <!-- Show DashPass quantity and total price -->
+        <p><strong>DashPasses Purchased:</strong> <span th:text="${dashPassQuantity}"></span></p>
+        <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
+
+        <!-- Button to return to the customer dashboard -->
+        <button class="confirm-button" type="button"
+                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">
+            Return to Dashboard
+        </button>
+    </div>
 </div>
 
 </body>
