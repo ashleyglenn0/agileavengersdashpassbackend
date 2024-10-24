@@ -42,6 +42,8 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.VALID; // Default to VALID
+    @Column(name = "confirmation_number")
+    private String confirmationNumber;
 
 
     public Reservation(Customer customer, LocalDate bookingDate){
@@ -142,6 +144,14 @@ public class Reservation {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public String getConfirmationNumber() {
+        return confirmationNumber;
+    }
+
+    public void setConfirmationNumber(String confirmationNumber) {
+        this.confirmationNumber = confirmationNumber;
     }
 }
 

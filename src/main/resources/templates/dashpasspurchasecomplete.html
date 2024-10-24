@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>DashPass Purchase Complete</title>
+</head>
+<body>
+<h1>DashPass Purchase Complete</h1>
+
+<div>
+    <h2>Thank you for your purchase <span th:text="${customer.user.firstName}"></span>!</h2>
+
+    <!-- Display confirmation number -->
+    <p><strong>Confirmation Number:</strong> <span th:text="${confirmationNumber}"></span></p>
+
+    <!-- Show DashPass quantity and total price -->
+    <p><strong>DashPasses Purchased:</strong> <span th:text="${dashPassQuantity}"></span></p>
+    <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
+
+    <button type="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">
+        Return to Dashboard
+    </button>
+</div>
+
+</body>
+</html>

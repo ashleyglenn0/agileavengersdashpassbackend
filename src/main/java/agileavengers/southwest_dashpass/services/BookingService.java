@@ -3,13 +3,17 @@ package agileavengers.southwest_dashpass.services;
 import agileavengers.southwest_dashpass.dtos.PaymentDetailsDTO;
 import agileavengers.southwest_dashpass.exceptions.PaymentFailedException;
 import agileavengers.southwest_dashpass.models.*;
+import agileavengers.southwest_dashpass.repository.ReservationRepository;
 import agileavengers.southwest_dashpass.utils.MockPaymentProcessor;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -20,15 +24,18 @@ public class BookingService {
     private final ReservationService reservationService;
     private final DashPassReservationService dashPassReservationService;
     private final MockPaymentProcessor mockPaymentProcessor;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     public BookingService(FlightService flightService, DashPassService dashPassService, ReservationService reservationService,
-                          DashPassReservationService dashPassReservationService, MockPaymentProcessor mockPaymentProcessor) {
+                          DashPassReservationService dashPassReservationService, MockPaymentProcessor mockPaymentProcessor,
+                          ReservationRepository reservationRepository) {
         this.flightService = flightService;
         this.dashPassService = dashPassService;
         this.reservationService = reservationService;
         this.dashPassReservationService = dashPassReservationService;
         this.mockPaymentProcessor = mockPaymentProcessor;
+        this.reservationRepository = reservationRepository;
     }
 
     @Async
@@ -164,6 +171,30 @@ public class BookingService {
             }
         });
     }
+
+    @Transactional
+    public Reservation createReservation(Customer customer, Long outboundFlightId, Long returnFlightId, String dashPassOption,
+                                         String tripType, double totalPrice) {
+        Flight outboundFlight = flightService.findFlightById(outboundFlightId);
+        List<Flight> flights = new ArrayList<>();
+        flights.add(outboundFlight);
+
+        if (returnFlightId != null) {
+            Flight returnFlight = flightService.findFlightById(returnFlightId);
+            flights.add(returnFlight);
+        }
+
+        // Create and populate reservation
+        Reservation reservation = new Reservation();
+        reservation.setFlights(flights);
+        reservation.setCustomer(customer);
+        reservation.setTotalPrice(totalPrice);
+        reservation.setDateBooked(LocalDate.now());
+
+        // Save reservation
+        return reservationRepository.save(reservation);
+    }
+
 
 }
 

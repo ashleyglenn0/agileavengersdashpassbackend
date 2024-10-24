@@ -8,6 +8,7 @@ import agileavengers.southwest_dashpass.utils.EncryptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +23,7 @@ public class PaymentDetailsService {
         this.encryptionUtils = encryptionUtils;
     }
 
+    // Save payment details for a customer
     // Save payment details for a customer
     public PaymentDetails savePaymentDetails(Customer customer, String cardNumber, String expirationDate, String cvv, String billingZip, String nameOnCard) {
         PaymentDetails paymentDetails = new PaymentDetails(customer, cardNumber, expirationDate, cvv, billingZip, nameOnCard);
@@ -48,13 +50,26 @@ public class PaymentDetailsService {
 
     public PaymentDetailsDTO getDecryptedPaymentDetails(PaymentDetails paymentDetails) {
         PaymentDetailsDTO dto = new PaymentDetailsDTO();
-
         // Decrypt sensitive fields before returning
         dto.setCardNumber(encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber()));
         dto.setCvv(encryptionUtils.decrypt(paymentDetails.getEncryptedCVV()));
         dto.setExpirationDate(encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate()));
-
         return dto;
+    }
+
+    // New Method to check if encrypted card number exists in the database
+    public boolean checkIfPaymentMethodExists(String cardNumber) {
+        // Encrypt the provided card number to compare with stored encrypted values
+        String encryptedCardNumber = encryptionUtils.encrypt(cardNumber);
+
+        // Check if any stored payment details have this encrypted card number
+        List<PaymentDetails> paymentDetailsList = paymentDetailsRepository.findAll();
+        for (PaymentDetails paymentDetails : paymentDetailsList) {
+            if (paymentDetails.getEncryptedCardNumber().equals(encryptedCardNumber)) {
+                return true; // Found a match
+            }
+        }
+        return false;
     }
 
 }

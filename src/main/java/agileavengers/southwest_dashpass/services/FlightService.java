@@ -161,6 +161,56 @@ public class FlightService {
         flightRepository.save(flight);
     }
 
+    public List<FlightSearchResponse> searchRoundTripFlights(String departureAirportCode, String arrivalAirportCode,
+                                                             LocalDate departureDateRangeStart, LocalDate departureDateRangeEnd,
+                                                             LocalDate returnDateRangeStart, LocalDate returnDateRangeEnd) {
+        // Search outbound flights within the date range
+        List<Flight> outboundFlights = flightRepository.findFlights(departureAirportCode, arrivalAirportCode,
+                departureDateRangeStart, departureDateRangeEnd);
+
+        List<FlightSearchResponse> searchResults = new ArrayList<>();
+
+        // For each outbound flight, find matching return flights
+        for (Flight outboundFlight : outboundFlights) {
+            LocalDate outboundFlightDepartureDate = outboundFlight.getDepartureDate();
+
+            // Search for return flights that depart after the outbound flight and within the return date range
+            List<Flight> returnFlights = flightRepository.findFlights(
+                    outboundFlight.getArrivalAirportCode(),  // Return flight departs from where the outbound arrives
+                    outboundFlight.getDepartureAirportCode(),  // Return flight arrives at the original departure airport
+                    outboundFlightDepartureDate.plusDays(1),  // Return flight must be after the outbound flight
+                    returnDateRangeEnd);
+
+            // Pair outbound flight with return flights if any exist
+            if (!returnFlights.isEmpty()) {
+                for (Flight returnFlight : returnFlights) {
+                    // Create a new FlightSearchResponse with both outbound and return flights
+                    FlightSearchResponse response = new FlightSearchResponse();
+
+                    // Wrap outbound flight in a list and set it in the response
+                    List<Flight> outboundFlightList = new ArrayList<>();
+                    outboundFlightList.add(outboundFlight);
+                    response.setOutboundFlights(outboundFlightList);
+
+                    // Wrap return flight in a list and set it in the response
+                    List<Flight> returnFlightList = new ArrayList<>();
+                    returnFlightList.add(returnFlight);
+                    response.setReturnFlights(returnFlightList);
+
+                    searchResults.add(response);
+                }
+            }
+        }
+
+        return searchResults;
+    }
+
+    public List<Flight> searchOneWayFlights(String departureAirportCode, String arrivalAirportCode,
+                                            LocalDate departureDateRangeStart, LocalDate departureDateRangeEnd) {
+        return flightRepository.findFlights(departureAirportCode, arrivalAirportCode, departureDateRangeStart, departureDateRangeEnd);
+    }
+
+
 
 }
 

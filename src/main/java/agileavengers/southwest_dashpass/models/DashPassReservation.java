@@ -28,10 +28,10 @@ public class DashPassReservation {
     @ManyToOne
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
+    @Column(name = "confirmation_number")
+    private String confirmationNumber;
 
-    // Other fields and methods...
 
-    // Getter and setter for Reservation
 
 
     public DashPassReservation(){
@@ -93,6 +93,13 @@ public class DashPassReservation {
         this.reservation = reservation;
     }
 
+    public String getConfirmationNumber() {
+        return confirmationNumber;
+    }
+
+    public void setConfirmationNumber(String confirmationNumber) {
+        this.confirmationNumber = confirmationNumber;
+    }
 }
 
 

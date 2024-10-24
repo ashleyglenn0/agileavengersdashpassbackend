@@ -20,6 +20,8 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
 
     boolean existsByFlightNumber(String flightNumber);
 
+    List<Flight> findFlightsByDepartureDateBefore(LocalDate departureDate);
+
 
     List<Flight> findByDepartureAirportCodeAndArrivalAirportCode(Airport departure, Airport arrival);
 
@@ -59,5 +61,19 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
                                          @Param("arrivalAirport") String arrivalAirport,
                                          @Param("departureDate") LocalDate departureDate,
                                          @Param("maxReturnDate") LocalDate maxReturnDate);
+
+
+    @Query("SELECT f FROM Flight f WHERE f.departureAirportCode = :departureAirportCode " +
+            "AND f.arrivalAirportCode = :arrivalAirportCode " +
+            "AND f.departureDate BETWEEN :startDate AND :endDate")
+    List<Flight> findFlights(@Param("departureAirportCode") String departureAirportCode,
+                             @Param("arrivalAirportCode") String arrivalAirportCode,
+                             @Param("startDate") LocalDate startDate,
+                             @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT f FROM Flight f WHERE f.departureAirportCode = :departure AND f.arrivalAirportCode = :arrival AND f.departureDate = :departureDate")
+    List<Flight> findFlightsByDepartureAndArrivalAndDate(@Param("departure") String departure,
+                                                         @Param("arrival") String arrival,
+                                                         @Param("departureDate") LocalDate departureDate);
 
 }

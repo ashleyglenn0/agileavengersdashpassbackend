@@ -174,6 +174,7 @@ public class FlightDataPopulator {
 
 
 
+
     // Helper method to generate a random airport code
     private String getRandomAirportCode(Random random) {
         return AIRPORTS.keySet().toArray(new String[0])[random.nextInt(AIRPORTS.size())];

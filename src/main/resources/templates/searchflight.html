@@ -17,24 +17,24 @@
 <div class="card">
   <h2>Book Flight</h2>
 
-  <form th:action="@{/customer/{customerID}/searchFlightsByDate(customerID=${customerID}, selectedDate=${selectedDate},
-  departureAirport=${departureAirport}, arrivalAirport=${arrivalAirport}, tripType=${tripType}, returnDate=${returnDate})}" th:object="${flight}" method="GET">
+  <form th:action="@{/customer/{customerID}/searchFlightsByDate(customerID=${customerID})}" method="GET">
     <input type="hidden" name="customerID" th:value="${customerID}" />
-    <!-- Date Field -->
-    <label for="selectedDate">Select Date:</label>
-    <input type="date" id="selectedDate" name="selectedDate" th:value="${selectedDate}" required />
 
-    <!-- Departure Airport Dropdown -->
-    <label for="departureAirport">Departure Airport:</label>
-    <select id="departureAirport" name="departureAirport"  th:value="${departureAirport}" required>
+    <!-- Date Field (departureDateRangeStart) -->
+    <label for="departureDate">Select Date:</label>
+    <input type="date" id="departureDate" name="departureDate" th:value="${departureDate}" required />
+
+    <!-- Departure Airport Dropdown (departureAirportCode) -->
+    <label for="departureAirportCode">Departure Airport:</label>
+    <select id="departureAirportCode" name="departureAirportCode" th:value="${departureAirport}" required>
       <option th:each="airport : ${airports}"
               th:value="${airport.airportCode}"
               th:text="${airport.airportCode}">Select Departure Airport</option>
     </select>
 
-    <!-- Arrival Airport Dropdown -->
-    <label for="arrivalAirport">Arrival Airport:</label>
-    <select id="arrivalAirport" name="arrivalAirport" required  th:value="${arrivalAirport}">
+    <!-- Arrival Airport Dropdown (arrivalAirportCode) -->
+    <label for="arrivalAirportCode">Arrival Airport:</label>
+    <select id="arrivalAirportCode" name="arrivalAirportCode" th:value="${arrivalAirport}" required>
       <option th:each="airport : ${airports}"
               th:value="${airport.airportCode}"
               th:text="${airport.airportCode}">Select Arrival Airport</option>
@@ -48,19 +48,20 @@
       </select>
     </div>
 
-    <!-- Return Date input, hidden by default -->
+    <!-- Return Date input (returnDateRangeStart), hidden by default -->
     <div id="returnDateDiv" style="display: none;">
-      <label for="returnDate">Return Date:</label>
-      <input type="date" name="returnDate" id="returnDate" th:value="${returnDate}">
+      <label for="returnDateRangeStart">Return Date:</label>
+      <input type="date" name="returnDateRangeStart" id="returnDateRangeStart" th:value="${returnDate}">
     </div>
 
     <!-- Find Flights Button -->
     <button type="submit">Find Flight</button>
   </form>
 </div>
-  <!-- Back Button -->
-  <button onclick="window.history.back();">Back</button>
-</div>
+
+<!-- Back Button -->
+<button onclick="window.history.back();">Back</button>
+
 <script>
   function toggleReturnDate() {
     const tripType = document.getElementById("tripType").value;
