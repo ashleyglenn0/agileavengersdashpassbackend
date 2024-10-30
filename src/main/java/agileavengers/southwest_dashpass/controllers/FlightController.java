@@ -300,12 +300,13 @@ public class FlightController {
 
             Reservation reservation = futureReservation.get();
 
+            // Debugging output
+            System.out.println("Payment Status after async completion: " + reservation.getPaymentStatus());
+
             // Check if the payment was successful
             if (reservation.getPaymentStatus() == PaymentStatus.PAID) {
-                // Process DashPass selection based on the customer's choice
                 processDashPassSelection(dashPassOption, customer, reservation.getFlights());
 
-                // Update the model with reservation and flight details
                 model.addAttribute("reservation", reservation);
                 model.addAttribute("outboundFlight", reservation.getFlights().get(0));
 
@@ -318,7 +319,6 @@ public class FlightController {
             }
 
         } catch (ExecutionException | InterruptedException e) {
-            // Handle payment processing errors
             model.addAttribute("errorMessage", "Payment failed. Please try again.");
             return handlePurchaseError(model, customerID, outboundFlightId, returnFlightId, tripType, dashPassOption, totalPrice, userSelectedStatus);
         }

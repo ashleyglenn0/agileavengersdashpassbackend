@@ -98,5 +98,16 @@ public class ReservationService {
                 .orElse(null); // Return null if no valid reservation is found
     }
 
+    public List<Reservation> findReservationsWithoutDashPass(Long customerId) {
+        List<Reservation> reservations = reservationRepository.findByCustomerIdAndDashPassReservationsIsNull(customerId);
+        if (reservations.isEmpty()) {
+            System.out.println("No reservations without DashPass found for customer: " + customerId);
+        } else {
+            System.out.println("Reservations without DashPass for customer " + customerId + ": " + reservations.size());
+        }
+        return reservations;
+    }
+
+
 
 }

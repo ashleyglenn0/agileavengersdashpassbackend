@@ -50,13 +50,8 @@ public class DashPassService {
         // Loop over DashPass quantity
         for (int i = 0; i < dashPassQuantity; i++) {
             // Check if the customer has reached their max number of DashPasses
-            if (customer.getMaxNumberOfDashPasses() == customer.getTotalDashPassesCustomerHas()) {
+            if (customer.getTotalDashPasses() >= customer.getMaxDashPasses()) {
                 throw new RuntimeException("Customer has reached the maximum number of DashPasses.");
-            }
-
-            // Handle potential null value for totalDashPassesForUse
-            if (customer.getTotalDashPassesForUse() == null) {
-                customer.setTotalDashPassesForUse(0); // Set a default value if it's null
             }
 
             // Create a new DashPass
@@ -66,9 +61,9 @@ public class DashPassService {
 
             // Generate a confirmation number and set it for the DashPass
             confirmationNumber = confirmationNumberGenerator.generateConfirmationNumber();
-            dashPass.setConfirmationNumber(confirmationNumber); // Assuming you added confirmationNumber to DashPass
+            dashPass.setConfirmationNumber(confirmationNumber);
 
-            // Add the DashPass to the customer's DashPasses array if not linked to a reservation
+            // Add the DashPass to the customer's DashPasses list if not linked to a reservation
             if (reservation == null) {
                 customer.addDashPass(dashPass);  // Use the method to manually add to list and set the relationship
                 System.out.println("DashPass added to customer list");
@@ -86,21 +81,17 @@ public class DashPassService {
                     dashPassReservation.setDashPass(dashPass);
                     dashPassReservation.setReservation(reservation);
                     dashPassReservation.setBookingDate(LocalDate.now()); // Set the booking date for the reservation
-                    customer.addDashPassReservation(dashPassReservation); // Attach the reservation
+                    customer.addDashPassReservation(dashPassReservation);
 
                     // Save the DashPassReservation entity
                     dashPassReservationRepository.save(dashPassReservation);
                 }
-
-                // Update the DashPass counters for the customer
-                customer.setNumberOfDashPassesUsed(customer.getNumberOfDashPassesUsed() + 1);
-            } else {
-                // If the DashPass is not attached to a reservation, make it available for future use
-                customer.setTotalDashPassesForUse(customer.getTotalDashPassesForUse() + 1);
             }
 
-            // Update the DashPass count for the customer
-            customer.setTotalDashPassesCustomerHas(customer.getTotalDashPassesCustomerHas() + 1);
+            // If the DashPass is not attached to a reservation, make it available for future use
+            if (reservation == null) {
+                customer.setDashPassesForPurchase(customer.getDashPassesForPurchase() - 1);
+            }
 
             // Save the updated customer and their DashPasses
             dashPassRepository.save(dashPass);
@@ -109,6 +100,7 @@ public class DashPassService {
 
         return confirmationNumber;
     }
+
 
 
 
@@ -163,24 +155,4 @@ public class DashPassService {
         // Return null if no available DashPass is found
         return null;
     }
-
-    private void incrementDashPassesInUse(Customer customer) {
-        customer.setNumberOfDashPassesUsed(customer.getNumberOfDashPassesUsed() + 1);
-    }
-
-    private void incrementTotalDashPassesOwned(Customer customer) {
-        customer.setTotalDashPassesCustomerHas(customer.getTotalDashPassesCustomerHas() + 1);
-    }
-
-    private void incrementDashPassesAvailableForPurchase(Customer customer) {
-        int availableForPurchase = customer.getMaxNumberOfDashPasses() - customer.getTotalDashPassesCustomerHas();
-        customer.setNumberOfDashPassesAvailableForPurchase(availableForPurchase);
-    }
-
-
-    // Check if customer has available DashPasses
-    private boolean customerHasAvailableDashPasses(Customer customer) {
-        return customer.getNumberOfDashPassesAvailableForPurchase() < customer.getMaxNumberOfDashPasses();
-    }
-
 }

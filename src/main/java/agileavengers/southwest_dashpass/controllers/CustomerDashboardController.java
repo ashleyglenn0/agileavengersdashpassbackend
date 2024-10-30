@@ -45,11 +45,6 @@ public class CustomerDashboardController {
             return "error/403";  // Show a 403 error page if access is unauthorized
         }
 
-        Integer numberOfDashPassesInUse = customer.getNumberOfDashPassesUsed();
-        Integer numberOfDashPassesAvailableForPurchase = customer.getNumberOfDashPassesAvailableForPurchase();
-        Integer numberOfDashPassesAvailableToAddToReservation = customer.getNumberOfDashPasses();
-        Integer totalNumberOfDashPassesOwned = customer.getTotalDashPassesCustomerHas();
-
 //        System.out.println("Upcoming Flight: " + (upcomingFlight != null ? upcomingFlight.getFlightDepartureDate() : "None"));
         for (Reservation reservation : upcomingFlight) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
@@ -62,14 +57,9 @@ public class CustomerDashboardController {
 
         // Add customer information to the model
         model.addAttribute("customer", customer);
-        model.addAttribute("numberOfDashPassesInUse", numberOfDashPassesInUse);
-        model.addAttribute("numberOfDashPassesAvailableForPurchase", numberOfDashPassesAvailableForPurchase);
-        model.addAttribute("numberOfDashPassesAvailableToAddToReservation", numberOfDashPassesAvailableToAddToReservation);
-        model.addAttribute("totalNumberOfDashPassesOwned", totalNumberOfDashPassesOwned);
         model.addAttribute("upcomingFlight", upcomingFlight);
 
 
         return "customerdashboard";  // Return the dashboard view
     }
-
 }

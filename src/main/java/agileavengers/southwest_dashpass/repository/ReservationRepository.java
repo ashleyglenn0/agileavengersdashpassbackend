@@ -24,4 +24,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // Query to fetch only valid reservations
     List<Reservation> findByCustomerIdAndStatus(Long customerId, ReservationStatus status);
 
+    List<Reservation> findByCustomerIdAndDashPassReservationsIsNull(Long customerId);
+
 }

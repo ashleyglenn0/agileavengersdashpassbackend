@@ -1,0 +1,109 @@
+/* Container for the entire page content */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Header section styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+}
+
+/* Button group to style the add and cancel buttons */
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add {
+    background-color: #4CAF50;
+}
+
+.btn-add:hover {
+    background-color: #45a049;
+}
+
+.btn-cancel {
+    background-color: #gray;
+    color: black;
+    text-decoration: none;
+}
+
+.btn-cancel:hover {
+    background-color: #d9d9d9;
+}
+
+.btn-delete {
+    background-color: #f44336;
+}
+
+.btn-delete:hover {
+    background-color: #e53935;
+}
+
+/* Individual payment method item */
+.payment-method {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.payment-method span {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Delete button within payment method item */
+.payment-method .btn-delete {
+    font-size: 14px;
+    padding: 6px 10px;
+    margin-left: 10px;
+    color: white;
+    background-color: #f44336;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.payment-method .btn-delete:hover {
+    background-color: #e53935;
+}
+
+/* Message for no payment methods available */
+.no-payment-methods {
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+}

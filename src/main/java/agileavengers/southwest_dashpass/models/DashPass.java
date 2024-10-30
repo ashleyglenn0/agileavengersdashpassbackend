@@ -87,6 +87,9 @@ public class DashPass {
     public void setConfirmationNumber(String confirmationNumber) {
         this.confirmationNumber = confirmationNumber;
     }
+    public boolean isRedeemable() {
+        return !isRedeemed && expirationDate.isAfter(LocalDate.now());
+    }
 }
 
 

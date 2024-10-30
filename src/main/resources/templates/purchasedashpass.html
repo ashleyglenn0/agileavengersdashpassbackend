@@ -42,6 +42,7 @@
 </header>
 <form th:action="@{/customer/{customerID}/purchasedashpass(customerID=${customerID})}" th:object="${dashPass}" method="post">
     <div class="container">
+        <div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red; font-weight: bold;"></div>
         <h2>Purchase DashPass</h2>
 
         <!-- Number of DashPasses to Purchase -->

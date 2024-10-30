@@ -52,15 +52,6 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-    public Integer getNumberOfDashPassesAvailableForPurchase(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        // Filter out redeemed DashPasses
-        long unredeemedDashPasses = customer.getDashPasses().stream()
-                .filter(dashPass -> !dashPass.isRedeemed())
-                .count();
-        return customer.getMaxNumberOfDashPasses() - (int) unredeemedDashPasses;
-    }
-
     public Integer getNumberOfDashPassesAvailableToRedeem(Long customerId) {
         Customer customer = findCustomerById(customerId);
         // Return only DashPasses that are not yet redeemed
@@ -83,12 +74,6 @@ public class CustomerService {
                 .filter(dashPass -> !dashPass.isRedeemed())
                 .count();
         return (int) (dashPassesInReservations + dashPassesNotInReservations);
-    }
-
-    public Integer getMaxNumberOfDashPasses(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        // Some logic to get total number of dash passes
-        return customer.getMaxNumberOfDashPasses();
     }
 
     private void clearCaches() {

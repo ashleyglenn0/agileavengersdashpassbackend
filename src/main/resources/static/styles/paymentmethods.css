@@ -1,0 +1,53 @@
+/* paymentMethods.css */
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.payment-method {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.btn {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    font-size: 1em;
+}
+
+.btn-add {
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-add:hover {
+    background-color: #45a049;
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+    border-radius: 5px;
+}
+
+.btn-delete:hover {
+    background-color: #e53935;
+}

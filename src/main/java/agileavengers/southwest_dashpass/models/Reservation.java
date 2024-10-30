@@ -153,6 +153,10 @@ public class Reservation {
     public void setConfirmationNumber(String confirmationNumber) {
         this.confirmationNumber = confirmationNumber;
     }
+
+    public boolean hasDashPass() {
+        return dashPassReservations != null && !dashPassReservations.isEmpty();
+    }
 }
 
 

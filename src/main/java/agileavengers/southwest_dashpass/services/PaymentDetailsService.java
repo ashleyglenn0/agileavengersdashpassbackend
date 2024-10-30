@@ -23,18 +23,6 @@ public class PaymentDetailsService {
         this.encryptionUtils = encryptionUtils;
     }
 
-    // Save payment details for a customer
-    // Save payment details for a customer
-    public PaymentDetails savePaymentDetails(Customer customer, String cardNumber, String expirationDate, String cvv, String billingZip, String nameOnCard) {
-        PaymentDetails paymentDetails = new PaymentDetails(customer, cardNumber, expirationDate, cvv, billingZip, nameOnCard);
-        return paymentDetailsRepository.save(paymentDetails);
-    }
-
-    // Get payment details for a customer by their ID
-    public Optional<PaymentDetails> getPaymentDetailsByCustomerId(Long customerId) {
-        return paymentDetailsRepository.findByCustomerId(customerId);
-    }
-
     public void savePaymentDetails(PaymentDetailsDTO paymentDetailsDTO, Customer customer) {
         if (paymentDetailsDTO.isSavePaymentDetails()) {
             PaymentDetails paymentDetails = new PaymentDetails();
@@ -48,28 +36,27 @@ public class PaymentDetailsService {
         }
     }
 
+    // Get decrypted payment details for display, showing only last 4 digits of card number
     public PaymentDetailsDTO getDecryptedPaymentDetails(PaymentDetails paymentDetails) {
         PaymentDetailsDTO dto = new PaymentDetailsDTO();
-        // Decrypt sensitive fields before returning
-        dto.setCardNumber(encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber()));
-        dto.setCvv(encryptionUtils.decrypt(paymentDetails.getEncryptedCVV()));
+
+        // Decrypt sensitive fields
+        String decryptedCardNumber = encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber());
+        dto.setCardNumber("**** **** **** " + decryptedCardNumber.substring(decryptedCardNumber.length() - 4));
+        dto.setCvv("***");  // Optionally mask CVV for security
         dto.setExpirationDate(encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate()));
+
         return dto;
     }
 
-    // New Method to check if encrypted card number exists in the database
+    // Check if a payment method with the encrypted card number exists in the database
     public boolean checkIfPaymentMethodExists(String cardNumber) {
-        // Encrypt the provided card number to compare with stored encrypted values
         String encryptedCardNumber = encryptionUtils.encrypt(cardNumber);
+        return paymentDetailsRepository.existsByEncryptedCardNumber(encryptedCardNumber);
+    }
 
-        // Check if any stored payment details have this encrypted card number
-        List<PaymentDetails> paymentDetailsList = paymentDetailsRepository.findAll();
-        for (PaymentDetails paymentDetails : paymentDetailsList) {
-            if (paymentDetails.getEncryptedCardNumber().equals(encryptedCardNumber)) {
-                return true; // Found a match
-            }
-        }
-        return false;
+    public List<PaymentDetails> findPaymentMethodsByCustomer(Long customerId) {
+        return paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
     }
 
 }

@@ -22,17 +22,20 @@ public class DashPassController {
     private final DashPassService dashPassService;
     private final PaymentService paymentService;
     private final PaymentDetailsService paymentDetailsService;
+    private final DashPassReservationService dashPassReservationService;
 
     // Constructor Injection
     @Autowired
     public DashPassController(CustomerService customerService, ReservationService reservationService,
                               DashPassService dashPassService, PaymentService paymentService,
-                              PaymentDetailsService paymentDetailsService) {
+                              PaymentDetailsService paymentDetailsService,
+                              DashPassReservationService dashPassReservationService) {
         this.customerService = customerService;
         this.reservationService = reservationService;
         this.dashPassService = dashPassService;
         this.paymentService = paymentService;
         this.paymentDetailsService = paymentDetailsService;
+        this.dashPassReservationService = dashPassReservationService;
     }
 
     @GetMapping("/customer/{customerID}/purchasedashpass")
@@ -66,6 +69,14 @@ public class DashPassController {
 
         if (customer.getUser() == null) {
             throw new RuntimeException("User information for this customer is missing.");
+        }
+
+        // Check if the customer has reached the maximum number of DashPasses
+        if (customer.getTotalDashPasses() >= customer.getMaxDashPasses()) {
+            model.addAttribute("errorMessage", "You have reached the maximum number of DashPasses allowed.");
+            model.addAttribute("customer", customer);  // Add customer info to show on the purchase page if needed
+            // Re-display the purchase form with the error message
+            return "purchasedashpass";
         }
 
         Reservation reservation = null;
@@ -222,4 +233,54 @@ public class DashPassController {
         // Return the confirmation page view
         return "dashpasspurchasecomplete";
     }
+
+    @GetMapping("/customer/{customerId}/redeem")
+    public String showRedeemDashPassPage(@PathVariable Long customerId, Model model) {
+        // Retrieve the customer details
+        Customer customer = customerService.findCustomerById(customerId);
+
+        // Retrieve reservations that don't have a DashPass attached yet
+        List<Reservation> availableReservations = reservationService.findReservationsWithoutDashPass(customerId);
+
+        System.out.println("Reservations without DashPass: " + availableReservations.size());
+        for (Reservation res : availableReservations) {
+            System.out.println("Reservation ID: " + res.getReservationId() + " Flights: " + res.getFlights().size());
+        }
+
+        // Add customer and reservations to the model
+        model.addAttribute("customer", customer);
+        model.addAttribute("reservationsWithoutDashPass", availableReservations);
+
+        return "redeemdashpass";
+    }
+
+    @PostMapping("/customer/{customerId}/redeemDashPass")
+    public String redeemDashPass(
+            @PathVariable Long customerId,
+            @RequestParam Long reservationId,
+            @RequestParam Long dashPassId,
+            Model model) {
+
+        try {
+            // Find the customer, reservation, and dashpass
+            Customer customer = customerService.findCustomerById(customerId);
+            Reservation reservation = reservationService.findById(reservationId);
+            DashPass dashPass = dashPassService.findDashPassById(dashPassId);
+
+            // Redeem the DashPass
+            dashPassReservationService.redeemDashPass(customer, reservation, dashPass);
+
+            // Set success alert in model
+            model.addAttribute("dashPassAdded", true);
+        } catch (Exception e) {
+            // Set failure alert in model
+            model.addAttribute("dashPassAdded", false);
+            model.addAttribute("errorMessage", "Failed to redeem DashPass: " + e.getMessage());
+        }
+
+        // Reload the Redeem DashPass page with updated model
+        return "redeemdashpass";
+    }
+
+
 }
