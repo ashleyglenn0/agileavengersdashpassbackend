@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Manage Payment Methods</title>
-  <link rel="stylesheet" th:href="@{/css/managePaymentMethods.css}">
+  <link rel="stylesheet" th:href="@{/styles/managePaymentMethods.css}">
 </head>
 <body>
 <div class="container">
@@ -18,12 +18,13 @@
 
   <!-- Payment Methods List -->
   <div th:if="${paymentMethods != null && !paymentMethods.isEmpty()}">
-    <div th:each="paymentMethod : ${paymentMethods}" class="payment-method">
-      <!-- Display last 4 digits of card number -->
-      <span>Card ending in <span th:text="${paymentMethod.cardNumber.substring(paymentMethod.cardNumber.length() - 4)}">****</span></span>
+    <div th:each="paymentMethod, iterStat : ${paymentMethods}" class="payment-method">
+      <!-- Use iterStat.index to access the corresponding masked card number -->
+      <span>Card ending in <span th:text="${maskedCardNumbers[iterStat.index]}">****</span></span>
 
       <!-- Delete button with confirmation -->
-      <form th:action="@{/customer/deletepaymentmethod/{id}(id=${paymentMethod.id})}" method="post" th:onsubmit="return confirm('Are you sure you want to delete this payment method?');">
+      <form th:action="@{/customer/{customerID}/deletepaymentmethod/{id}(customerID=${customer.id}, id=${paymentMethod.id})}"  method="post"
+            th:onsubmit="return confirm('Are you sure you want to delete this payment method?');">
         <button type="submit" class="btn btn-delete">Delete</button>
       </form>
     </div>
