@@ -35,6 +35,9 @@
 
     <!-- DashPass Reservation Details -->
     <h2>DashPass</h2>
+    <div th:if="${#lists.isEmpty(reservation.dashPassReservations)}">
+      No Dash Pass Reservation Added to this Reservation. You may purchase a Dash Pass or add a Dash Pass from the dashboard.
+    </div>
     <div th:if="${not #lists.isEmpty(reservation.dashPassReservations)}">
       <h3>DashPass Reservations:</h3>
       <ul>

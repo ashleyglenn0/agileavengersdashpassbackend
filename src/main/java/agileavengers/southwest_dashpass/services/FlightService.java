@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.services;
 
+import agileavengers.southwest_dashpass.dtos.RoundTripFlightDTO;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.AirportRepository;
 import agileavengers.southwest_dashpass.repository.FlightRepository;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FlightService {
@@ -40,6 +42,27 @@ public class FlightService {
                 .orElseThrow(() -> new EntityNotFoundException("Flight not found with ID: " + flightID));
     }
 
+
+    // Helper method to check if the customer can use an existing DashPass
+    private boolean checkCustomerDashPasses(Customer customer, Flight flight) {
+        return customer.getDashPasses().stream().anyMatch(dashPass -> !dashPass.isRedeemed());
+    }
+
+    // Helper method to check if new DashPasses can be added to the flight
+    private boolean checkIfCanAddDashPass(Flight flight) {
+        return flight.getNumberOfDashPassesAvailable() > 0;
+    }
+
+    public void save(Flight flight) {
+        flightRepository.save(flight);
+    }
+
+    public List<Flight> searchOutboundFlights(String departureAirportCode, String arrivalAirportCode,
+                                              LocalDate startDate, LocalDate endDate, TripType tripType) {
+        return flightRepository.findFlights(departureAirportCode, arrivalAirportCode, startDate, endDate, tripType);
+    }
+
+
     public FlightSearchResponse findFlights(String departureAirportCode,
                                             String arrivalAirportCode,
                                             LocalDate selectedDate,
@@ -49,24 +72,23 @@ public class FlightService {
         FlightSearchResponse flightResponse = new FlightSearchResponse();
 
         if (tripType == TripType.ONE_WAY) {
-            // Fetch one-way flights
-            List<Flight> flights = flightRepository.findByDepartureAirportCodeAndArrivalAirportCodeAndDepartureDateAndTripType(
-                    departureAirportCode, arrivalAirportCode, selectedDate, tripType
-            );
+            // Use searchOutboundFlights to get outbound flights for one-way trips
+            List<Flight> flights = searchOutboundFlights(departureAirportCode, arrivalAirportCode, selectedDate, selectedDate, tripType);
+
             flights.forEach(flight -> {
                 flight.setCanUseExistingDashPass(checkCustomerDashPasses(customer, flight));
                 flight.setCanAddNewDashPass(checkIfCanAddDashPass(flight));
             });
+
             flightResponse.setOutboundFlights(flights);
             flightResponse.setReturnFlights(Collections.emptyList()); // No return flights for one-way
 
         } else if (tripType == TripType.ROUND_TRIP) {
-            // Fetch both outbound and return flights using the date range
+            // Fetch round-trip flights
             List<Flight> roundTripFlights = flightRepository.findFlightsForRoundTrip(
                     departureAirportCode, arrivalAirportCode, selectedDate, returnDate
             );
 
-            // Separate the outbound and return flights from the result
             List<Flight> departingFlights = new ArrayList<>();
             List<Flight> returningFlights = new ArrayList<>();
 
@@ -88,7 +110,6 @@ public class FlightService {
                 flight.setCanAddNewDashPass(checkIfCanAddDashPass(flight));
             });
 
-            // Set the flights in the response object
             flightResponse.setOutboundFlights(departingFlights);
             flightResponse.setReturnFlights(returningFlights);
         }
@@ -96,121 +117,32 @@ public class FlightService {
         return flightResponse;
     }
 
-    // Helper method to check if the customer can use an existing DashPass
-    private boolean checkCustomerDashPasses(Customer customer, Flight flight) {
-        return customer.getDashPasses().stream().anyMatch(dashPass -> !dashPass.isRedeemed());
-    }
 
-    // Helper method to check if new DashPasses can be added to the flight
-    private boolean checkIfCanAddDashPass(Flight flight) {
-        return flight.getNumberOfDashPassesAvailable() > 0;
-    }
+    // In FlightService.java
+    public List<RoundTripFlightDTO> searchRoundTripFlights(String departureAirportCode, String arrivalAirportCode,
+                                                           LocalDate departureDateRangeStart, LocalDate departureDateRangeEnd,
+                                                           LocalDate returnDateRangeStart, LocalDate returnDateRangeEnd) {
+        List<Flight> flights = flightRepository.findRoundTripFlightsByCriteria(
+                departureAirportCode, arrivalAirportCode, departureDateRangeStart, departureDateRangeEnd,
+                returnDateRangeStart, returnDateRangeEnd);
 
-    public List<Flight> getRoundTripFlights(String departureAirport, String arrivalAirport, LocalDate departureDate, LocalDate returnDate) {
-        return flightRepository.findFlightsForRoundTrip(departureAirport, arrivalAirport, departureDate, returnDate);
-    }
-
-    public Reservation confirmFlightForCustomer(Long flightID, Long customerID, String dashPassOption) {
-        // Fetch flight and customer
-        Flight flight = flightRepository.findById(flightID)
-                .orElseThrow(() -> new EntityNotFoundException("Flight not found with ID: " + flightID));
-
-        Customer customer = customerService.findCustomerById(customerID);
-
-        // Create a reservation object
-        Reservation reservation = new Reservation();
-        reservation.setCustomer(customer);
-        reservation.getFlights().add(flight); // Add flight to reservation
-
-        DashPassReservation dashPassReservation = null;
-
-        // Handle DashPass logic
-        if ("existing".equals(dashPassOption)) {
-            Optional<DashPass> optionalDashPass = dashPassService.findAvailableDashPass(customer);
-            if (optionalDashPass.isPresent()) {
-                DashPass dashPass = optionalDashPass.get();
-                dashPass.setRedeemed(true); // Mark as redeemed
-                dashPassService.save(dashPass); // Save redeemed DashPass
-
-                dashPassReservation = new DashPassReservation(customer, dashPass, flight, LocalDate.now());
-            } else {
-                throw new RuntimeException("No available DashPass found for the customer.");
-            }
-        } else if ("purchase".equals(dashPassOption)) {
-            DashPass newDashPass = dashPassService.createAndAssignDashPassDuringPurchase(customer, flight);
-            dashPassReservation = new DashPassReservation(customer, newDashPass, flight, LocalDate.now());
-        } else {
-            throw new IllegalArgumentException("Invalid DashPass option: " + dashPassOption);
+        Map<String, RoundTripFlightDTO> roundTripMap = new HashMap<>();
+        for (Flight flight : flights) {
+            roundTripMap.computeIfAbsent(flight.getTripId(), id -> new RoundTripFlightDTO(id))
+                    .addFlight(flight);
         }
 
-        // Link DashPassReservation to the reservation
-        if (dashPassReservation != null) {
-            dashPassReservation.setReservation(reservation);
-            flight.getDashPassReservations().add(dashPassReservation);
+        List<RoundTripFlightDTO> roundTripFlights = new ArrayList<>(roundTripMap.values());
+
+        // Log to confirm that roundTripFlights contain outbound and return flights
+        for (RoundTripFlightDTO trip : roundTripFlights) {
+            System.out.println("Trip ID: " + trip.getTripId());
+            System.out.println("Outbound Flights Count: " + trip.getOutboundFlights().size());
+            System.out.println("Return Flights Count: " + trip.getReturnFlights().size());
         }
 
-        // Save the reservation and return
-        reservationService.save(reservation);
-        flightRepository.save(flight); // Save updated flight with DashPassReservation
-
-        return reservation;
+        return roundTripFlights;
     }
-
-
-    public void save(Flight flight) {
-        flightRepository.save(flight);
-    }
-
-    public List<FlightSearchResponse> searchRoundTripFlights(String departureAirportCode, String arrivalAirportCode,
-                                                             LocalDate departureDateRangeStart, LocalDate departureDateRangeEnd,
-                                                             LocalDate returnDateRangeStart, LocalDate returnDateRangeEnd) {
-        // Search outbound flights within the date range
-        List<Flight> outboundFlights = flightRepository.findFlights(departureAirportCode, arrivalAirportCode,
-                departureDateRangeStart, departureDateRangeEnd);
-
-        List<FlightSearchResponse> searchResults = new ArrayList<>();
-
-        // For each outbound flight, find matching return flights
-        for (Flight outboundFlight : outboundFlights) {
-            LocalDate outboundFlightDepartureDate = outboundFlight.getDepartureDate();
-
-            // Search for return flights that depart after the outbound flight and within the return date range
-            List<Flight> returnFlights = flightRepository.findFlights(
-                    outboundFlight.getArrivalAirportCode(),  // Return flight departs from where the outbound arrives
-                    outboundFlight.getDepartureAirportCode(),  // Return flight arrives at the original departure airport
-                    outboundFlightDepartureDate.plusDays(1),  // Return flight must be after the outbound flight
-                    returnDateRangeEnd);
-
-            // Pair outbound flight with return flights if any exist
-            if (!returnFlights.isEmpty()) {
-                for (Flight returnFlight : returnFlights) {
-                    // Create a new FlightSearchResponse with both outbound and return flights
-                    FlightSearchResponse response = new FlightSearchResponse();
-
-                    // Wrap outbound flight in a list and set it in the response
-                    List<Flight> outboundFlightList = new ArrayList<>();
-                    outboundFlightList.add(outboundFlight);
-                    response.setOutboundFlights(outboundFlightList);
-
-                    // Wrap return flight in a list and set it in the response
-                    List<Flight> returnFlightList = new ArrayList<>();
-                    returnFlightList.add(returnFlight);
-                    response.setReturnFlights(returnFlightList);
-
-                    searchResults.add(response);
-                }
-            }
-        }
-
-        return searchResults;
-    }
-
-    public List<Flight> searchOneWayFlights(String departureAirportCode, String arrivalAirportCode,
-                                            LocalDate departureDateRangeStart, LocalDate departureDateRangeEnd) {
-        return flightRepository.findFlights(departureAirportCode, arrivalAirportCode, departureDateRangeStart, departureDateRangeEnd);
-    }
-
-
 
 }
 

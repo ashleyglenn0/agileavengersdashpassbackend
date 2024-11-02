@@ -162,5 +162,10 @@ public class DashPassReservationService {
 
         // Optionally, update the reservation or notify the customer
     }
+
+    public List<DashPassReservation> findPastDashPassReservations(Customer customer) {
+        LocalDate today = LocalDate.now();
+        return dashPassReservationRepository.findByCustomerAndReservation_DateBookedBefore(customer, today);
+    }
 }
 

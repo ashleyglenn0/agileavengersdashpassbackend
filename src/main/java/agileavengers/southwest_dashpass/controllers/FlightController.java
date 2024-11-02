@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.controllers;
 
+import agileavengers.southwest_dashpass.dtos.RoundTripFlightDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -93,67 +91,68 @@ public class FlightController {
     }
 
     @GetMapping("/customer/{customerID}/searchFlightsByDate")
-    public String searchFlights(@PathVariable Long customerID,
-                                @RequestParam("departureAirportCode") String departureAirportCode,
-                                @RequestParam("arrivalAirportCode") String arrivalAirportCode,
-                                @RequestParam("departureDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate departureDate,
-                                @RequestParam(value = "returnDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate returnDate,
-                                @RequestParam(value = "tripType", required = false) String tripType,
-                                Model model) {
-        // Define a default search range (e.g., 3 days before and after the selected date)
-        LocalDate departureDateRangeStart = departureDate.minusDays(3);
-        LocalDate departureDateRangeEnd = departureDate.plusDays(3);
+    public String searchFlightsByDate(
+            @PathVariable Long customerID,
+            @RequestParam("departureDate") LocalDate departureDate,
+            @RequestParam("departureAirportCode") String departureAirportCode,
+            @RequestParam("arrivalAirportCode") String arrivalAirportCode,
+            @RequestParam("tripType") TripType tripType,
+            @RequestParam(value = "returnDate", required = false) LocalDate returnDate,
+            Model model) {
 
-        LocalDate returnDateRangeStart = null;
-        LocalDate returnDateRangeEnd = null;
+        Customer customer = customerService.findCustomerById(customerID);
 
-        // If it's a round-trip flight, define a search range for the return date
-        if ("round-trip".equalsIgnoreCase(tripType) && returnDate != null) {
-            returnDateRangeStart = returnDate.minusDays(5);
-            returnDateRangeEnd = returnDate.plusDays(5);
+        // Maps to hold DashPass display flags by flight ID
+        Map<Long, Boolean> showExistingDashPassMap = new HashMap<>();
+        Map<Long, Boolean> showNewDashPassMap = new HashMap<>();
+
+        if (tripType == TripType.ROUND_TRIP && returnDate != null) {
+            List<RoundTripFlightDTO> roundTripFlights = flightService.searchRoundTripFlights(
+                    departureAirportCode, arrivalAirportCode,
+                    departureDate.minusDays(3), departureDate.plusDays(3),
+                    returnDate.minusDays(5), returnDate.plusDays(5)
+            );
+
+            roundTripFlights.forEach(roundTrip -> {
+                roundTrip.getOutboundFlights().forEach(flight -> {
+                    showExistingDashPassMap.put(flight.getFlightID(),
+                            customer.getDashPasses().size() > 0 && flight.getNumberOfDashPassesAvailable() > 0);
+                    showNewDashPassMap.put(flight.getFlightID(),
+                            customer.getDashPassesForPurchase() < customer.getMaxDashPasses() && flight.getNumberOfDashPassesAvailable() > 0);
+                });
+                roundTrip.getReturnFlights().forEach(flight -> {
+                    showExistingDashPassMap.put(flight.getFlightID(),
+                            customer.getDashPasses().size() > 0 && flight.getNumberOfDashPassesAvailable() > 0);
+                    showNewDashPassMap.put(flight.getFlightID(),
+                            customer.getDashPassesForPurchase() < customer.getMaxDashPasses() && flight.getNumberOfDashPassesAvailable() > 0);
+                });
+            });
+
+            model.addAttribute("roundTripFlights", roundTripFlights != null ? roundTripFlights : Collections.emptyList());
+        } else {
+            FlightSearchResponse flightSearchResponse = flightService.findFlights(
+                    departureAirportCode, arrivalAirportCode, departureDate, returnDate, tripType, customer
+            );
+
+            flightSearchResponse.getOutboundFlights().forEach(flight -> {
+                showExistingDashPassMap.put(flight.getFlightID(),
+                        customer.getDashPasses().size() > 0 && flight.getNumberOfDashPassesAvailable() > 0);
+                showNewDashPassMap.put(flight.getFlightID(),
+                        customer.getDashPassesForPurchase() < customer.getMaxDashPasses() && flight.getNumberOfDashPassesAvailable() > 0);
+            });
+
+            model.addAttribute("outboundFlights", flightSearchResponse.getOutboundFlights() != null ? flightSearchResponse.getOutboundFlights() : Collections.emptyList());
+            model.addAttribute("returnFlights", flightSearchResponse.getReturnFlights() != null ? flightSearchResponse.getReturnFlights() : Collections.emptyList());
         }
 
-        // Rest of the flight search logic...
-        List<Flight> outboundFlights = flightService.searchOneWayFlights(departureAirportCode, arrivalAirportCode,
-                departureDateRangeStart, departureDateRangeEnd);
-
-        List<FlightSearchResponse> returnFlights = new ArrayList<>();
-        if ("round-trip".equalsIgnoreCase(tripType)) {
-            returnFlights = flightService.searchRoundTripFlights(departureAirportCode, arrivalAirportCode,
-                    departureDateRangeStart, departureDateRangeEnd, returnDateRangeStart, returnDateRangeEnd);
-        }
-
-        model.addAttribute("outboundFlights", outboundFlights);
-        model.addAttribute("returnFlights", returnFlights.isEmpty() ? null : returnFlights);
         model.addAttribute("tripType", tripType);
-        model.addAttribute("customer", customerService.findCustomerById(customerID));
+        model.addAttribute("customer", customer);
+        model.addAttribute("showExistingDashPassMap", showExistingDashPassMap);
+        model.addAttribute("showNewDashPassMap", showNewDashPassMap);
 
         return "flighttable";
     }
 
-
-
-
-
-    @GetMapping("/customer/{customerID}/flighttable")
-    public String showFlightTable(@PathVariable Long customerID,
-                                  @RequestParam("tripType") String tripType,
-                                  @RequestParam(value = "outboundFlights", required = false) List<Flight> outboundFlights,
-                                  @RequestParam(value = "returnFlights", required = false) List<Flight> returnFlights,
-                                  Model model) {
-        // Find the customer by ID
-        Customer customer = customerService.findCustomerById(customerID);
-
-        // Add customer and tripType to the model
-        model.addAttribute("customer", customer);
-        model.addAttribute("tripType", tripType);
-
-        // Add flight results to the model if they exist
-        model.addAttribute("outboundFlights", outboundFlights);
-        model.addAttribute("returnFlights", returnFlights != null ? returnFlights : null);  // Add return flights if present
-
-        return "flighttable";  // Return the view for displaying results
-    }
 
 
     // GET mapping to show the review order page
@@ -166,10 +165,7 @@ public class FlightController {
                                      Model model) {
         Customer customer = customerService.findCustomerById(customerID);
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
-        Flight returnFlight = null;
-        if (returnFlightId != null) {
-            returnFlight = flightService.findFlightById(returnFlightId);
-        }
+        Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
 
         double totalPrice = outboundFlight.getPrice();
         if (returnFlight != null) {
@@ -178,29 +174,39 @@ public class FlightController {
 
         if ("new".equals(dashPassOption)) {
             totalPrice += 50.0;
+        }
+
+        // Retrieve the first available DashPass if an existing DashPass is selected
+        DashPass dashPass = null;
+        if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
+            dashPass = customer.getDashPasses().get(0); // Get the first DashPass in the list
         }
 
         model.addAttribute("customer", customer);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
+        model.addAttribute("dashPass", dashPass); // Add the dashPass to the model
         model.addAttribute("dashPassOption", dashPassOption);
         model.addAttribute("tripType", tripType);
         model.addAttribute("totalPrice", totalPrice);
 
-        return "revieworder"; // Updated to match the new template name
+        return "revieworder";
     }
 
-    // POST mapping to handle the final flight purchase and create the reservation
     @PostMapping("/customer/{customerID}/revieworder")
-    public String confirmFlight(@PathVariable Long customerID,
-                                @RequestParam("outboundFlightId") Long outboundFlightId,
-                                @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
-                                @RequestParam("dashPassOption") String dashPassOption,
-                                @RequestParam("tripType") String tripType,
-                                Model model) {
+    public String confirmFlight(
+            @PathVariable Long customerID,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            @RequestParam("tripType") String tripType,
+            Model model) {
+
         Customer customer = customerService.findCustomerById(customerID);
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
         Flight returnFlight = null;
+        DashPass dashPass = null;
+
         if (returnFlightId != null) {
             returnFlight = flightService.findFlightById(returnFlightId);
         }
@@ -210,22 +216,24 @@ public class FlightController {
             totalPrice += returnFlight.getPrice();
         }
 
+        // Check DashPass options and calculate total price accordingly
         if ("new".equals(dashPassOption)) {
             totalPrice += 50.0;
+        } else if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
+            dashPass = customer.getDashPasses().get(0); // Retrieve the first available DashPass
         }
 
-        // Redirect with the parameters added directly to the URL
+        // Redirect to the payment method details page with the updated URL parameters
         return "redirect:/customer/" + customerID + "/paymentmethoddetails"
                 + "?outboundFlightId=" + outboundFlightId
                 + (returnFlightId != null ? "&returnFlightId=" + returnFlightId : "")
                 + "&dashPassOption=" + dashPassOption
                 + "&tripType=" + tripType
-                + "&totalPrice=" + totalPrice;
+                + "&totalPrice=" + totalPrice
+                + (dashPass != null ? "&dashPassId=" + dashPass.getDashpassId() : "");
     }
 
 
-
-    // GET mapping for payment method details page (adjust this as needed)
     @GetMapping("/customer/{customerID}/paymentmethoddetails")
     public String showPaymentMethodPage(@PathVariable Long customerID,
                                         @RequestParam("outboundFlightId") Long outboundFlightId,
@@ -234,36 +242,52 @@ public class FlightController {
                                         @RequestParam("tripType") String tripType,
                                         @RequestParam("totalPrice") double totalPrice,
                                         Model model) {
-
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
-        Flight returnFlight = null;
-        if (returnFlightId != null) {
-            returnFlight = flightService.findFlightById(returnFlightId);
-        }
+        Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
 
-        // If the customer is not in the model (in case of direct access or reload), fetch it.
-        if (!model.containsAttribute("customer")) {
-            Customer customer = customerService.findCustomerById(customerID);
-            model.addAttribute("customer", customer);
-        }
+        Customer customer = model.containsAttribute("customer") ?
+                (Customer) model.getAttribute("customer") :
+                customerService.findCustomerById(customerID);
 
-        logger.debug("Customer ID: " + customerID);
-        logger.debug("Outbound Flight: " + outboundFlightId);
-        if (returnFlightId != null) {
-            logger.debug("Return Flight: " + returnFlightId);
-        }
-        logger.debug("DashPass Option: " + dashPassOption);
-
+        List<PaymentDetails> savedPaymentMethods = paymentDetailsService.findSavedPaymentMethodsForCustomer(customerID); // Get saved payment methods
 
         model.addAttribute("paymentDetailsDTO", new PaymentDetailsDTO());
+        model.addAttribute("customer", customer);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
         model.addAttribute("dashPassOption", dashPassOption);
         model.addAttribute("tripType", tripType);
         model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("savedPaymentMethods", savedPaymentMethods); // Add saved payment methods to model
 
-        return "paymentmethoddetails"; // Template for payment method details
+        return "paymentmethoddetails";
     }
+
+//    @PostMapping("/customer/{customerID}/paymentmethoddetails")
+//    public String processPaymentMethodDetails(
+//            @PathVariable Long customerID,
+//            @RequestParam("outboundFlightId") Long outboundFlightId,
+//            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+//            @RequestParam("dashPassOption") String dashPassOption,
+//            @RequestParam("tripType") String tripType,
+//            @RequestParam("totalPrice") double totalPrice,
+//            Model model) {
+//
+//        List<PaymentDetails> savedPaymentMethods = paymentDetailsService.findSavedPaymentMethodsForCustomer(customerID); // Get saved payment methods
+//
+//        model.addAttribute("paymentDetailsDTO", new PaymentDetailsDTO());
+//        model.addAttribute("customer", customerID);
+//        model.addAttribute("outboundFlight", outboundFlightId);
+//        model.addAttribute("returnFlight", returnFlightId);
+//        model.addAttribute("dashPassOption", dashPassOption);
+//        model.addAttribute("tripType", tripType);
+//        model.addAttribute("totalPrice", totalPrice);
+//        model.addAttribute("savedPaymentMethods", savedPaymentMethods); // Add saved payment methods to model
+//
+//
+//        return "paymentmethoddetails";
+//    }
+
 
     // POST mapping to handle the flight purchase and show purchase complete page
     @PostMapping("/customer/{customerID}/purchasecomplete")
@@ -278,60 +302,86 @@ public class FlightController {
                                    BindingResult bindingResult,
                                    Model model) throws InterruptedException, ExecutionException {
 
+        // Check for validation errors in the form
         if (bindingResult.hasErrors()) {
-            return handlePurchaseError(model, customerID, outboundFlightId, returnFlightId, tripType, dashPassOption, totalPrice, userSelectedStatus);
-        }
+            Flight outboundFlight = flightService.findFlightById(outboundFlightId);
+            model.addAttribute("outboundFlight", outboundFlight);
 
-        Customer customer = customerService.findCustomerById(customerID);
-        if (customer == null) {
-            throw new IllegalStateException("Customer not found for ID: " + customerID);
-        }
+            if (returnFlightId != null) {
+                Flight returnFlight = flightService.findFlightById(returnFlightId);
+                model.addAttribute("returnFlight", returnFlight);
+            }
 
-        // Adjust total price if a new DashPass is being purchased
-        if ("new".equalsIgnoreCase(dashPassOption)) {
-            totalPrice += 50.0;
+            Customer customer = customerService.findCustomerById(customerID);
+            model.addAttribute("customer", customer);
+
+            model.addAttribute("tripType", tripType);
+            model.addAttribute("dashPassOption", dashPassOption);
+            model.addAttribute("totalPrice", totalPrice);
+            model.addAttribute("userSelectedStatus", userSelectedStatus);
+
+            return "paymentmethoddetails";
         }
 
         try {
-            // Process payment asynchronously
+            Customer customer = customerService.findCustomerById(customerID);
+
+            if (customer == null) {
+                throw new IllegalStateException("Customer not found for ID: " + customerID);
+            }
+
+            logger.debug("Customer ID: " + customerID);
+            logger.debug("Outbound Flight: " + outboundFlightId);
+            if (returnFlightId != null) {
+                logger.debug("Return Flight: " + returnFlightId);
+            }
+            logger.debug("DashPass Option: " + dashPassOption);
+
+            // Process the payment asynchronously
             CompletableFuture<Reservation> futureReservation = bookingService.purchaseFlightAsync(
                     customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsDTO, userSelectedStatus
             );
 
+            // Wait for the payment to process
             Reservation reservation = futureReservation.get();
 
-            // Debugging output
-            System.out.println("Payment Status after async completion: " + reservation.getPaymentStatus());
-
-            // Check if the payment was successful
+            // If payment is successful, proceed to the purchase complete page
             if (reservation.getPaymentStatus() == PaymentStatus.PAID) {
-                processDashPassSelection(dashPassOption, customer, reservation.getFlights());
-
                 model.addAttribute("reservation", reservation);
                 model.addAttribute("outboundFlight", reservation.getFlights().get(0));
 
                 if (reservation.getFlights().size() > 1) {
                     model.addAttribute("returnFlight", reservation.getFlights().get(1));
                 }
-                model.addAttribute("totalPrice", totalPrice);
 
+                // Pass the DashPassReservation details to the model
+                if (!reservation.getDashPassReservations().isEmpty()) {
+                    model.addAttribute("dashPassReservation", reservation.getDashPassReservations().get(0));
+                    model.addAttribute("dashPass", reservation.getDashPassReservations().get(0).getDashPass());
+                }
+
+                model.addAttribute("totalPrice", reservation.getTotalPrice());
                 return "purchasecomplete";
             }
 
         } catch (ExecutionException | InterruptedException e) {
+            // If payment fails, return to the payment page with an error message
+            handlePaymentError(model, outboundFlightId, returnFlightId, customerID, tripType, dashPassOption, totalPrice, userSelectedStatus);
             model.addAttribute("errorMessage", "Payment failed. Please try again.");
-            return handlePurchaseError(model, customerID, outboundFlightId, returnFlightId, tripType, dashPassOption, totalPrice, userSelectedStatus);
+            return "paymentmethoddetails";
         }
 
-        // Handle failure for unprocessed payment status
+        // If the payment status is anything other than PAID, assume failure and return to payment page
+        handlePaymentError(model, outboundFlightId, returnFlightId, customerID, tripType, dashPassOption, totalPrice, userSelectedStatus);
         model.addAttribute("errorMessage", "Payment failed or no valid payment status was detected.");
-        return handlePurchaseError(model, customerID, outboundFlightId, returnFlightId, tripType, dashPassOption, totalPrice, userSelectedStatus);
+
+        return "paymentmethoddetails";
     }
 
 
-    private String handlePurchaseError(Model model, Long customerID, Long outboundFlightId, Long returnFlightId, String tripType,
-                                       String dashPassOption, double totalPrice, String userSelectedStatus) {
-        // Fetch flight details
+    // Helper method to handle errors and return the model with necessary attributes
+    private void handlePaymentError(Model model, Long outboundFlightId, Long returnFlightId, Long customerID,
+                                    String tripType, String dashPassOption, double totalPrice, String userSelectedStatus) {
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
         model.addAttribute("outboundFlight", outboundFlight);
 
@@ -342,24 +392,11 @@ public class FlightController {
 
         Customer customer = customerService.findCustomerById(customerID);
         model.addAttribute("customer", customer);
+
         model.addAttribute("tripType", tripType);
         model.addAttribute("dashPassOption", dashPassOption);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("userSelectedStatus", userSelectedStatus);
-
-        return "paymentmethoddetails";
-    }
-
-    private void processDashPassSelection(String dashPassOption, Customer customer, List<Flight> flights) {
-        for (Flight flight : flights) {
-            if ("new".equalsIgnoreCase(dashPassOption)) {
-                // Customer opted to purchase a new DashPass
-                dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(customer, flight);
-            } else if ("existing".equalsIgnoreCase(dashPassOption)) {
-                // Customer opted to use an existing DashPass
-                dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(customer, flight);
-            }
-        }
     }
 
 

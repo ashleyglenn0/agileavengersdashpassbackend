@@ -1,94 +1,55 @@
-/* General Styles */
 body {
+    background-color: #00338D; /* Southwest Blue */
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    color: #004687;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     margin: 0;
-    padding: 0;
 }
 
-h1 {
-    text-align: center;
-    margin-top: 20px;
-    color: #0070c9;
-}
-
-h2 {
-    text-align: center;
-    margin-top: 10px;
-    color: #333;
-}
-
-.container {
-    width: 80%;
-    margin: 0 auto;
+.confirmation-container {
     background-color: white;
-    padding: 30px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin-top: 50px;
     border-radius: 8px;
+    padding: 2rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Confirmation Details */
-.confirmation-details {
-    text-align: center;
-    margin: 20px 0;
+.confirmation-container h1 {
+    color: #004687; /* Southwest Blue */
+}
+
+.confirmation-container h2 {
+    color: #004687; /* Southwest Blue */
+    margin-bottom: 1rem;
 }
 
 .confirmation-details p {
-    font-size: 18px;
-    margin: 10px 0;
-}
-
-strong {
+    font-size: 1.1em;
+    margin: 0.5rem 0;
     color: #333;
 }
 
-/* Back to Dashboard Button */
-button {
-    display: block;
-    width: 200px;
-    margin: 30px auto;
-    padding: 12px 20px;
-    font-size: 16px;
-    background-color: #0070c9;
-    color: white;
+.confirm-button {
+    background-color: #FFB612; /* Southwest Yellow */
+    color: #004687; /* Blue text */
+    font-size: 1em;
+    padding: 0.8em 1.5em;
     border: none;
-    cursor: pointer;
     border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease;
 }
 
-button:hover {
-    background-color: #005f9c;
+.confirm-button:hover {
+    background-color: #FFCD41; /* Slightly lighter yellow */
 }
 
-/* Reservation/Flight Information */
-.reservation-info {
-    text-align: left;
-    margin-top: 30px;
-}
-
-.reservation-info h3 {
-    margin-bottom: 10px;
-    color: #0070c9;
-}
-
-.reservation-info p {
-    font-size: 16px;
-    margin: 8px 0;
-}
-
-/* DashPass Information */
-.dashpass-info {
-    margin-top: 20px;
-    border-top: 1px solid #ddd;
-    padding-top: 15px;
-}
-
-.dashpass-info h3 {
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.dashpass-info p {
-    margin: 8px 0;
+.confirm-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #004687; /* Focus outline in blue */
 }

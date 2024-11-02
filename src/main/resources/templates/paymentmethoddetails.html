@@ -23,16 +23,31 @@
       <span th:text="${errorMessage}"></span>
     </div>
     <div class="card-body">
-      <form th:action="@{/customer/{customerID}/purchasecomplete(customerID=${customerID})}"
-            th:object="${paymentDetailsDTO}" method="post">
 
-        <!-- Hidden inputs for Customer ID, Outbound Flight, and DashPass -->
+      <!-- Section for Saved Payment Methods -->
+      <div th:if="${!#lists.isEmpty(savedPaymentMethods)}">
+        <h3>Select a Saved Payment Method</h3>
+        <div th:each="paymentMethod : ${savedPaymentMethods}">
+          <input type="radio" name="selectedPaymentMethodId" th:value="${paymentMethod.id}"
+                 onclick="toggleNewPaymentForm(false)" />
+          <label th:text="${'**** **** **** ' + paymentMethod.lastFourDigits}"></label>
+          <p><strong>Name on Card:</strong> <span th:text="${paymentMethod.cardName}"></span></p>
+          <p><strong>Expiration:</strong> <span th:text="${paymentMethod.expirationDate}"></span></p>
+        </div>
+        <input type="radio" name="selectedPaymentMethodId" value="new" onclick="toggleNewPaymentForm(true)" />
+        Use a New Payment Method
+      </div>
+
+      <!-- Form for Entering New Payment Method Details -->
+      <form th:action="@{/customer/{customerID}/purchasecomplete(customerID=${customerID})}"
+            th:object="${paymentDetailsDTO}" method="POST" id="newPaymentForm">
+
+        <!-- Hidden inputs for additional data -->
         <input type="hidden" th:value="${customer != null ? customer.id : ''}" name="customerId">
         <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}" />
         <input type="hidden" name="dashPassOption" th:value="${dashPassOption}" />
         <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
         <input type="hidden" name="tripType" th:value="${tripType}" />
-<!--        <input type="hidden" name="userSelectedStatus" value="${userSelectedStatus}" />-->
 
         <!-- Outbound Flight Details -->
         <div>
@@ -60,8 +75,7 @@
           <p><strong>Total Cost:</strong> $<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
         </div>
 
-        <!-- Payment Method Fields -->
-        <!-- Card Number -->
+        <!-- Payment Method Fields with Conditional Error Display -->
         <div class="form-group">
           <label for="cardNumber">Card Number</label>
           <input type="text" id="cardNumber" th:field="*{cardNumber}" />
@@ -119,5 +133,11 @@
     </div>
   </div>
 </div>
+
+<script>
+  function toggleNewPaymentForm(show) {
+    document.getElementById('newPaymentForm').style.display = show ? 'block' : 'none';
+  }
+</script>
 </body>
 </html>

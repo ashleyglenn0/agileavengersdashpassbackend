@@ -86,16 +86,18 @@ public class ReservationService {
         return reservationRepository.findByCustomerIdAndStatus(customerId, ReservationStatus.VALID);
     }
 
-    public Reservation findSoonestReservationForCustomer(Long customerId) {
+    public Reservation findSoonestUpcomingReservationForCustomer(Long customerId) {
         Customer customer = customerService.findCustomerById(customerId);
+        LocalDate today = LocalDate.now();
 
         return customer.getReservations().stream()
-                .filter(reservation -> reservation.getStatus() == ReservationStatus.VALID)
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.VALID) // Only valid reservations
                 .flatMap(reservation -> reservation.getFlights().stream()) // Flattening flights
+                .filter(flight -> !flight.getDepartureDate().isBefore(today)) // Only upcoming flights
                 .sorted(Comparator.comparing(Flight::getDepartureDate)) // Sorting by soonest departure date
                 .map(Flight::getReservation) // Mapping back to the reservation
-                .findFirst() // Get the first result
-                .orElse(null); // Return null if no valid reservation is found
+                .findFirst() // Get the first upcoming reservation
+                .orElse(null); // Return null if no upcoming reservation is found
     }
 
     public List<Reservation> findReservationsWithoutDashPass(Long customerId) {
@@ -108,6 +110,19 @@ public class ReservationService {
         return reservations;
     }
 
+    public List<Reservation> findPastReservations(Customer customer) {
+        LocalDate today = LocalDate.now();
+        return reservationRepository.findByCustomerAndFlights_DepartureDateBefore(customer, today);
+    }
 
+    public void deleteReservation(Long reservationId) {
+        Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+
+        if (reservation.isPresent()) {
+            reservationRepository.delete(reservation.get());
+        } else {
+            throw new IllegalArgumentException("Reservation not found for ID: " + reservationId);
+        }
+    }
 
 }

@@ -1,107 +1,101 @@
-/* General Styles */
+/* General Page Style */
 body {
+    background-color: #00338D; /* Southwest Blue */
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 0;
+    color: #004488; /* Southwest Blue font color */
 }
 
-h2 {
-    text-align: center;
-    margin-top: 20px;
-    color: #333;
-}
-
+/* Container Style */
 .container {
-    width: 90%;
-    margin: 0 auto;
     background-color: white;
+    border-radius: 8px; /* Rounded edges */
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin-top: 30px;
-    border-radius: 8px;
+    max-width: 600px;
+    margin: 40px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for contrast */
 }
-
-/* Section Styles */
-.section {
-    margin-bottom: 20px;
-}
-
-.section p {
-    font-size: 16px;
-    margin: 8px 0;
-}
-
-strong {
-    color: #333;
-}
-
-/* Payment Info Section */
-.payment-info {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-}
-
-.payment-info h3 {
-    margin-bottom: 10px;
-}
-
-.payment-info p {
-    margin: 8px 0;
-}
-
-/* Form Styles */
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-form label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-form input[type="text"], form input[type="date"], form select {
+.navbar {
     padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-form input[type="checkbox"] {
-    margin-right: 10px;
+/* Heading Styles */
+.container h1, .container h2 {
+    color: #004488; /* Southwest Blue */
+}
+
+/* Section Padding */
+.section {
+    padding: 15px 0;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+
+/* Navbar and Footer */
+.navbar, footer {
+    background-color: #FFB612; /* Southwest Yellow */
+    color: #004488; /* Southwest Blue font color */
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
 }
 
 /* Button Styles */
-button {
-    padding: 12px 20px;
-    font-size: 16px;
-    background-color: #0070c9;
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.confirm-button {
+    background-color: #FFB612; /* Southwest Yellow */
+    color: #004488; /* Text color on yellow button */
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #ffcb42; /* Slightly lighter yellow for hover */
+}
+
+.cancel-button {
+    background-color: #B0B0B0; /* Complementary neutral gray for cancel */
     color: white;
     border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
     cursor: pointer;
-    border-radius: 4px;
-    width: 100%;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
-button:hover {
-    background-color: #005f9c;
+.cancel-button:hover {
+    background-color: #d3d3d3; /* Slightly lighter gray for hover */
 }
 
-/* Cancel Button */
-button.cancel-button {
-    background-color: #ccc;
-}
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+        width: 90%;
+    }
 
-button.cancel-button:hover {
-    background-color: #999;
-}
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
 
-/* Error Message Styles */
-.error {
-    color: red;
-    font-size: 14px;
-    margin-bottom: 15px;
+    .confirm-button, .cancel-button {
+        width: 100%;
+    }
 }

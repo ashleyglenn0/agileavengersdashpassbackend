@@ -10,11 +10,11 @@
 <div class="container">
     <h2>Confirm Your Flight</h2>
 
-    <form th:action="@{/customer/{customerID}/paymentmethoddetails(customerID=${customer.id})}" method="POST">
+    <form th:action="@{/customer/{customerID}/paymentmethoddetails(customerID=${customer.id})}" method="GET">
         <!-- Hidden Fields -->
         <input type="hidden" name="tripType" th:value="${tripType}">
         <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}">
-        <input type="hidden" name="returnFlightId" th:value="${returnFlight != null ? returnFlight.flightId : null}">
+        <input type="hidden" name="returnFlightId" th:value="${returnFlight != null} ? ${returnFlight.flightID} : ''" />
         <input type="hidden" name="dashPassOption" th:value="${dashPassOption}">
         <input type="hidden" name="totalPrice" th:value="${totalPrice}">
 
@@ -41,18 +41,21 @@
             <h3>DashPass Option</h3>
             <div th:if="${dashPassOption == 'existing'}">
                 <p><strong>Using Existing DashPass:</strong></p>
-                <p><strong>DashPass ID:</strong> <span th:text="${dashPass.id}"></span></p>
-                <p><strong>Valid Until:</strong> <span th:text="${dashPass.expirationDate}"></span></p>
+                <p>DashPass ID: <span th:text="${dashPass.dashpassId}">[DashPass ID]</span></p>
+                <p>Expiration Date: <span th:text="${#temporals.format(dashPass.expirationDate, 'MM-dd-yyyy')}">[Expiration Date]</span></p>
             </div>
             <div th:if="${dashPassOption == 'purchase'}">
                 <p><strong>Purchasing New DashPass:</strong></p>
                 <p><strong>DashPass Price:</strong> $<span th:text="${#numbers.format(dashPass.price, 1, 'COMMA', 2, 'POINT')}"></span></p>
             </div>
+            <div th:if="${dashPassOption == 'none'}">
+                <p><strong>No DashPass will be used for this trip.</strong></p>
+            </div>
         </div>
 
         <!-- Total Price -->
         <div class="section">
-            <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
+            <p><strong>Total Price:</strong> $<span th:text="${totalPrice != null ? #numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT') : 'N/A'}"></span></p>
         </div>
 
         <!-- Buttons -->

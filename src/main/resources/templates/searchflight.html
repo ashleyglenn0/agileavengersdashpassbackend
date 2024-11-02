@@ -9,10 +9,11 @@
   <nav class="navbar">
     <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
     <form class="navForm" action="/perform_logout" method="post">
-      <button type="submit" class="logoutbutton">Logout</button>
+      <button type="submit" class="logout-button">Logout</button>
     </form>
   </nav>
 </header>
+
 <!-- Flight Search Card -->
 <div class="card">
   <h2>Book Flight</h2>
@@ -20,57 +21,67 @@
   <form th:action="@{/customer/{customerID}/searchFlightsByDate(customerID=${customerID})}" method="GET">
     <input type="hidden" name="customerID" th:value="${customerID}" />
 
-    <!-- Date Field (departureDateRangeStart) -->
-    <label for="departureDate">Select Date:</label>
-    <input type="date" id="departureDate" name="departureDate" th:value="${departureDate}" required />
+    <!-- Trip Type Radio Buttons -->
+    <div class="trip-type-container">
+      <label>Trip Type:</label>
+      <label>
+        <input type="radio" name="tripType" value="ONE_WAY" onclick="toggleReturnDate(false)" required> One Way
+      </label>
+      <label>
+        <input type="radio" name="tripType" value="ROUND_TRIP" onclick="toggleReturnDate(true)"> Round Trip
+      </label>
+    </div>
 
-    <!-- Departure Airport Dropdown (departureAirportCode) -->
-    <label for="departureAirportCode">Departure Airport:</label>
-    <select id="departureAirportCode" name="departureAirportCode" th:value="${departureAirport}" required>
-      <option th:each="airport : ${airports}"
-              th:value="${airport.airportCode}"
-              th:text="${airport.airportCode}">Select Departure Airport</option>
-    </select>
+    <!-- Dates in a row -->
+    <div class="form-row">
+      <label for="departureDate">Departure Date:</label>
+      <input type="date" id="departureDate" name="departureDate" th:value="${departureDate}" required />
 
-    <!-- Arrival Airport Dropdown (arrivalAirportCode) -->
-    <label for="arrivalAirportCode">Arrival Airport:</label>
-    <select id="arrivalAirportCode" name="arrivalAirportCode" th:value="${arrivalAirport}" required>
-      <option th:each="airport : ${airports}"
-              th:value="${airport.airportCode}"
-              th:text="${airport.airportCode}">Select Arrival Airport</option>
-    </select>
+      <label for="returnDate" id="returnDateLabel" style="display: none;">Return Date:</label>
+      <input type="date" name="returnDate" id="returnDate" style="display: none;">
+    </div>
 
-    <!-- One-Way or Round-Trip -->
-    <div>
-      <select name="tripType" id="tripType" onchange="toggleReturnDate()" required>
-        <option value="ONE_WAY">One Way</option>
-        <option value="ROUND_TRIP">Round Trip</option>
+    <!-- Airport Dropdowns in a row -->
+    <div class="form-row">
+      <label for="departureAirportCode">Departure Airport:</label>
+      <select id="departureAirportCode" name="departureAirportCode" th:value="${departureAirport}" required>
+        <option th:each="airport : ${airports}"
+                th:value="${airport.airportCode}"
+                th:text="${airport.airportCode}">Select Departure Airport</option>
+      </select>
+
+      <label for="arrivalAirportCode">Arrival Airport:</label>
+      <select id="arrivalAirportCode" name="arrivalAirportCode" th:value="${arrivalAirport}" required>
+        <option th:each="airport : ${airports}"
+                th:value="${airport.airportCode}"
+                th:text="${airport.airportCode}">Select Arrival Airport</option>
       </select>
     </div>
 
-    <!-- Return Date input (returnDateRangeStart), hidden by default -->
-    <div id="returnDateDiv" style="display: none;">
-      <label for="returnDateRangeStart">Return Date:</label>
-      <input type="date" name="returnDateRangeStart" id="returnDateRangeStart" th:value="${returnDate}">
+    <!-- Buttons -->
+    <div class="button-row">
+      <button type="button" class="back-button" onclick="window.history.back();">Cancel</button>
+      <button type="submit" class="find-flight-button">Find Flight</button>
     </div>
-
-    <!-- Find Flights Button -->
-    <button type="submit">Find Flight</button>
   </form>
 </div>
 
-<!-- Back Button -->
-<button onclick="window.history.back();">Back</button>
+<footer>
+  For educational purposes only. All Trademarks are the property of their respective owners.
+</footer>
 
 <script>
-  function toggleReturnDate() {
-    const tripType = document.getElementById("tripType").value;
-    const returnDateDiv = document.getElementById("returnDateDiv");
-
-    if (tripType === "ROUND_TRIP") {
-      returnDateDiv.style.display = "block"; // Show the return date input
+  function toggleReturnDate(show) {
+    const returnDateLabel = document.getElementById("returnDateLabel");
+    const returnDateInput = document.getElementById("returnDate");
+    if (show) {
+      returnDateLabel.style.display = "block";
+      returnDateInput.style.display = "block";
+      returnDateInput.required = true;
     } else {
-      returnDateDiv.style.display = "none";  // Hide the return date input
+      returnDateLabel.style.display = "none";
+      returnDateInput.style.display = "none";
+      returnDateInput.required = false;
     }
   }
 </script>

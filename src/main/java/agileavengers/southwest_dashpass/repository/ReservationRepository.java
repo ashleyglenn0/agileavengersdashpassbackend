@@ -26,4 +26,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByCustomerIdAndDashPassReservationsIsNull(Long customerId);
 
+    List<Reservation> findByCustomerAndFlights_DepartureDateBefore(Customer customer, LocalDate date);
+
+
 }

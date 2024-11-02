@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,14 @@ public class ReservationController {
 
         // Return the reservation details template
         return "reservationdetails";
+    }
+
+    @PostMapping("/customer/{customerID}/reservation/deletereservation/{id}")
+    public String deleteReservation(@PathVariable Long customerID, @PathVariable Long id) {
+        reservationService.deleteReservation(id);
+
+        // Redirect back to manage payment methods page after deletion
+        return "reservationlist";
     }
 
 }

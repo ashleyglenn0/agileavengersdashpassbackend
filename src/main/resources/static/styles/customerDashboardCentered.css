@@ -1,124 +1,61 @@
 /* customerDashboardCentered.css */
 
-/* Center the main container */
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+body {
+            background-color: #00338D; /* Southwest Blue */
+            color: #ffffff;
+            font-family: Arial;
+        }
+        .navbar {
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar, footer {
+            background-color: #FFC72C;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .container {
+            background-color: #f4f4f4;
+            padding: 20px;
+            margin: 0 auto; /* Center the container */
+            border-radius: 10px;
+            max-width: 800px;
+        }
+        .button, .btn {
+            background-color: #FFC72C; /* Southwest Yellow */
+            color: #00338D;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover, .btn:hover {
+            background-color: #FFD56E; /* Lighter yellow for hover */
+        }
 
-/* Section titles */
-section h3 {
-  margin-top: 20px;
-  color: #333;
-  font-size: 1.4em;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 10px;
-}
-
-/* Button styling */
-.button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.button:hover {
-  background-color: #0056b3;
-}
-
-.actions .button {
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.actions a {
-  text-decoration: none;
-}
-
-/* Reservation details styling */
-.upcoming-reservation,
-.dashpass-reservation {
-  background-color: #fff;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-
-.upcoming-reservation p,
-.dashpass-reservation p {
-  font-size: 1.1em;
-}
-
-.alert {
-  padding: 15px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-
-.alert.success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.alert.failure {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-/* Align buttons */
-.actions {
-  text-align: center;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background-color: #333;
-  color: white;
-}
-
-.navbar-left {
-  display: flex;
-  align-items: center;
-}
-
-.navbar-brand {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  margin-right: 1rem;
-}
-
-.navbar-right form {
-  margin: 0;
-}
-
-.button {
-  background-color: #ff6600;
-  border: none;
-  padding: 0.5rem 1rem;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-.button:hover {
-  background-color: #ff8533;
-}
+        .dashboard-card, .upcoming-reservation, .past-reservations, .past-dashpass-reservations, .actions {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            color: #00338D;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .error-message {
+            color: #E4002B; /* Southwest Red */
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 20px; /* Space between container and footer */
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #ffffff;
+        }
 
 /* Media query for smaller screens */
 @media (max-width: 600px) {

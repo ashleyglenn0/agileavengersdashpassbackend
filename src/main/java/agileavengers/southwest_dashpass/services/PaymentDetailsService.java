@@ -79,4 +79,8 @@ public class PaymentDetailsService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public List<PaymentDetails> findSavedPaymentMethodsForCustomer(Long customerId) {
+        return paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
+    }
 }

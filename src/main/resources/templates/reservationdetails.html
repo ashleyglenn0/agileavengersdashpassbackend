@@ -36,7 +36,7 @@
       <button class="button">Edit Reservation</button>
     </a>
     <!-- Delete Reservation Button -->
-    <form th:action="@{/customer/{customerId}/reservation/delete/{reservationId}(customerId=${reservation.customer.id}, reservationId=${reservation.reservationId})}" method="post">
+    <form th:action="@{/customer/{customerId}/reservation/deletereservation/{reservationId}(customerId=${reservation.customer.id}, reservationId=${reservation.reservationId})}" method="post">
       <button type="submit" class="button delete-button">Delete Reservation</button>
     </form>
   </div>

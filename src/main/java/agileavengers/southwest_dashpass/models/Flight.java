@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class Flight {
@@ -35,25 +36,25 @@ public class Flight {
     private String arrivalAirportCode; // Use code instead of ID
 
     @Column(name="availableSeats")
-    private int availableSeats;
+    private Integer availableSeats;
 
     @Column(name="canAddNewDashPass")
-    private boolean canAddNewDashPass;
+    private Boolean canAddNewDashPass;
 
     @Column(name="canUseExistingDashPass")
-    private boolean canUseExistingDashPass;
+    private Boolean canUseExistingDashPass;
 
     @Column(name="maxNumberOfDashPassesForFlight")
-    private int maxNumberOfDashPassesForFlight;
+    private Integer maxNumberOfDashPassesForFlight;
 
     @Column(name="numberOfDashPassesAvailable")
-    private int numberOfDashPassesAvailable;
+    private Integer numberOfDashPassesAvailable;
 
     @Column(name="numberOfSeatsAvailable")
-    private int numberOfSeatsAvailable;
+    private Integer numberOfSeatsAvailable;
 
     @Column(name="seatsSold")
-    private int seatsSold;
+    private Integer seatsSold;
 
     @Column(name="returnDate")
     private LocalDate returnDate;
@@ -72,6 +73,11 @@ public class Flight {
     @Column(name="trip_type")
     private TripType tripType;  // New trip type field
 
+    @Column(name = "trip_id", nullable = false)
+    private String tripId;
+    @Column(name = "direction", nullable = false)
+    private String direction;
+
     public Flight(){
         //empty for hibernate
     }
@@ -84,11 +90,11 @@ public class Flight {
                   double price,
                   String departureAirportCode,
                   String arrivalAirportCode,
-                  int numberOfSeatsAvailable,
-                  int numberOfSeatsSold,
-                  boolean canAddDashPass,
-                  int maxNumberOfDashPassesForFlight,
-                  int numberOfDashPassesAvailable,
+                  Integer numberOfSeatsAvailable,
+                  Integer numberOfSeatsSold,
+                  Boolean canAddDashPass,
+                  Integer maxNumberOfDashPassesForFlight,
+                  Integer numberOfDashPassesAvailable,
                   TripType tripType) {
 
         this.flightNumber = flightNumber;
@@ -179,63 +185,63 @@ public class Flight {
         this.arrivalAirportCode = arrivalAirportCode;
     }
 
-    public int getAvailableSeats() {
+    public Integer getAvailableSeats() {
         return availableSeats;
     }
 
-    public void setAvailableSeats(int availableSeats) {
+    public void setAvailableSeats(Integer availableSeats) {
         this.availableSeats = availableSeats;
     }
 
-    public boolean isCanAddNewDashPass() {
+    public Boolean isCanAddNewDashPass() {
         return canAddNewDashPass;
     }
 
-    public void setCanAddNewDashPass(boolean canAddDashPass) {
+    public void setCanAddNewDashPass(Boolean canAddDashPass) {
         this.canAddNewDashPass = canAddDashPass;
     }
 
-    public boolean isCanUseExistingDashPass() {
+    public Boolean isCanUseExistingDashPass() {
         return canUseExistingDashPass;
     }
 
-    public void setCanUseExistingDashPass(boolean canUseExistingDashPass) {
+    public void setCanUseExistingDashPass(Boolean canUseExistingDashPass) {
         this.canUseExistingDashPass = canUseExistingDashPass;
     }
 
-    public int getMaxNumberOfDashPassesForFlight() {
+    public Integer getMaxNumberOfDashPassesForFlight() {
         return maxNumberOfDashPassesForFlight;
     }
 
-    public void setMaxNumberOfDashPassesForFlight(int maxNumberOfDashPassesForFlight) {
+    public void setMaxNumberOfDashPassesForFlight(Integer maxNumberOfDashPassesForFlight) {
         this.maxNumberOfDashPassesForFlight = maxNumberOfDashPassesForFlight;
     }
 
-    public int getNumberOfDashPassesAvailable() {
+    public Integer getNumberOfDashPassesAvailable() {
         return numberOfDashPassesAvailable;
     }
 
-    public void setNumberOfDashPassesAvailable(int numberOfDashPassesAvailable) {
+    public void setNumberOfDashPassesAvailable(Integer numberOfDashPassesAvailable) {
         this.numberOfDashPassesAvailable = numberOfDashPassesAvailable;
     }
 
-    public int getNumberOfSeatsAvailable() {
+    public Integer getNumberOfSeatsAvailable() {
         return numberOfSeatsAvailable;
     }
 
-    public void setNumberOfSeatsAvailable(int numberOfSeatsAvailable) {
+    public void setNumberOfSeatsAvailable(Integer numberOfSeatsAvailable) {
         this.numberOfSeatsAvailable = numberOfSeatsAvailable;
     }
 
-    public int getSeatsSold() {
+    public Integer getSeatsSold() {
         return seatsSold;
     }
 
-    public void setSeatsSold(int seatsSold) {
+    public void setSeatsSold(Integer seatsSold) {
         this.seatsSold = seatsSold;
     }
 
-    public int getSeatsRemaining() {
+    public Integer getSeatsRemaining() {
         return this.numberOfSeatsAvailable - this.seatsSold;
     }
 
@@ -277,6 +283,26 @@ public class Flight {
 
     public void setReturnFlightID(Flight returnFlight) {
         this.returnFlight = returnFlight;
+    }
+
+    public void setReturnFlight(Flight returnFlight) {
+        this.returnFlight = returnFlight;
+    }
+
+    public String getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }
 
