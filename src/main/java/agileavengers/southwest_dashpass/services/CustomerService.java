@@ -42,6 +42,7 @@ public class CustomerService {
                 .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + customerId));
     }
 
+
     @Transactional
     public void registerCustomer(Customer customer, User user) {
         userService.saveUser(user);  // Save the user first
@@ -52,53 +53,7 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-    public Integer getNumberOfDashPassesAvailableToRedeem(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        // Return only DashPasses that are not yet redeemed
-        return (int) customer.getDashPasses().stream()
-                .filter(dashPass -> !dashPass.isRedeemed())
-                .count();
-    }
 
-    public Integer getNumberOfDashPassesInUse(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        // Assuming DashPassReservations represent the redeemed DashPasses
-        return customer.getDashPassReservations().size();
-    }
-
-    public Integer getTotalNumberOfDashPasses(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        // Ensure that DashPasses are only counted once
-        long dashPassesInReservations = customer.getDashPassReservations().size();
-        long dashPassesNotInReservations = customer.getDashPasses().stream()
-                .filter(dashPass -> !dashPass.isRedeemed())
-                .count();
-        return (int) (dashPassesInReservations + dashPassesNotInReservations);
-    }
-
-    private void clearCaches() {
-        // Clear first-level cache (per-transaction cache)
-        entityManager.clear();
-
-        // Clear second-level cache (shared cache for the session factory)
-        sessionFactory.getCache().evictAllRegions();
-    }
-
-    public void useExistingDashPass(Customer customer, Flight flight) {
-        DashPass availableDashPass = customer.getDashPasses().stream()
-                .filter(dashPass -> !dashPass.isRedeemed())
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No available DashPass"));
-
-        availableDashPass.setRedeemed(true);
-        dashPassRepository.save(availableDashPass);
-
-        DashPassReservation reservation = new DashPassReservation();
-        reservation.setDashPass(availableDashPass);
-        reservation.setFlight(flight);
-        reservation.setCustomer(customer);
-        dashPassReservationRepository.save(reservation);
-    }
 
     public void save(Customer customer) {
         customerRepository.save(customer);

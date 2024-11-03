@@ -52,18 +52,20 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         boolean isCustomer = authorities.stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"));
         boolean isEmployee = authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_EMPLOYEE"));
+                .anyMatch(authority -> authority.getAuthority().startsWith("ROLE_EMPLOYEE"));
 
         // Redirect based on the user's role
         if (isCustomer) {
             Long customerId = user.getCustomer().getId();  // Retrieve the customer ID from the User object
             return "/customer/" + customerId + "/customerdashboard";  // Return the URL with customerId
         } else if (isEmployee) {
-            return "/employee/employeedashboard";  // Redirect to employee dashboard (assuming employee logic is handled later)
+            Long employeeId = user.getEmployee().getId();
+            return "/employee/" + employeeId + "/employeedashboard";  // Redirect to employee dashboard
         } else {
-            throw new IllegalStateException("Unexpected user role");
+            throw new IllegalStateException("Unexpected user role: " + authorities);
         }
     }
+
 }
 
 
