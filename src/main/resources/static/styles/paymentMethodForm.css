@@ -1,133 +1,119 @@
-/* General Styling */
+/* General Styles */
 body {
+    background-color: #00338D; /* Southwest blue background */
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    color: #003057; /* Southwest dark blue for text */
     margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
-.container {
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
-}
-
-.card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
-
-.card-header h2 {
-    margin: 0;
-    text-align: center;
-    font-size: 24px;
-    color: #333;
-}
-
-.card-body {
-    margin-top: 20px;
-}
-
-/* Form Styling */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.form-group input:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
-}
-
-.btn {
-    padding: 10px 20px;
-    font-size: 14px;
-    border-radius: 5px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: #fff;
-    text-decoration: none;
-    border: none;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-/* Navbar Styling */
+/* Navbar */
 .navbar {
+    background-color: #ffb500; /* Southwest yellow */
+    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #fff;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 20px;
 }
 
-.logo {
-    height: 40px;
+.navbar .logo {
+    height: 50px;
 }
 
-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 8px 16px;
+.navbar .button {
+    background-color: #0072ce; /* Southwest blue for logout button */
+    color: white;
     border: none;
-    border-radius: 5px;
+    padding: 0.5rem 1rem;
     cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
 }
 
-button:hover {
-    background-color: #0056b3;
+/* Container */
+.container {
+    background-color: white;
+    border-radius: 12px;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Flight Details Styling */
-p {
-    font-size: 16px;
-    margin: 10px 0;
+/* Card Header */
+.card-header h2 {
+    color: #003057; /* Southwest dark blue */
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
-strong {
-    color: #333;
-}
-
+/* Error Message */
 .error {
-    color: red;
+    color: #d82c20; /* Southwest red */
+    background-color: #fdecea;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
     font-weight: bold;
+    color: #003057; /* Dark blue */
+}
+
+.form-group input[type="text"],
+.form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.form-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.form-group .error {
+    font-size: 0.9rem;
+    color: #d82c20; /* Southwest red */
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #ffb500; /* Southwest yellow */
+    color: #003057; /* Dark blue */
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-right: 1rem;
+}
+
+.btn-secondary {
+    background-color: #aaaaaa; /* Complementary grey */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+/* Footer */
+footer {
+    background-color: #ffb500; /* Southwest yellow */
+    color: #003057;
+    padding: 1rem;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }

@@ -23,6 +23,8 @@ public class DashPass {
     private Customer customer;
     @OneToOne(mappedBy = "dashPass", cascade = CascadeType.ALL, optional = true)
     private DashPassReservation dashPassReservation;
+    @Column(name = "confirmation_number")
+    private String confirmationNumber;
 
     public DashPass() {
         this.dashpassId = 0L;
@@ -76,6 +78,17 @@ public class DashPass {
 
     public void setRedeemed(boolean redeemed) {
         isRedeemed = redeemed;
+    }
+
+    public String getConfirmationNumber() {
+        return confirmationNumber;
+    }
+
+    public void setConfirmationNumber(String confirmationNumber) {
+        this.confirmationNumber = confirmationNumber;
+    }
+    public boolean isRedeemable() {
+        return !isRedeemed && expirationDate.isAfter(LocalDate.now());
     }
 }
 

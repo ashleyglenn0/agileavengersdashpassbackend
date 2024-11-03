@@ -6,159 +6,129 @@
     <title>Customer Dashboard</title>
     <meta name="description" content="Southwest Airlines Customer Dashboard">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Link to the custom CSS file -->
     <link rel="stylesheet" th:href="@{/styles/customerDashboardCentered.css}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-           background-color: rgb(0, 51, 153);
-           font-family: Arial;
-        }
-        .logo {
-           height: 100px;
-           width: 150px;
-        }
-        .container {
-           height: 1500px;
-           display: flex;
-           flex-direction: column;
-           align-items: center;
-           background-color: white;
-           border-radius: 30px;
-        }
-        .card-grid {
-           display: flex;
-           flex-wrap: wrap;
-           justify-content: center;
-           gap: 20px; /* Add space between the cards */
-           max-width: 800px; /* Adjust based on your design */
-        }
-        .dashboard-card {
-            margin-bottom: 20px;
-        }
-        .card {
-            padding: 15px;
-            border-radius: 30px;
-            background-color: #f9f9f9;
-        }
-        .card-actions {
-            margin-top: 20px;
-            text-align: center;
-            border-radius: 30px;
-        }
-        .button {
-           background-color: rgb(0, 51, 153);
-           color: white;
-           border-radius: 25px;
-        }
-        .navbar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 10px 20px;
-          background-color: rgb(255, 204, 0);
-        }
-
-       .logo {
-         width: 150px;
-        }
-
-       .navbar .button {
-        background-color: rgb(0, 51, 153);
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 25px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-       }
-
-      .navbar .button:hover {
-       background-color: #ff9900;
-       color: white;
-      }
-
-    </style>
 </head>
-<body>
+<body class="southwest-blue-bg">
 <header>
-    <nav class="navbar">
-        <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
-        <form action="/perform_logout" method="post">
-            <button type="submit" class="button">Logout</button>
-        </form>
+    <nav class="navbar southwest-yellow-bg rounded-container">
+        <div class="navbar-left">
+            <a href="/customer/{customerId}/customerdashboard" class="navbar-brand text-dark">Home</a>
+        </div>
+        <div class="navbar-right">
+            <form action="/perform_logout" method="post">
+                <button style="background-color: #00338D; color: white;" type="submit" class="button southwest-blue-bg text-white rounded-button">Logout</button>
+            </form>
+        </div>
     </nav>
 </header>
-<div class="container">
-    <!-- Welcome message with the customer's name -->
-    <h1>Welcome To The Dash Pass System, <span th:text="${customer.user.firstName}"></span>!</h1>
-    <!-- Upcoming Flight Card -->
-    <!-- Check if upcomingFlight is null -->
-    <div class="dashboard-card card">
-        <h4>Upcoming Flight</h4>
-        <!-- If there is an upcoming flight, show the details -->
+
+<div class="container white-bg rounded-container">
+    <h1 style="color:#00338D">Welcome, <span th:text="${customer.user.firstName}"></span>!</h1>
+
+    <!-- Upcoming Flight Section -->
+    <section class="upcoming-reservation card-section white-bg rounded-container">
+        <h3>Upcoming Flight</h3>
         <div th:if="${soonestReservation != null}">
             <p>Flight Number: <span th:text="${soonestReservation.flights[0].flightNumber}"></span></p>
             <p>Departure Airport: <span th:text="${soonestReservation.flights[0].departureAirportCode}"></span></p>
             <p>Departure Date: <span th:text="${soonestReservation.flights[0].departureDate}"></span></p>
             <p>Departure Time: <span th:text="${soonestReservation.flights[0].departureTime}"></span></p>
+            <p>Outbound Flight Terminal: <span th:text="${soonestReservation.getFlightTerminal(soonestReservation.flights[0].flightID)}">1A</span></p>
+            <p>Outbound Flight Gate: <span th:text="${soonestReservation.getFlightGate(soonestReservation.flights[0].flightID)}">20</span></p>
+            <p>Flight Status: <span style="color: green; font-style: italic;">On Time</span></p>
             <p>Status: <span th:text="${soonestReservation.status}"></span></p>
-            <button>View All Reservations</button>
+            <button class="button southwest-blue-bg text-white rounded-button"
+                    th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/reservations\''">
+                View All Reservations
+            </button>
         </div>
         <div th:if="${soonestReservation == null}">
             <p>No upcoming reservations at this time.</p>
         </div>
-    </div>
+    </section>
 
-    <!-- Card showing total DashPasses owned -->
-    <div class="card-grid">
-        <div class="dashboard-card card">
-            <h4>Total Dash Passes You Own</h4>
-            <p>You have <strong th:text="${totalNumberOfDashPassesOwned}"></strong> Dash Pass(es).</p>
+    <!-- DashPass Information Section -->
+    <section>
+        <div class="card-grid">
+            <div class="dashboard-card white-bg rounded-container">
+                <h3>Available DashPass</h3>
+                <div th:if="${customer.dashPasses.size() > 0}">
+                    <p>You have DashPasses available to add to a reservation.</p>
+                    <a th:href="@{/customer/{customerId}/redeem(customerId=${customer.id})}">
+                        <button class="button southwest-blue-bg text-white rounded-button">Redeem DashPass</button>
+                    </a>
+                </div>
+                <div th:if="${customer.dashPasses.size() == 0}">
+                    <p>You have no DashPasses available to redeem at the moment.</p>
+                </div>
+            </div>
+
+            <div class="dashboard-card white-bg rounded-container">
+                <h3>Purchase DashPass</h3>
+                <p>Need more DashPasses? Purchase one below!</p>
+                <a th:href="@{/customer/{customerId}/purchasedashpass(customerId=${customer.id})}">
+                    <button class="button southwest-blue-bg text-white rounded-button">Purchase DashPass</button>
+                </a>
+            </div>
         </div>
+    </section>
 
-        <!-- Card showing total DashPasses used -->
-        <div class="dashboard-card card">
-            <h4>Total Dash Pass Usage</h4>
-            <p>You have used <strong th:text="${numberOfDashPassesInUse}"></strong> Dash Pass(es).</p>
+    <!-- Past Reservations Section -->
+    <section class="past-reservations">
+        <h3>Past Reservations</h3>
+        <div th:if="${pastReservations != null && !pastReservations.isEmpty()}">
+            <div th:each="reservation : ${pastReservations}">
+                <p>Reservation ID: <span th:text="${reservation.reservationId}"></span></p>
+                <ul th:each="flight : ${reservation.flights}">
+                    <li>Flight Number: <span th:text="${flight.flightNumber}"></span></li>
+                    <li>Departure Date: <span th:text="${flight.departureDate}"></span></li>
+                    <li>Arrival Date: <span th:text="${flight.arrivalDate}"></span></li>
+                </ul>
+            </div>
         </div>
-
-        <!-- Card showing current DashPasses available -->
-        <div class="dashboard-card card">
-            <h4>Available Dash Passes For Purchase</h4>
-            <p>You currently have <strong th:text="${numberOfDashPassesAvailableForPurchase}"></strong> Dash Pass(es) available for purchase.</p>
+        <div th:if="${pastReservations == null || pastReservations.isEmpty()}">
+            <p>No past reservations available.</p>
         </div>
+    </section>
 
-        <!-- Card showing current DashPasses available but not in use -->
-        <div class="dashboard-card card">
-            <h4>Available Dash Passes</h4>
-            <p>You currently have <strong th:text="${numberOfDashPassesAvailableToAddToReservation}"></strong> Dash Pass(es) available to add to a reservation.</p>
-            <button class="button" th:onclick="'/dashpass/redeem?customerId=' + ${customer.user.id}">Redeem Dash Pass</button>
+    <!-- Past DashPass Reservations Section -->
+    <section class="past-dashpass-reservations card-section white-bg rounded-container">
+        <h3>Past DashPass Reservations</h3>
+        <div th:if="${pastDashPassReservations != null && !pastDashPassReservations.isEmpty()}">
+            <ul>
+                <li th:each="dashpassReservation : ${pastDashPassReservations}">
+                    <p>DashPass Reservation Date: <span th:text="${dashpassReservation.bookingDate}"></span></p>
+                    <p>Status: <span style="color:red">Expired</span></p>
+                </li>
+            </ul>
         </div>
-
-    </div>
-    <!-- Action cards -->
-    <div class="dashboard-card card card-actions">
-        <h4>Dashboard Actions</h4>
-        <div class="button-container">
-            <button class="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchaseflight\''">Purchase Flight</button>
-            <button class="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchasedashpass\''">
-                Purchase Dash Pass
-            </button>
+        <div th:if="${pastDashPassReservations == null || pastDashPassReservations.isEmpty()}">
+            <p>No past DashPass reservations available.</p>
         </div>
-    </div>
+    </section>
 
-    <!-- Button to view previous DashPass trips -->
-    <div class="dashboard-card card">
-        <h4>Previous Dash Trips</h4>
-        <button class="btn btn-secondary" th:onclick="'/dashpass/trips?customerId=' + ${customer.user.id}">View Previous Dash Trips</button>
-    </div>
+    <!-- Dashboard Actions Section -->
+    <section class="actions card-section white-bg rounded-container">
+        <h3>Dashboard Actions</h3>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchaseflight\''">
+            Purchase Flight
+        </button>
+    </section>
+
+    <!-- Manage Payment Methods Section -->
+    <section class="dashboard-card white-bg rounded-container">
+        <h3>Manage Payment Methods</h3>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/managepaymentmethods\''">
+            Manage Payment Methods
+        </button>
+    </section>
 </div>
 
-<!-- Footer section -->
-<footer>
-    For educational purposes only. All Trademarks are the property of their respective owners
+<footer class="southwest-yellow-bg text-dark rounded-container">
+    For educational purposes only. All Trademarks are the property of their respective owners.
 </footer>
+
 </body>
 </html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Redeem DashPass</title>
+  <link rel="stylesheet" href="/styles/redeemDashPass.css" />
+</head>
+<body>
+
+<!--<header>-->
+<!--  <nav class="navbar">-->
+<!--    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">-->
+<!--    <form action="/perform_logout" method="post">-->
+<!--      <button type="submit" class="button">Logout</button>-->
+<!--    </form>-->
+<!--  </nav>-->
+<!--</header>-->
+
+<div class="content-container">
+  <!-- Success Alert -->
+  <div class="alert success" th:if="${dashPassAdded}">
+    DashPass successfully redeemed for reservation!
+  </div>
+
+  <!-- Failure Alert -->
+  <div class="alert failure" th:if="${dashPassFailed}">
+    Failed to redeem DashPass. Please try again.
+  </div>
+
+  <!-- Title -->
+  <h2>Redeem DashPass</h2>
+
+  <form th:action="@{/customer/{customerID}/redeemDashPass(customerID=${customer != null ? customer.id : 0})}" method="POST">
+  <table class="reservation-table">
+      <thead>
+      <tr>
+        <th>Reservation ID</th>
+        <th>Flight Number</th>
+        <th>Departure Date</th>
+        <th>Departure Airport</th>
+        <th>Arrival Airport</th>
+        <th>Add DashPass</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="reservation : ${reservationsWithoutDashPass}">
+        <td th:text="${reservation.reservationId}">Reservation ID</td>
+
+        <!-- Loop over the flights associated with the reservation -->
+        <td>
+          <ul>
+            <li th:each="flight : ${reservation.flights}">
+              <span th:text="${flight.flightNumber}">Flight Number</span>
+            </li>
+          </ul>
+        </td>
+
+        <td>
+          <ul>
+            <li th:each="flight : ${reservation.flights}">
+              <span th:text="${#temporals.format(flight.departureDate, 'yyyy-MM-dd')}">Departure Date</span>
+            </li>
+          </ul>
+        </td>
+
+        <td>
+          <ul>
+            <li th:each="flight : ${reservation.flights}">
+              <span th:text="${flight.departureAirportCode}">Departure Airport</span>
+            </li>
+          </ul>
+        </td>
+
+        <td>
+          <ul>
+            <li th:each="flight : ${reservation.flights}">
+              <span th:text="${flight.arrivalAirportCode}">Arrival Airport</span>
+            </li>
+          </ul>
+        </td>
+
+        <td>
+          <input type="radio" name="reservationId" th:value="${reservation.reservationId}" required>
+          Redeem DashPass
+        </td>
+        <td>
+          <input type="hidden" name="dashPassId" th:value="${customer.dashPasses[0].dashpassId}">
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Redeem Button -->
+    <button class="button" type="submit">Redeem DashPass</button>
+  </form>
+
+  <!-- Return to Dashboard Button -->
+  <button class="button" onclick="window.history.back();">Return to Dashboard</button>
+</div>
+
+</body>
+</html>

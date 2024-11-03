@@ -31,7 +31,20 @@ public class PaymentDetailsDTO {
 
     private boolean savePaymentDetails;
 
+    private String displayCardNumber;
+
+    // Constructors, getters, and setters
+
+
     // Getters and Setters
+
+    public String getDisplayCardNumber() {
+        return displayCardNumber;
+    }
+
+    public void setDisplayCardNumber(String displayCardNumber) {
+        this.displayCardNumber = displayCardNumber;
+    }
 
     public String getCardNumber() {
         return cardNumber;

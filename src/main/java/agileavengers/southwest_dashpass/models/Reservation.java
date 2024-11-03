@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name="reservation")
@@ -42,6 +44,13 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.VALID; // Default to VALID
+    @Column(name = "confirmation_number")
+    private String confirmationNumber;
+
+    @ElementCollection
+    private Map<Long, String> flightTerminals = new HashMap<>(); // Map to store flight ID and terminal info
+    @ElementCollection
+    private Map<Long, String> flightGates = new HashMap<>(); // Map to store flight ID and gate info
 
 
     public Reservation(Customer customer, LocalDate bookingDate){
@@ -142,6 +151,35 @@ public class Reservation {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public String getConfirmationNumber() {
+        return confirmationNumber;
+    }
+
+    public void setConfirmationNumber(String confirmationNumber) {
+        this.confirmationNumber = confirmationNumber;
+    }
+
+    public boolean hasDashPass() {
+        return dashPassReservations != null && !dashPassReservations.isEmpty();
+    }
+
+    // Getters and setters for flightTerminals and flightGates
+    public void setFlightTerminal(Long flightId, String terminal) {
+        flightTerminals.put(flightId, terminal);
+    }
+
+    public String getFlightTerminal(Long flightId) {
+        return flightTerminals.get(flightId);
+    }
+
+    public void setFlightGate(Long flightId, String gate) {
+        flightGates.put(flightId, gate);
+    }
+
+    public String getFlightGate(Long flightId) {
+        return flightGates.get(flightId);
     }
 }
 

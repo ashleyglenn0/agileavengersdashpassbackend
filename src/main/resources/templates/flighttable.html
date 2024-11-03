@@ -5,120 +5,140 @@
     <link rel="stylesheet" href="/styles/flights.css" />
 </head>
 <body>
-<header>
-    <nav class="navbar">
-        <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
-        <form action="/perform_logout" method="post">
-            <button type="submit" class="button">Logout</button>
-        </form>
-    </nav>
+<header class="navbar southwest-yellow-bg">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form action="/perform_logout" method="post">
+        <button type="submit" class="logout-button southwest-blue-bg text-white rounded-button">Logout</button>
+    </form>
 </header>
-<!-- Available Flights Table -->
-<div th:if="${outboundFlights != null || roundTripFlights != null}">
+
+<div class="container southwest-blue-bg">
+    <h3 class="section-title southwest-yellow-text">Available Flights</h3>
+
+    <!-- Message if no flights are found -->
     <div th:if="${#lists.isEmpty(outboundFlights) && #lists.isEmpty(roundTripFlights)}" class="no-flights-message">
         <p>No flights match your search criteria.</p>
-        <button class="button" onclick="window.history.back();">Back</button>
+        <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Back</button>
     </div>
 
-    <!-- Form for selecting flights -->
-    <div class="table-container"> <!-- Updated container class -->
-        <form th:action="@{/customer/{customerID}/revieworder(customerID=${customer.id})}" method="POST">
-            <input type="hidden" name="customerID" th:value="${customerID}" />
-            <input type="hidden" name="tripType" th:value="${tripType}"/>
+    <form th:action="@{/customer/{customerID}/revieworder(customerID=${customer.id})}" method="get">
+        <input type="hidden" name="customerID" th:value="${customerID}" />
+        <input type="hidden" name="tripType" th:value="${tripType}" />
 
-            <!-- Outbound Flights for Round Trip or One-Way Flights -->
-            <div th:if="${outboundFlights != null && !#lists.isEmpty(outboundFlights)}">
-                <h3>Available Flights</h3>
-                <button class="button" type="button" onclick="window.history.back();">Back</button>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Flight Number</th>
-                        <th>Departure Date</th>
-                        <th>Departure Time</th>
-                        <th>Arrival Time</th>
-                        <th>Departure Airport</th>
-                        <th>Arrival Airport</th>
-                        <th>Price</th>
-                        <th>DashPass Option</th>
-                        <th>Select Outbound Flight</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="flight : ${outboundFlights}">
-                        <td th:text="${flight.flightNumber}">Flight Number</td>
-                        <td th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Departure Date</td>
-                        <td th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Departure Time</td>
-                        <td th:text="${#temporals.format(flight.arrivalTime, 'hh:mm a')}">Arrival Time</td>
-                        <td th:text="${flight.departureAirportCode}">Departure Airport Code</td>
-                        <td th:text="${flight.arrivalAirportCode}">Arrival Airport Code</td>
-                        <td th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}">Flight Price</td>
+        <!-- Outbound Flights Section -->
+        <div th:if="${!#lists.isEmpty(outboundFlights)}" class="card-container">
+            <h3 class="section-title southwest-yellow-text">Available Outbound Flights</h3>
+            <div class="flight-card" th:each="flight : ${outboundFlights}">
+                <div class="flight-details">
+                    <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">FL0000</span></p>
+                    <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+                    <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Time</span></p>
+                    <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(flight.arrivalTime, 'hh:mm a')}">Time</span></p>
+                    <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
 
-                        <td>
-                            <!-- DashPass Option -->
-                            <div th:if="${customer != null}">
-                                <div th:if="${customer.dashPasses.size() > 0}">
-                                    <input type="radio" name="dashPassOption" value="existing">
-                                    <label>Use Existing DashPass</label><br>
-                                </div>
+                    <!-- Seat Availability Flag -->
+                    <div th:if="${flight.numberOfSeatsAvailable <= 15}">
+                        <p class="seat-warning">Only <span th:text="${flight.numberOfSeatsAvailable}"></span> seats left! Book soon!</p>
+                    </div>
+
+                    <!-- DashPass Option (Only for Outbound Flights) -->
+                    <div>
+                        <p><strong>DashPass Option:</strong></p>
+                        <div th:if="${showExistingDashPassMap[flight.flightID]}">
+                            <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
+                        </div>
+                        <div th:if="${showNewDashPassMap[flight.flightID]}">
+                            <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
+                        </div>
+                        <div>
+                            <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                        </div>
+                    </div>
+
+                    <!-- Select Outbound Flight -->
+                    <div>
+                        <input type="radio" name="outboundFlightId" th:value="${flight.flightID}" required> Select this Flight
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Round-Trip Flights Section -->
+        <div th:if="${!#lists.isEmpty(roundTripFlights)}" class="card-container">
+            <h3 class="section-title southwest-yellow-text">Available Round Trip Flights</h3>
+            <div th:each="roundTrip : ${roundTripFlights}">
+                <h4 class="section-header" th:text="'Trip ID: ' + ${roundTrip.tripId}">Trip ID</h4>
+
+                <!-- Outbound Flight for Round Trip -->
+                <div class="flight-card">
+                    <h5 class="section-title">Outbound Flight</h5>
+                    <div class="flight-details" th:each="outbound : ${roundTrip.outboundFlights}">
+                        <p><strong>Flight Number:</strong> <span th:text="${outbound.flightNumber}">FL0000</span></p>
+                        <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(outbound.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+                        <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outbound.departureTime, 'hh:mm a')}">Time</span></p>
+                        <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(outbound.arrivalTime, 'hh:mm a')}">Time</span></p>
+                        <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(outbound.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
+
+                        <!-- Seat Availability Flag for Outbound Flight -->
+                        <div th:if="${outbound.numberOfSeatsAvailable <= 15}">
+                            <p class="seat-warning">Only <span th:text="${outbound.numberOfSeatsAvailable}"></span> seats left! Book soon!</p>
+                        </div>
+
+                        <!-- DashPass Option (Only for Outbound Flights in Round Trip) -->
+                        <div>
+                            <p><strong>DashPass Option:</strong></p>
+                            <div th:if="${showExistingDashPassMap[outbound.flightID]}">
+                                <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
                             </div>
-                            <div th:if="${flight.numberOfDashPassesAvailable > 0}">
-                                <input type="radio" name="dashPassOption" value="new">
-                                <label>Purchase New DashPass ($50.00)</label><br>
+                            <div th:if="${showNewDashPassMap[outbound.flightID]}">
+                                <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
                             </div>
-                            <input type="radio" name="dashPassOption" value="none">
-                            <label>Do not use DashPass</label>
-                        </td>
+                            <div>
+                                <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                            </div>
+                        </div>
 
                         <!-- Select Outbound Flight -->
-                        <td>
-                            <input type="radio" name="outboundFlightId" th:value="${flight.flightID}" required>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                        <div>
+                            <input type="radio" name="outboundFlightId" th:value="${outbound.flightID}" required> Select this Outbound Flight
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Return Flight for Round Trip (No DashPass Option) -->
+                <div class="flight-card">
+                    <h5 class="section-title">Return Flight</h5>
+                    <div class="flight-details" th:each="returnFlight : ${roundTrip.returnFlights}">
+                        <p><strong>Flight Number:</strong> <span th:text="${returnFlight.flightNumber}">FL0000</span></p>
+                        <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+                        <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
+                        <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(returnFlight.arrivalTime, 'hh:mm a')}">Time</span></p>
+                        <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(returnFlight.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
+
+                        <!-- Seat Availability Flag for Return Flight -->
+                        <div th:if="${returnFlight.numberOfSeatsAvailable <= 15}">
+                            <p class="seat-warning">Only <span th:text="${returnFlight.numberOfSeatsAvailable}"></span> seats left! Book soon!</p>
+                        </div>
+
+                        <!-- Select Return Flight (No DashPass Option) -->
+                        <div>
+                            <input type="radio" name="returnFlightId" th:value="${returnFlight.flightID}" required> Select this Return Flight
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <!-- Return Flights for Round Trip -->
-            <div th:if="${roundTripFlights != null && !#lists.isEmpty(roundTripFlights.returnFlights)}">
-                <h3>Return Flights</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Flight Number</th>
-                        <th>Departure Date</th>
-                        <th>Departure Time</th>
-                        <th>Arrival Time</th>
-                        <th>Departure Airport</th>
-                        <th>Arrival Airport</th>
-                        <th>Price</th>
-                        <th>Select Return Flight</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="flight : ${roundTripFlights.returnFlights}">
-                        <td th:text="${flight.flightNumber}">Flight Number</td>
-                        <td th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Departure Date</td>
-                        <td th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Departure Time</td>
-                        <td th:text="${#temporals.format(flight.arrivalTime, 'hh:mm a')}">Arrival Time</td>
-                        <td th:text="${flight.departureAirportCode}">Departure Airport Code</td>
-                        <td th:text="${flight.arrivalAirportCode}">Arrival Airport Code</td>
-                        <td th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}">Flight Price</td>
-
-                        <!-- Select Return Flight -->
-                        <td>
-                            <input type="radio" name="returnFlightId" th:value="${flight.flightID}" required>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Submit button to confirm both flights -->
-            <button class="button" type="submit">Confirm Booking</button>
-        </form>
-    </div>
+        <!-- Submit Button for both One-Way and Round-Trip -->
+        <div class="button-group">
+            <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Cancel</button>
+            <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Confirm Booking</button>
+        </div>
+    </form>
 </div>
 
+<footer class="southwest-yellow-bg footer">
+    For educational purposes only. All Trademarks are the property of their respective owners.
+</footer>
 </body>
 </html>

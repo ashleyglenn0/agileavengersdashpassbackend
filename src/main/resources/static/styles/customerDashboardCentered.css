@@ -1,102 +1,66 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    color:rgb(0, 51, 153);
-}
+/* customerDashboardCentered.css */
 
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f0f0f0;
-}
+            background-color: #00338D; /* Southwest Blue */
+            color: #ffffff;
+            font-family: Arial;
+        }
+        .navbar {
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar, footer {
+            background-color: #FFC72C;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .container {
+            background-color: #f4f4f4;
+            padding: 20px;
+            margin: 0 auto; /* Center the container */
+            border-radius: 10px;
+            max-width: 800px;
+        }
+        .button, .btn {
+            background-color: #FFC72C; /* Southwest Yellow */
+            color: #00338D;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover, .btn:hover {
+            background-color: #FFD56E; /* Lighter yellow for hover */
+        }
 
-.container {
+        .dashboard-card, .upcoming-reservation, .past-reservations, .past-dashpass-reservations, .actions {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            color: #00338D;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .error-message {
+            color: #E4002B; /* Southwest Red */
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 20px; /* Space between container and footer */
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #ffffff;
+        }
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+  .button {
     width: 100%;
-    height: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.logo {
-    height: 100px;
-    width: 150px;
-}
-
-header {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px 0;
-}
-
-header a {
-    color: rgb(0, 51, 153);
-    text-decoration: none;
-}
-
-img {
-    max-width: 50%;
-    margin-bottom: 20px;
-}
-
-h1, h2, h3 {
-    margin-bottom: 10px;
-}
-
-.button-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-button {
-    background-color: #FFD700;
-    color: rgb(0, 51, 153);
-    border: none;
-    border-radius: 25px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    cursor: pointer;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-button:hover {
-    background-color: #FFC300;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-button:active {
-    background-color: #FFB700;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transform: translateY(1px);
-}
-
-footer {
-    font-size: 18px;
-    margin-top: 20px;
-}
-
-a {
-    color: rgb(0, 51, 153);
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
+    margin: 5px 0;
+  }
 }

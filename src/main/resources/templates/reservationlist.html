@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>View All Reservations</title>
+  <link rel="stylesheet" th:href="@{/styles/reservations.css}" />
+</head>
+<body>
+<div class="container">
+  <h2>All Reservations</h2>
+  <!-- Check if there are any reservations -->
+  <div th:if="${reservations != null and reservations.isEmpty()}">
+    <p>No reservations found.</p>
+  </div>
+  <!-- Reservations Table -->
+  <table th:if="${reservations != null and !reservations.isEmpty()}" class="reservations-table">
+    <thead>
+    <tr>
+      <th>Reservation ID</th>
+      <th>Flight Number(s)</th>
+      <th>Departure Airport(s)</th>
+      <th>Arrival Airport(s)</th>
+      <th>Departure Date(s)</th>
+      <th>DashPass</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="reservation : ${reservations}">
+      <td th:text="${reservation.reservationId}">12345</td>
+      <td>
+        <ul>
+          <li th:each="flight : ${reservation.flights}" th:text="${flight.flightNumber}">FL1234</li>
+        </ul>
+      </td>
+      <td th:unless="${!#lists.isEmpty(reservation.flights)}">No Flight Info</td>
+
+      <td>
+        <ul>
+          <li th:each="flight : ${reservation.flights}" th:text="${flight.departureAirportCode}">STL</li>
+        </ul>
+      </td>
+      <td th:unless="${!#lists.isEmpty(reservation.flights)}">No Departure Airport Code</td>
+
+      <td>
+        <ul>
+          <li th:each="flight : ${reservation.flights}" th:text="${flight.arrivalAirportCode}">STL</li>
+        </ul>
+      </td>
+      <td th:unless="${!#lists.isEmpty(reservation.flights)}">No Arrival Airport Code</td>
+
+      <td>
+        <ul>
+          <li th:each="flight : ${reservation.flights}" th:text="${flight.departureDate}">STL</li>
+        </ul>
+      </td>
+      <td th:unless="${!#lists.isEmpty(reservation.flights)}">No Departure Date</td>
+
+      <td>
+        <span th:if="${reservation.dashPassReservations != null and !#lists.isEmpty(reservation.dashPassReservations)}">Yes</span>
+        <span th:if="${reservation.dashPassReservations == null or #lists.isEmpty(reservation.dashPassReservations)}">No</span>
+      </td>
+
+      <td>
+        <a th:href="@{/customer/{customerId}/reservation/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
+          <button class="button">View</button>
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <!-- Back Button -->
+  <button type="button" onclick="window.history.back();">Back to Dashboard</button>
+</div>
+
+</body>
+</html>

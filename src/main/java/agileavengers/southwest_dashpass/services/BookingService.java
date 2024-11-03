@@ -3,13 +3,18 @@ package agileavengers.southwest_dashpass.services;
 import agileavengers.southwest_dashpass.dtos.PaymentDetailsDTO;
 import agileavengers.southwest_dashpass.exceptions.PaymentFailedException;
 import agileavengers.southwest_dashpass.models.*;
+import agileavengers.southwest_dashpass.repository.ReservationRepository;
 import agileavengers.southwest_dashpass.utils.MockPaymentProcessor;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -20,154 +25,124 @@ public class BookingService {
     private final ReservationService reservationService;
     private final DashPassReservationService dashPassReservationService;
     private final MockPaymentProcessor mockPaymentProcessor;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     public BookingService(FlightService flightService, DashPassService dashPassService, ReservationService reservationService,
-                          DashPassReservationService dashPassReservationService, MockPaymentProcessor mockPaymentProcessor) {
+                          DashPassReservationService dashPassReservationService, MockPaymentProcessor mockPaymentProcessor,
+                          ReservationRepository reservationRepository) {
         this.flightService = flightService;
         this.dashPassService = dashPassService;
         this.reservationService = reservationService;
         this.dashPassReservationService = dashPassReservationService;
         this.mockPaymentProcessor = mockPaymentProcessor;
+        this.reservationRepository = reservationRepository;
     }
+
 
     @Async
     public CompletableFuture<Reservation> purchaseFlightAsync(Customer currentCustomer, Long outboundFlightId, Long returnFlightId,
-                                                              String dashPassOption, String tripType, double totalCost, PaymentDetailsDTO paymentDetails,
-                                                              String userSelectedStatus) throws InterruptedException {
+                                                              String dashPassOption, String tripType, double totalCost,
+                                                              PaymentDetailsDTO paymentDetails, String userSelectedStatus)
+            throws InterruptedException {
         if (currentCustomer == null) {
             throw new IllegalArgumentException("Customer cannot be null");
         }
 
-        // Fetch outbound flight details
-        Flight outboundFlight = flightService.findFlightById(outboundFlightId);
-
-        // Process payment status asynchronously using the mock payment processor
         CompletableFuture<PaymentStatus> paymentStatusFuture = mockPaymentProcessor.processPaymentAsync(paymentDetails, userSelectedStatus);
 
-        // Create a new reservation
-        Reservation reservation = new Reservation();
-        reservation.setCustomer(currentCustomer);
-        reservation.setTripType(TripType.valueOf(tripType));
-        reservation.setPaymentStatus(PaymentStatus.PENDING); // Set initial payment status to PENDING
-
-        // Save the reservation immediately to persist it in the database
-        reservationService.save(reservation);
-
-        // Initialize total price with the outbound flight price
-        double finalPrice = outboundFlight.getPrice();
-        reservation.setFlightDepartureDate(outboundFlight.getDepartureDate());
-        reservation.setAirportCode(outboundFlight.getDepartureAirportCode());
-
-        // Initialize the list of flights in the reservation if it doesn't exist
-        if (reservation.getFlights() == null) {
-            reservation.setFlights(new ArrayList<>());
-        }
-
-        // Associate the outbound flight with the saved reservation
-        outboundFlight.setReservation(reservation);
-        reservation.getFlights().add(outboundFlight);
-
-        // Handle return flight for round-trip bookings
-        if (tripType.equals("ROUND_TRIP") && returnFlightId != null) {
-            Flight returnFlight = flightService.findFlightById(returnFlightId);
-            returnFlight.setReservation(reservation);
-            reservation.getFlights().add(returnFlight);
-            finalPrice += returnFlight.getPrice();  // Add return flight price to the total price
-        }
-
-        boolean isNewPurchase = dashPassOption.equals("new");
-        final DashPassReservation[] dashPassReservation = new DashPassReservation[1];
-        final DashPass[] dashPass = new DashPass[1];
-
-        // Handle DashPass logic
-        if (isNewPurchase) {
-            // Only create DashPass on successful payment
-            dashPass[0] = null; // Defer creation until payment success
-            finalPrice += 50.0; // Add DashPass price (adjust as needed)
-        } else if (dashPassOption.equals("existing")) {
-            // Only assign existing DashPass on success
-            dashPass[0] = null; // Defer assignment until payment success
-        }
-
-        // Set the final price for the reservation
-        reservation.setTotalPrice(finalPrice);
-
-        // Handle Payment Status
         return paymentStatusFuture.thenApply(paymentStatus -> {
+            System.out.println("Payment Status for Customer ID " + currentCustomer.getId() + ": " + paymentStatus);
             if (paymentStatus == PaymentStatus.PAID) {
-                // Successful payment - update DashPass numbers
-                reservation.setStatus(ReservationStatus.VALID);
+                System.out.println("Creating reservation for Customer ID " + currentCustomer.getId());
+                Reservation reservation = new Reservation();
+                reservation.setCustomer(currentCustomer);
+                reservation.setTripType(TripType.valueOf(tripType));
                 reservation.setPaymentStatus(PaymentStatus.PAID);
-                reservationService.save(reservation); // Save reservation
+                reservation.setStatus(ReservationStatus.VALID);
 
-                if (isNewPurchase) {
-                    // Now create and assign the new DashPass since payment was successful
-                    dashPassReservation[0] = dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(currentCustomer, outboundFlight);
-                    dashPass[0] = dashPassReservation[0].getDashPass();
-                } else if (dashPassOption.equals("existing")) {
-                    // Now assign an existing DashPass since payment was successful
-                    dashPassReservation[0] = dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(currentCustomer, outboundFlight);
-                    dashPass[0] = dashPassReservation[0].getDashPass();
+                // Populate reservation with flight details
+                Flight outboundFlight = flightService.findFlightById(outboundFlightId);
+                reservation.setFlights(new ArrayList<>());
+                reservation.getFlights().add(outboundFlight);
+                outboundFlight.setReservation(reservation);
+
+                if (outboundFlight.getAvailableSeats() > 0) {
+                    outboundFlight.setAvailableSeats(outboundFlight.getSeatsRemaining() - 1);
+                    outboundFlight.setSeatsSold(outboundFlight.getSeatsSold() + 1);
+                } else {
+                    throw new IllegalStateException("No available seats for outbound flight");
                 }
 
-                // Handle DashPass updates on success
-                dashPassReservationService.handleDashPassOnSuccessfulPayment(currentCustomer, dashPass[0], isNewPurchase, outboundFlight);
+                double finalPrice = outboundFlight.getPrice();
+
+                if ("ROUND_TRIP".equals(tripType) && returnFlightId != null) {
+                    Flight returnFlight = flightService.findFlightById(returnFlightId);
+                    returnFlight.setReservation(reservation);
+                    reservation.getFlights().add(returnFlight);
+                    finalPrice += returnFlight.getPrice();
+
+                    if (returnFlight.getAvailableSeats() > 0) {
+                        returnFlight.setAvailableSeats(outboundFlight.getSeatsRemaining() - 1);
+                        returnFlight.setSeatsSold(returnFlight.getSeatsSold() + 1);
+                    } else {
+                        throw new IllegalStateException("No available seats for outbound flight");
+                    }
+                }
+                System.out.println("Final price for reservation: $" + finalPrice);
+                Random random = new Random();
+                for (Flight flight : reservation.getFlights()) {
+                    // Generate terminal and gate information
+                    String terminal = generateTerminal(flight.getDepartureAirportCode());
+                    String gate = "Gate " + (random.nextInt(20) + 1);
+
+                    System.out.println("Assigned Terminal for Flight " + flight.getFlightID() + ": " + terminal);
+                    System.out.println("Assigned Gate for Flight " + flight.getFlightID() + ": " + gate);
+
+                    // Set terminal and gate for the flight
+                    reservation.setFlightTerminal(flight.getFlightID(), terminal);
+                    reservation.setFlightGate(flight.getFlightID(), gate);
+                }
+
+                boolean isNewPurchase = "new".equals(dashPassOption);
+                reservation.setTotalPrice(isNewPurchase ? finalPrice + 50.0 : finalPrice);
+
+                reservationService.save(reservation);
+                System.out.println("Reservation saved successfully for Customer ID " + currentCustomer.getId());
+
+                // Process DashPass based on selection
+                if (isNewPurchase) {
+                    DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(
+                            currentCustomer, reservation, outboundFlight // Link the DashPassReservation to the entire reservation, not just the flight
+                    );
+                    reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
+                    System.out.println("New DashPass created and linked to reservation.");
+                } else if ("existing".equals(dashPassOption)) {
+                    DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(
+                            currentCustomer, reservation, outboundFlight
+                    );
+                    reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
+                    System.out.println("Existing DashPass linked to reservation.");
+                }
 
                 return reservation;
-
-            } else if (paymentStatus == PaymentStatus.PENDING) {
-                // Simulate the pending status
-                try {
-                    Thread.sleep(5000); // Simulate a delay (5 seconds)
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-
-                PaymentStatus finalStatus;
-                try {
-                    finalStatus = mockPaymentProcessor.simulatePendingStatus();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                reservation.setPaymentStatus(finalStatus);
-
-                if (finalStatus == PaymentStatus.PAID) {
-                    reservation.setStatus(ReservationStatus.VALID);
-                    reservationService.save(reservation); // Save reservation after payment success
-
-                    if (isNewPurchase) {
-                        dashPassReservation[0]= dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(currentCustomer, outboundFlight);
-                        dashPass[0] = dashPassReservation[0].getDashPass();
-                    } else if (dashPassOption.equals("existing")) {
-                        dashPassReservation[0] = dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(currentCustomer, outboundFlight);
-                        dashPass[0] = dashPassReservation[0].getDashPass();
-                    }
-
-                    dashPassReservationService.handleDashPassOnSuccessfulPayment(currentCustomer, dashPass[0], isNewPurchase, outboundFlight);
-
-                    return reservation;
-                } else {
-                    reservation.setStatus(ReservationStatus.INVALID); // Mark as invalid
-                    reservationService.save(reservation); // Save reservation as invalid
-
-                    // No need to rollback anything since nothing was updated
-                    throw new PaymentFailedException("Payment failed after pending processing.");
-                }
             } else {
-                // For failed payments
-                reservation.setStatus(ReservationStatus.INVALID); // Mark as invalid
-                reservationService.save(reservation); // Save reservation as failed
-
-                // No rollback needed
+                System.out.println("Payment failed for Customer ID " + currentCustomer.getId() + " with status " + paymentStatus);
                 throw new PaymentFailedException("Payment failed.");
             }
         });
     }
 
+    // Helper method to generate terminal based on airport
+    private String generateTerminal(String airportCode) {
+        if ("ATL".equals(airportCode)) {
+            return "Terminal 6";
+        }
+        Random random = new Random();
+        int terminalNumber = random.nextInt(5) + 1;
+        char terminalLetter = (char) ('A' + random.nextInt(6));
+        return "Terminal " + terminalNumber + terminalLetter;
+    }
+
 }
 
-//        // Save the reservation again to ensure flights and DashPasses are associated
-//        reservationService.save(reservation);
-//
-//        return reservation;

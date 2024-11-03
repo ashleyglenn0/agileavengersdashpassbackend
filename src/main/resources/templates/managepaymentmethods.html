@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Payment Methods</title>
+  <link rel="stylesheet" th:href="@{/styles/managePaymentMethods.css}">
+</head>
+<body>
+<div class="container">
+  <!-- Header with "Add Payment Method" and "Cancel" buttons -->
+  <div class="header">
+    <h1>Manage Payment Methods</h1>
+    <div class="button-group">
+      <a th:href="@{/customer/{customerID}/addpaymentmethod(customerID=${customer.id})}" class="btn btn-add">Add Payment Method</a>
+      <button type="button" class="btn btn-cancel" onclick="window.history.back();">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Payment Methods List -->
+  <div th:if="${paymentMethods != null && !paymentMethods.isEmpty()}">
+    <div th:each="paymentMethod, iterStat : ${paymentMethods}" class="payment-method">
+      <!-- Use iterStat.index to access the corresponding masked card number -->
+      <span>Card ending in <span th:text="${maskedCardNumbers[iterStat.index]}">****</span></span>
+
+      <!-- Delete button with confirmation -->
+      <form th:action="@{/customer/{customerID}/deletepaymentmethod/{id}(customerID=${customer.id}, id=${paymentMethod.id})}"  method="post"
+            th:onsubmit="return confirm('Are you sure you want to delete this payment method?');">
+        <button type="submit" class="btn btn-delete">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- No Payment Methods Message -->
+  <div th:if="${paymentMethods == null || paymentMethods.isEmpty()}" class="no-payment-methods">
+    <p>No payment methods available.</p>
+  </div>
+</div>
+</body>
+</html>

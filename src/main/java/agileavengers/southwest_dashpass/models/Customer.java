@@ -1,62 +1,47 @@
 package agileavengers.southwest_dashpass.models;
 
 import jakarta.persistence.*;
-
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 @Entity
-@Table(name="customer")
+@Table(name = "customer")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // Add an ID field for the Customer
+    private Long id;
 
-    @Column(name="max_number_of_dashpasses")
-    private Integer maxNumberOfDashPasses = 5;
+    private static final int MAX_DASHPASSES = 5; // Maximum DashPasses allowed
 
-    @Column(name="total_dash_passes_customer_has")
-    private Integer totalDashPassesCustomerHas = 0;
-    @Column(name="number_of_dash_passes_used")
-    private Integer numberOfDashPassesUsed = 0;
+    @Transient // Calculated field, not persisted
+    private int totalDashPasses;
 
-    @Column(name="total_dash_passes_for_use")
-    private Integer totalDashPassesForUse = 0;
+    @Transient // Calculated field, not persisted
+    private int dashPassesForPurchase;
 
-    @Column(name="can_purchase_dash_pass")
+    @Transient // Calculated field, not persisted
     private boolean canPurchaseDashPass;
 
-    @Column(name="can_fly")
     private boolean canFly;
-    @Column(name="can_purchase_flight")
     private boolean canPurchaseFlight;
 
-    @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<DashPass> dashPasses = new ArrayList<>();
 
-    // Consider mapping this properly if flights are associated entities
-    @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 
-    @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<DashPassReservation> dashPassReservations = new ArrayList<>();
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentDetails> paymentDetails;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Default constructor
     public Customer() {
         super();
-        this.numberOfDashPassesUsed = 0; // Default initialization
-        this.canPurchaseDashPass = false; // Default value, adjust as needed
-        this.dashPasses = new ArrayList<>();  // Initialize lists to avoid null pointers
-        this.reservations = new ArrayList<>();  // Initialize lists
-        this.dashPassReservations = new ArrayList<>();  // Initialize lists
     }
 
     // Getters and setters
@@ -75,28 +60,29 @@ public class Customer {
     public void setId(Long id) {
         this.id = id;
     }
-    public void setMaxNumberOfDashPasses(Integer maxNumberOfDashPasses) {
-        this.maxNumberOfDashPasses = maxNumberOfDashPasses;
+
+    public int getMaxDashPasses() {
+        return MAX_DASHPASSES;
     }
 
-    public void setTotalDashPassesCustomerHas(Integer totalDashPassesCustomerHas) {
-        this.totalDashPassesCustomerHas = totalDashPassesCustomerHas;
+    public void setCanPurchaseDashPass(boolean canPurchaseDashPass) {
+        this.canPurchaseDashPass = canPurchaseDashPass;
     }
 
-    public void setNumberOfDashPassesUsed(Integer numberOfDashPassesUsed) {
-        this.numberOfDashPassesUsed = numberOfDashPassesUsed;
+    public int getTotalDashPasses() {
+        return dashPasses.size();
     }
 
-    public Integer getTotalDashPassesForUse() {
-        return totalDashPassesForUse;
+    public int getDashPassesForPurchase() {
+        return MAX_DASHPASSES - getTotalDashPasses();
     }
 
-    public void setTotalDashPassesForUse(Integer totalDashPassesForUse) {
-        this.totalDashPassesForUse = totalDashPassesForUse;
+    public void setDashPassesForPurchase(int dashPassesForPurchase) {
+        this.dashPassesForPurchase = dashPassesForPurchase;
     }
 
-    public Integer getTotalDashPassesCustomerHas() {
-        return totalDashPassesCustomerHas;
+    public boolean isCanPurchaseDashPass() {
+        return getTotalDashPasses() < MAX_DASHPASSES;
     }
 
     public boolean isCanFly() {
@@ -119,47 +105,8 @@ public class Customer {
         return dashPasses;
     }
 
-    public int getNumberOfDashPasses(){
-        return dashPasses.size();
-    }
-
-
     public List<DashPassReservation> getDashPassReservations() {
         return dashPassReservations;
-    }
-
-    public void setDashPassReservations(List<DashPassReservation> dashPassReservations) {
-        this.dashPassReservations = dashPassReservations;
-    }
-
-    public Integer getMaxNumberOfDashPasses() {
-        return maxNumberOfDashPasses;
-    }
-
-    public void setMaxNumberOfDashPasses(int maxNumberOfDashPasses) {
-        this.maxNumberOfDashPasses = maxNumberOfDashPasses;
-    }
-
-    public Integer getNumberOfDashPassesAvailableForPurchase() {
-        // Use the non-redeemed count instead of manipulating the list
-        return maxNumberOfDashPasses - getNonRedeemedDashPassCount();
-    }
-
-
-    public Integer getNumberOfDashPassesUsed() {
-        return numberOfDashPassesUsed;
-    }
-
-    public void setNumberOfDashPassesUsed(int numberOfDashPassesUsed) {
-        this.numberOfDashPassesUsed = numberOfDashPassesUsed;
-    }
-
-    public boolean isCanPurchaseDashPass() {
-        return canPurchaseDashPass;
-    }
-
-    public void setCanPurchaseDashPass(boolean canPurchaseDashPass) {
-        this.canPurchaseDashPass = canPurchaseDashPass;
     }
 
     public List<Reservation> getReservations() {
@@ -170,10 +117,12 @@ public class Customer {
         this.reservations = reservations;
     }
 
-    // Add method to handle adding DashPassReservation
-    public void addDashPassReservation(DashPassReservation dashPassReservation) {
-        dashPassReservations.add(dashPassReservation);
-        dashPassReservation.setCustomer(this);  // Set the customer reference in DashPassReservation
+    // Method to get list of past DashPass reservations
+    public List<DashPassReservation> getPreviousDashPassReservations() {
+        LocalDate currentDate = LocalDate.now();
+        return dashPassReservations.stream()
+                .filter(dashPassReservation -> dashPassReservation.getBookingDate().isBefore(currentDate))
+                .collect(Collectors.toList());
     }
 
     public void addDashPass(DashPass dashPass) {
@@ -181,26 +130,10 @@ public class Customer {
         dashPass.setCustomer(this);
     }
 
-    public List<PaymentDetails> getPaymentDetails() {
-        return paymentDetails;
+    public void addDashPassReservation(DashPassReservation dashPassReservation) {
+        dashPassReservations.add(dashPassReservation);
+        dashPassReservation.setCustomer(this);
     }
 
-    public void setPaymentDetails(List<PaymentDetails> paymentDetails) {
-        this.paymentDetails = paymentDetails;
-    }
-
-    public void setNumberOfDashPassesAvailableForPurchase(int dashPassesAvailable) {
-        // This should directly set the number of dash passes available for purchase
-        // based on maxNumberOfDashPasses minus what the customer already owns
-        this.totalDashPassesForUse = dashPassesAvailable;
-    }
-
-    public int getNonRedeemedDashPassCount() {
-        return (int) dashPasses.stream()
-                .filter(dashPass -> !dashPass.isRedeemed())
-                .count();
-    }
-
-
-
+    // Other necessary methods and logic if needed
 }

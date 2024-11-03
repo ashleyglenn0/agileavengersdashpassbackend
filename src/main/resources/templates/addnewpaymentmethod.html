@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Payment Method</title>
+  <link rel="stylesheet" th:href="@{/styles/paymentMethodForm.css}" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form action="/perform_logout" method="post">
+      <button type="submit" class="button">Logout</button>
+    </form>
+  </nav>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Add Payment Method</h2>
+    </div>
+    <div th:if="${errorMessage}" class="error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/customer/{customerID}/savepaymentmethod(customerID=${customer.id})}"
+            th:object="${paymentDetailsDTO}" method="post">
+
+        <!-- Card Number -->
+        <div class="form-group">
+          <label for="cardNumber">Card Number</label>
+          <input type="text" id="cardNumber" th:field="*{cardNumber}" required
+                 pattern="^\d{16}$" aria-label="Card Number (16 digits)" />
+          <span class="error" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}">Card number error</span>
+        </div>
+
+        <!-- CVV -->
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="text" id="cvv" th:field="*{cvv}" required
+                 pattern="^\d{3,4}$" aria-label="CVV (3 or 4 digits)" />
+          <span class="error" th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}">CVV error</span>
+        </div>
+
+        <!-- Expiration Date -->
+        <div class="form-group">
+          <label for="expirationDate">Expiration Date (MM/YY)</label>
+          <input type="text" id="expirationDate" th:field="*{expirationDate}" required
+                 pattern="^(0[1-9]|1[0-2])\/\d{2}$" placeholder="MM/YY" aria-label="Expiration Date in MM/YY format" />
+          <span class="error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}">Expiration date error</span>
+        </div>
+
+        <!-- Name on Card -->
+        <div class="form-group">
+          <label for="cardName">Name on Card</label>
+          <input type="text" id="cardName" th:field="*{cardName}" required aria-label="Name on Card" />
+          <span class="error" th:if="${#fields.hasErrors('cardName')}" th:errors="*{cardName}">Name on card error</span>
+        </div>
+
+        <!-- ZIP Code -->
+        <div class="form-group">
+          <label for="zipCode">ZIP Code</label>
+          <input type="text" id="zipCode" th:field="*{zipCode}" required
+                 pattern="^\d{5}(-\d{4})?$" aria-label="ZIP Code" placeholder="5 or 9 digits" />
+          <span class="error" th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}">ZIP code error</span>
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="form-group button-group">
+          <button type="submit" class="btn btn-primary">Save Payment</button>
+          <button type="button" class="btn btn-cancel" onclick="window.history.back();">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

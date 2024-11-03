@@ -1,0 +1,55 @@
+body {
+    background-color: #00338D; /* Southwest Blue */
+    font-family: Arial, sans-serif;
+    color: #004687;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.confirmation-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.confirmation-container h1 {
+    color: #004687; /* Southwest Blue */
+}
+
+.confirmation-container h2 {
+    color: #004687; /* Southwest Blue */
+    margin-bottom: 1rem;
+}
+
+.confirmation-details p {
+    font-size: 1.1em;
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.confirm-button {
+    background-color: #FFB612; /* Southwest Yellow */
+    color: #004687; /* Blue text */
+    font-size: 1em;
+    padding: 0.8em 1.5em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #FFCD41; /* Slightly lighter yellow */
+}
+
+.confirm-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #004687; /* Focus outline in blue */
+}

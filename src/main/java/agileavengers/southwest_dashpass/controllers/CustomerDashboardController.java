@@ -2,8 +2,10 @@ package agileavengers.southwest_dashpass.controllers;
 
 import agileavengers.southwest_dashpass.models.Customer;
 import agileavengers.southwest_dashpass.models.DashPass;
+import agileavengers.southwest_dashpass.models.DashPassReservation;
 import agileavengers.southwest_dashpass.models.Reservation;
 import agileavengers.southwest_dashpass.services.CustomerService;
+import agileavengers.southwest_dashpass.services.DashPassReservationService;
 import agileavengers.southwest_dashpass.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,12 +20,15 @@ import java.util.List;
 public class CustomerDashboardController {
     private final CustomerService customerService;
     private final ReservationService reservationService;
+    private final DashPassReservationService dashPassReservationService;
 
     // Constructor Injection
     @Autowired
-    public CustomerDashboardController(CustomerService customerService, ReservationService reservationService) {
+    public CustomerDashboardController(CustomerService customerService, ReservationService reservationService,
+                                       DashPassReservationService dashPassReservationService) {
         this.customerService = customerService;
         this.reservationService = reservationService;
+        this.dashPassReservationService = dashPassReservationService;
     }
 
     @GetMapping("/customer/{customerID}/customerdashboard")
@@ -45,31 +50,30 @@ public class CustomerDashboardController {
             return "error/403";  // Show a 403 error page if access is unauthorized
         }
 
-        Integer numberOfDashPassesInUse = customer.getNumberOfDashPassesUsed();
-        Integer numberOfDashPassesAvailableForPurchase = customer.getNumberOfDashPassesAvailableForPurchase();
-        Integer numberOfDashPassesAvailableToAddToReservation = customer.getNumberOfDashPasses();
-        Integer totalNumberOfDashPassesOwned = customer.getTotalDashPassesCustomerHas();
-
 //        System.out.println("Upcoming Flight: " + (upcomingFlight != null ? upcomingFlight.getFlightDepartureDate() : "None"));
         for (Reservation reservation : upcomingFlight) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
             System.out.println("Flights: " + reservation.getFlights());  // Check if flights are populated
+
+            System.out.println("DashPass Reservations: " + reservation.getDashPassReservations());
+
         }
 
-        Reservation soonestReservation = reservationService.findSoonestReservationForCustomer(customerID);
+        Reservation soonestReservation = reservationService.findSoonestUpcomingReservationForCustomer(customerID);
+        List<Reservation> pastReservations = reservationService.findPastReservations(customer);
+
+        // Fetch past DashPass reservations
+        List<DashPassReservation> pastDashPassReservations = dashPassReservationService.findPastDashPassReservations(customer);
         model.addAttribute("soonestReservation", soonestReservation);
 
 
         // Add customer information to the model
         model.addAttribute("customer", customer);
-        model.addAttribute("numberOfDashPassesInUse", numberOfDashPassesInUse);
-        model.addAttribute("numberOfDashPassesAvailableForPurchase", numberOfDashPassesAvailableForPurchase);
-        model.addAttribute("numberOfDashPassesAvailableToAddToReservation", numberOfDashPassesAvailableToAddToReservation);
-        model.addAttribute("totalNumberOfDashPassesOwned", totalNumberOfDashPassesOwned);
         model.addAttribute("upcomingFlight", upcomingFlight);
+        model.addAttribute("pastReservations", pastReservations);
+        model.addAttribute("pastDashPassReservations", pastDashPassReservations);
 
 
         return "customerdashboard";  // Return the dashboard view
     }
-
 }
