@@ -45,28 +45,35 @@ public class UserService implements UserDetailsService {
         this.eventPublisher = eventPublisher;
     }
 
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Find the user by username using Optional
+        // Find the user by username
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username " + username));
 
-        // Optionally, you can initialize the user to ensure lazy-loaded entities are not fetched
-        Hibernate.initialize(user); // Initializes only the user, not related entities like Employee or Customer
-         //Assign authorities based on the UserType
+        // Log user loading for verification
+        System.out.println("Loaded user: " + user.getUsername());
+
+        // Collection to hold authorities
         Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+        // Assign authorities based on the UserType
         if (user.getUserType() == UserType.CUSTOMER) {
             if (user.getCustomer() == null) {
                 throw new UsernameNotFoundException("Customer profile not found for username: " + username);
             }
             authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+        } else if (user.getUserType() == UserType.EMPLOYEE) {
+            if (user.getEmployee() == null) {
+                throw new UsernameNotFoundException("Employee profile not found for username: " + username);
+            }
+            authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
         }
-//        else if (user.getUserType() == UserType.EMPLOYEE) {
-//            if (user.getEmployee() == null) {
-//                throw new UsernameNotFoundException("Employee profile not found for username: " + username);
-//            }
-//            authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
-//        }
+
+        // Log authorities for debugging
+        System.out.println("Authorities: " + authorities);
+
         // Create and return a Spring Security User object
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
@@ -74,6 +81,8 @@ public class UserService implements UserDetailsService {
                 authorities
         );
     }
+
+
 
     // Save or update the user based on the UserType
     @Transactional
@@ -95,10 +104,6 @@ public class UserService implements UserDetailsService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username " + username));
-    }
-
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
     }
 
 }

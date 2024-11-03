@@ -42,7 +42,9 @@ public class SecurityConfig {
                         .requestMatchers("/admin/cleanupPage").permitAll()
                         .requestMatchers("/admin/cleanupFlights").permitAll()
                         .requestMatchers("/admin/success").permitAll()
-                        .requestMatchers("/employeedashboard/**").hasAuthority("ROLE_EMPLOYEE")
+                        .requestMatchers("/employeedashboard/**").hasAuthority("ROLE_EMPLOYEE_SALES")
+                        .requestMatchers("/employeedashboard/**").hasAuthority("ROLE_EMPLOYEE_MANAGER")
+                        .requestMatchers("/employeedashboard/**").hasAuthority("ROLE_EMPLOYEE_SUPPORT")
                         .requestMatchers("/customerdashboard/**").hasAuthority("ROLE_CUSTOMER")
                         .anyRequest().authenticated() // Allow all requests temporarily for testing
                 )

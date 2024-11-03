@@ -1,10 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Employee Dashboard</title>
+    <meta name="description" content="Southwest Airlines Employee Dashboard">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/styles/employeedashboard.css}">
 </head>
-<body>
+<body class="southwest-blue-bg">
+<header>
+    <nav class="navbar southwest-yellow-bg rounded-container">
+        <div class="navbar-left">
+            <a href="/employee/dashboard" class="navbar-brand text-dark">Home</a>
+        </div>
+        <div class="navbar-right">
+            <form action="/perform_logout" method="post">
+                <button style="background-color: #00338D; color: white;" type="submit" class="button southwest-blue-bg text-white rounded-button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<div class="container white-bg rounded-container">
+    <h1 style="color:#00338D">Welcome, <span th:text="${employee.user.firstName}"></span>!</h1>
+
+    <!-- Upcoming Shifts Section -->
+    <section class="upcoming-shifts card-section white-bg rounded-container">
+        <div class="shifts-section">
+            <h3>Upcoming Shifts</h3>
+            <div th:if="${shifts.isEmpty()}">
+                <p>No shifts assigned yet.</p>
+            </div>
+            <ul th:each="shift : ${shifts}">
+                <li>
+                    Date: <span th:text="${shift.date}"></span> |
+                    Start: <span th:text="${shift.startTime}"></span> |
+                    End: <span th:text="${shift.endTime}"></span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Upcoming Holidays & Busy Days Section -->
+    <section class="upcoming-holidays card-section white-bg rounded-container">
+        <h3>Upcoming Holidays & Busy Days</h3>
+        <ul>
+            <li>Thanksgiving: November 23</li>
+            <li>Christmas: December 25</li>
+            <li>New Year's Day: January 1</li>
+        </ul>
+        <div class="announcements-section">
+            <h3>Announcements</h3>
+            <ul th:if="${announcements != null}">
+                <li th:each="announcement : ${announcements}">
+                    <strong th:text="${announcement.type} + ': '"></strong>
+                    <span th:text="${announcement.message}"></span>
+                    <small>(Date: <span th:text="${announcement.date}"></span>)</small>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Dashboard Actions Section -->
+    <section class="actions card-section white-bg rounded-container">
+        <h3>Actions</h3>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/addcustomer\''">
+            Add Customer
+        </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/validatedashpass\''">
+            Validate DashPass
+        </button>
+    </section>
+
+    <!-- Additional Actions Section -->
+    <section class="additional-actions card-section white-bg rounded-container">
+        <h3>Additional Tools</h3>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/customersearch\''">
+            Search Customer
+        </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/flightsearch\''">
+            Search Flights
+        </button>
+    </section>
+</div>
+
+<footer class="southwest-yellow-bg text-dark rounded-container">
+    For educational purposes only. All Trademarks are the property of their respective owners.
+</footer>
 
 </body>
 </html>

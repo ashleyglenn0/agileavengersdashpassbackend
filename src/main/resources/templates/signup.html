@@ -20,7 +20,7 @@
 </header>
 <div class="container">
     <div class="signup-box">
-        <h1>Signup for Southwest Airlines Dash Pass</h1>
+        <h1>Sign up for Southwest Airlines Dash Pass</h1>
         <div th:if="${error}">
             <p class="error-message" th:text="${error}"></p>
         </div>
@@ -39,15 +39,15 @@
             <!-- User Type Radio Buttons -->
             <div class="radio">
                 <label>Customer</label>
-                <input type="radio" id="customer" name="userType" value="CUSTOMER" th:field="*{userType}" required>
+                <input type="radio" id="customer" name="userType" value="CUSTOMER" th:field="*{userType}" required onchange="toggleRoleDropdown()">
                 <label>Employee</label>
-                <input type="radio" id="employee" name="userType" value="EMPLOYEE" th:field="*{userType}" required>
+                <input type="radio" id="employee" name="userType" value="EMPLOYEE" th:field="*{userType}" required onchange="toggleRoleDropdown()">
             </div>
             <br />
             <!-- Role Select for Employee -->
-            <div th:if="*{userType} == 'EMPLOYEE'">
+            <div id="roleContainer" style="display: none;">
                 <label>Role (If Employee):</label><br />
-                <select name="role" id="role" th:field="*{role}">
+                <select name="role" id="role">
                     <option value="">-- Select Role --</option>
                     <option value="SALES">Sales</option>
                     <option value="MANAGER">Manager</option>
@@ -57,10 +57,15 @@
             <!-- Submit Button -->
             <input class="button" type="submit" value="Sign Up">
         </form>
-        <div>
-        </div>
     </div>
 </div>
-<script src="" async defer></script>
+
+<script>
+    function toggleRoleDropdown() {
+        const employeeRadio = document.getElementById('employee');
+        const roleContainer = document.getElementById('roleContainer');
+        roleContainer.style.display = employeeRadio.checked ? 'block' : 'none';
+    }
+</script>
 </body>
 </html>

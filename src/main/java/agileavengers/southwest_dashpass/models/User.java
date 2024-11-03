@@ -36,10 +36,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserType userType = UserType.CUSTOMER;  // Defaulting to CUSTOMER
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Customer customer;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Employee employee;
 
     // Constructor with parameters

@@ -1,57 +1,137 @@
+/* Southwest theme colors */
+:root {
+    --southwest-blue: #00338D;
+    --southwest-yellow: #FFC72C;
+    --white: #FFFFFF;
+    --light-gray: #F3F4F6;
+}
+
+/* General Page Styling */
 body {
-    font-family: Arial;
-    color:rgb(0, 51, 153);
-}
-.logo {
-    height: 100px;
-    width: 150px;
-}
-.container {
+    background-color: var(--southwest-blue);
+    font-family: Arial, sans-serif;
+    color: var(--southwest-blue);
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    color: var(--white);
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
     text-align: center;
 }
+
+/* Header and Navigation */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: rgb(0, 51, 153);
-    background-color: white;
-    width: 100%;
-    font-family: Arial;
-  }
-  nav ul {
-    list-style: none;
-  }
-  .card {
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    justify-content: center;
-    border-radius: 30px;
-    width: 400px;
-    height: 300px;
-  }
-  .cardlist {
-    text-align: center;
-    padding: 70px;
-  }
-  .button {
-    background-color: rgb(255, 204, 0);
-    color: rgb(0, 51, 153);
-    font-size: 16px;
-    font-weight: bold;
+    padding: 10px 20px;
+    background-color: var(--southwest-yellow);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.navbar .logo {
     height: 50px;
-    width: 250px;
-    border-radius: 25px;
+}
+
+.navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul li {
+    display: inline;
+    margin-left: 20px;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: var(--southwest-blue);
+    font-weight: bold;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: var(--white);
+    margin: 10px 0;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* Card Section */
+.card {
+    background-color: var(--white);
+    color: var(--southwest-blue);
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+}
+
+.cardlist {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.cardlist strong {
+    font-size: 1.2rem;
+    color: var(--southwest-blue);
+}
+
+/* Action Button */
+.button {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
     border: none;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-  a:hover {
-    background-color: rgb(255, 204, 0);
-  }
-  footer {
-    font-size: 18px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
     margin-top: 20px;
+}
+
+.button:hover {
+    background-color: #e6b82c;
+}
+
+.action {
+    margin-top: 20px;
+}
+
+.action p {
+    color: var(--white);
+    font-size: 1.2rem;
+}
+
+/* Footer */
+footer {
     text-align: center;
+    padding: 10px 20px;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin-top: auto;
 }
