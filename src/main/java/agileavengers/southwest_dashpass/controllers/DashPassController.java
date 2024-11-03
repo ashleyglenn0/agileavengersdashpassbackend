@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.controllers;
 
+import agileavengers.southwest_dashpass.dtos.DisplayPaymentDetailsDTO;
 import agileavengers.southwest_dashpass.dtos.PaymentDetailsDTO;
 import agileavengers.southwest_dashpass.exceptions.PaymentFailedException;
 import agileavengers.southwest_dashpass.models.*;
@@ -82,7 +83,12 @@ public class DashPassController {
         Reservation reservation = null;
         if (reservationId != null) {
             reservation = reservationService.findById(reservationId);
+            System.out.println("Reservation ID: " + (reservation != null ? reservation.getReservationId() : "No Reservation"));
+            System.out.println("Flight Departure Date: " + (reservation != null ? reservation.getFlightDepartureDate() : "No Date"));
+            System.out.println("Airport Code: " + (reservation != null ? reservation.getAirportCode() : "No Code"));
+
         }
+
 
         // Calculate the total price for the dash pass(es)
         double totalPrice = dashPassQuantity * 50.0;
@@ -124,12 +130,15 @@ public class DashPassController {
         // Calculate total price for DashPass purchase
         double totalPrice = dashPassQuantity * 50.0;  // Assuming $50 per DashPass
 
+        List<DisplayPaymentDetailsDTO> savedPaymentMethods = paymentDetailsService.getDisplayPaymentDetails(customerID);
+
         // Add customer, reservation, and calculated price to the model
         model.addAttribute("customer", customer);
         model.addAttribute("reservation", reservation); // Add reservation, null if not available
         model.addAttribute("dashPassQuantity", dashPassQuantity);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("userSelectedStatus", "PAID"); // Default value for the form
+        model.addAttribute("paymentMethods", savedPaymentMethods);
 
         System.out.println("Customer: " + customer);
         System.out.println("User: " + (customer != null ? customer.getUser() : "No user associated"));

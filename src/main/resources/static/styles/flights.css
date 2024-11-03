@@ -41,6 +41,7 @@ body {
     background-color: #004287; /* Southwest Blue */
     color: #ffffff;
     text-align: center;
+    border-radius: 8px;
 }
 
 /* Section Title */
@@ -64,24 +65,32 @@ body {
     gap: 15px;
 }
 
-/* Card Styling */
-.card {
-    background-color: #f0f4fa; /* Slightly darker than white for better contrast */
+/* Individual Flight Card Styling */
+.flight-card {
+    background-color: #f0f4fa; /* Light background for contrast */
     color: #004287; /* Southwest Blue text */
-    padding: 15px; /* Internal padding */
-    margin-bottom: 15px; /* Space between each card */
+    padding: 15px;
     border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
     text-align: left;
 }
 
-.card p {
+.flight-card h5.section-title {
+    color: #ffb400; /* Southwest Yellow */
+    margin-bottom: 10px;
+}
+
+.flight-card p {
     margin: 5px 0;
 }
 
-.card h4 {
-    color: #ffbf27; /* Southwest Yellow */
-    margin-bottom: 10px;
+/* Seat Availability Warning */
+.seat-warning {
+    color: red;
+    font-style: italic;
+    font-size: 0.9em;
 }
 
 /* Button Group */
@@ -99,24 +108,13 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-}
-
-.back-button {
-    background-color: #ffbf27; /* Southwest Yellow */
+    background-color: #ffb400; /* Southwest Yellow */
     color: #004287;
+    font-weight: bold;
 }
 
-.back-button:hover {
-    background-color: #ffd966;
-}
-
-.confirm-button {
-    background-color: #ffbf27; /* Southwest Yellow */
-    color: #004287;
-}
-
-.confirm-button:hover {
-    background-color: #ffd966;
+.back-button:hover, .confirm-button:hover {
+    background-color: #e0a500; /* Darken on hover */
 }
 
 /* Footer Styling */
@@ -127,3 +125,33 @@ body {
     color: #004287;
     background-color: #ffbf27; /* Southwest Yellow */
 }
+
+/* Flight Section Styling */
+.flight-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    color: #333333; /* Dark text for contrast */
+}
+
+/* Flight Details Container */
+.flight-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #333333;
+}
+
+/* Divider Line Between Flight Cards */
+.card-container .flight-section {
+    border-bottom: 1px solid #cccccc;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.card-container .flight-section:last-child {
+    border-bottom: none; /* Remove divider after the last flight */
+}
+

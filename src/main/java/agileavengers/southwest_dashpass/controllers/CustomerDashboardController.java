@@ -54,6 +54,9 @@ public class CustomerDashboardController {
         for (Reservation reservation : upcomingFlight) {
             System.out.println("Reservation ID: " + reservation.getReservationId());
             System.out.println("Flights: " + reservation.getFlights());  // Check if flights are populated
+
+            System.out.println("DashPass Reservations: " + reservation.getDashPassReservations());
+
         }
 
         Reservation soonestReservation = reservationService.findSoonestUpcomingReservationForCustomer(customerID);

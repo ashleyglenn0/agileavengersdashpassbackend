@@ -63,11 +63,9 @@ public class FlightDataPopulator {
                 arrivalCode = getRandomAirportCode(random);
             }
 
-            // Decide if this trip will be a round trip or one way
             boolean isRoundTrip = random.nextBoolean();
             TripType tripType = isRoundTrip ? TripType.ROUND_TRIP : TripType.ONE_WAY;
 
-            // Generate outbound flights
             LocalDate outboundDate = LocalDate.now().plusDays(random.nextInt(30));
             int outboundFlightsOnSameDay = random.nextInt(4) + 2;
 
@@ -79,8 +77,9 @@ public class FlightDataPopulator {
                 int durationMinutes = 60 + random.nextInt(240);
                 LocalDateTime arrivalTime = departureTime.plusMinutes(durationMinutes);
 
-                // DashPass details
-                int dashPassesAvailable = random.nextInt(16); // 0 to 15
+                int maxSeats = 50 + random.nextInt(151); // Random seats between 50 and 200
+                int seatsSold = random.nextInt(maxSeats);
+                int dashPassesAvailable = random.nextInt(16); // DashPass availability between 0 and 15
                 boolean dashPassAvailable = dashPassesAvailable > 0;
 
                 // Create Outbound Flight
@@ -96,8 +95,9 @@ public class FlightDataPopulator {
                 outboundFlight.setTripId(tripId);
                 outboundFlight.setTripType(tripType);
                 outboundFlight.setPrice(100 + (random.nextDouble() * (500 - 100)));
-                outboundFlight.setNumberOfSeatsAvailable(60);
-                outboundFlight.setSeatsSold(60 - (20 + random.nextInt(31)));
+                outboundFlight.setAvailableSeats(maxSeats);
+                outboundFlight.setSeatsSold(seatsSold);
+                outboundFlight.setNumberOfSeatsAvailable(maxSeats - seatsSold);
                 outboundFlight.setMaxNumberOfDashPassesForFlight(15);
                 outboundFlight.setNumberOfDashPassesAvailable(dashPassesAvailable);
                 outboundFlight.setCanAddNewDashPass(dashPassAvailable);
@@ -105,20 +105,19 @@ public class FlightDataPopulator {
 
                 flightRepository.save(outboundFlight);
 
-                // Generate return flights if this is a round trip
                 if (isRoundTrip) {
                     LocalDate returnDate = outboundDate.plusDays(1 + random.nextInt(7));
                     int returnFlightsOnSameDay = random.nextInt(4) + 2;
 
                     for (int k = 0; k < returnFlightsOnSameDay; k++) {
-                        // Generate return departure and arrival times based on returnDate
                         LocalDateTime returnDepartureTime = returnDate.atStartOfDay()
                                 .plusHours(random.nextInt(12) + 6)
                                 .plusMinutes(random.nextInt(60));
                         LocalDateTime returnArrivalTime = returnDepartureTime.plusMinutes(60 + random.nextInt(240));
 
-                        // Randomize DashPass availability for return flights
-                        dashPassesAvailable = random.nextInt(16); // 0 to 15
+                        maxSeats = 50 + random.nextInt(151); // New random seats for return flight
+                        seatsSold = random.nextInt(maxSeats);
+                        dashPassesAvailable = random.nextInt(16);
                         dashPassAvailable = dashPassesAvailable > 0;
 
                         // Create Return Flight
@@ -135,8 +134,9 @@ public class FlightDataPopulator {
                         returnFlight.setTripType(TripType.ROUND_TRIP);
                         returnFlight.setReturnDate(returnDate);
                         returnFlight.setPrice(100 + (random.nextDouble() * (500 - 100)));
-                        returnFlight.setNumberOfSeatsAvailable(60);
-                        returnFlight.setSeatsSold(60 - (20 + random.nextInt(31)));
+                        returnFlight.setAvailableSeats(maxSeats);
+                        returnFlight.setSeatsSold(seatsSold);
+                        returnFlight.setNumberOfSeatsAvailable(maxSeats - seatsSold);
                         returnFlight.setMaxNumberOfDashPassesForFlight(15);
                         returnFlight.setNumberOfDashPassesAvailable(dashPassesAvailable);
                         returnFlight.setCanAddNewDashPass(dashPassAvailable);
@@ -148,6 +148,7 @@ public class FlightDataPopulator {
             }
         }
     }
+
 
 
 

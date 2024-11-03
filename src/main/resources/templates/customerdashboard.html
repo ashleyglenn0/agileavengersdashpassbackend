@@ -33,6 +33,9 @@
             <p>Departure Airport: <span th:text="${soonestReservation.flights[0].departureAirportCode}"></span></p>
             <p>Departure Date: <span th:text="${soonestReservation.flights[0].departureDate}"></span></p>
             <p>Departure Time: <span th:text="${soonestReservation.flights[0].departureTime}"></span></p>
+            <p>Outbound Flight Terminal: <span th:text="${soonestReservation.getFlightTerminal(soonestReservation.flights[0].flightID)}">1A</span></p>
+            <p>Outbound Flight Gate: <span th:text="${soonestReservation.getFlightGate(soonestReservation.flights[0].flightID)}">20</span></p>
+            <p>Flight Status: <span style="color: green; font-style: italic;">On Time</span></p>
             <p>Status: <span th:text="${soonestReservation.status}"></span></p>
             <button class="button southwest-blue-bg text-white rounded-button"
                     th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/reservations\''">

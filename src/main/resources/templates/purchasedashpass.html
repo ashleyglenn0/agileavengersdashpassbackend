@@ -80,8 +80,9 @@
                             <input type="radio" name="selectedReservationId" th:value="${reservation.reservationId}" />
                         </td>
                         <td th:text="${reservation.reservationId}"></td>
-                        <td th:text="${#temporals.format(reservation.flightDepartureDate, 'yyyy-MM-dd')}"></td>
-                        <td th:text="${reservation.airportCode}"></td>
+                        <!-- Assuming 'flights' is a list and we're using the first flight's details -->
+                        <td th:text="${#temporals.format(reservation.flights[0].departureDate, 'yyyy-MM-dd')}">No Date</td>
+                        <td th:text="${reservation.flights[0].arrivalAirportCode}">No Destination</td>
                     </tr>
                     </tbody>
                 </table>

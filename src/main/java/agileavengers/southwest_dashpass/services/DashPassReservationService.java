@@ -3,6 +3,7 @@ package agileavengers.southwest_dashpass.services;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.DashPassRepository;
 import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
+import agileavengers.southwest_dashpass.repository.FlightRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,21 +31,25 @@ public class DashPassReservationService {
     @Autowired
     private DashPassService dashPassService;
 
-    public DashPassReservation createNewDashPassAndSaveNewDashPassReservation(Customer customer, Flight flight) {
+    @Autowired
+    private FlightRepository flightRepository;
+
+    public DashPassReservation createNewDashPassAndSaveNewDashPassReservation(Customer customer, Reservation flightReservation, Flight flight) {
         // Create a new DashPass, mark it as redeemed, and associate it with the customer
         DashPass newDashPass = new DashPass();
         newDashPass.setRedeemed(true);
         newDashPass.setCustomer(customer);
-        customer.getDashPasses().add(newDashPass);  // Add to customer’s DashPass list
 
         // Save the new DashPass first to persist it in the database
         dashPassRepository.save(newDashPass);
 
         // Create the DashPassReservation
-        DashPassReservation reservation = new DashPassReservation(customer, newDashPass, flight, LocalDate.now());
+        DashPassReservation reservation = new DashPassReservation(customer, newDashPass, flightReservation, flight, LocalDate.now());
 
         // Add the reservation to the flight's dashPassReservations
         flight.getDashPassReservations().add(reservation);
+        flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
+        flightRepository.save(flight);
 
         // Add the reservation to the customer's dashPassReservations
         customer.getDashPassReservations().add(reservation);
@@ -59,7 +64,7 @@ public class DashPassReservationService {
     }
 
 
-    public DashPassReservation createNewDashPassReservationAndAssignExistingDashPass(Customer customer, Flight flight) {
+    public DashPassReservation createNewDashPassReservationAndAssignExistingDashPass(Customer customer, Reservation flightReservation, Flight flight) {
         // Retrieve the list of available (non-redeemed) DashPasses associated with the customer
         List<DashPass> availableDashPasses = customer.getDashPasses().stream()
                 .filter(dashPass -> !dashPass.isRedeemed()) // Get only the non-redeemed DashPasses
@@ -77,12 +82,15 @@ public class DashPassReservationService {
         // Create the DashPassReservation
         DashPassReservation reservation = new DashPassReservation();
         reservation.setCustomer(customer);
+        reservation.setReservation(flightReservation);
         reservation.setFlight(flight);
         reservation.setDashPass(dashPassToAssign);
         reservation.setBookingDate(LocalDate.now());  // Set current date as booking date
 
         // Add the reservation to the flight's dashPassReservations
         flight.getDashPassReservations().add(reservation);
+        flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
+        flightRepository.save(flight);
 
         // Add the reservation to the customer's dashPassReservations
         customer.getDashPassReservations().add(reservation);
@@ -100,37 +108,6 @@ public class DashPassReservationService {
         return dashPassReservationRepository.save(dashPassReservation);
     }
 
-    @Transactional
-    public void handleDashPassOnSuccessfulPayment(Customer customer, DashPass dashPass, boolean isNewPurchase, Flight flight) {
-        // Ensure the customer is eligible to purchase the DashPass
-        if (!customer.isCanPurchaseDashPass()) {
-            throw new IllegalArgumentException("Customer has reached the maximum DashPass limit and cannot purchase more.");
-        }
-
-        if (isNewPurchase) {
-            // Only add the new DashPass to the customer's list if it's not tied to a reservation
-            if (flight == null) {
-                customer.addDashPass(dashPass);  // Adds DashPass to the list, effectively increasing totalDashPasses
-            } else {
-                // If tied to a flight reservation, set the DashPass as redeemed immediately
-                dashPass.setRedeemed(true);
-            }
-        }
-
-        // Update dashPassesForPurchase only if this was a general DashPass purchase (not associated with a reservation)
-        if (isNewPurchase && flight == null) {
-            customer.setDashPassesForPurchase(customer.getDashPassesForPurchase() - 1);
-        }
-
-        // Save the updated customer information
-        customerService.save(customer);
-
-        // If there's a flight, create and save the DashPassReservation
-        if (flight != null) {
-            DashPassReservation reservation = new DashPassReservation(customer, dashPass, flight, LocalDate.now());
-            dashPassReservationRepository.save(reservation);
-        }
-    }
 
     public void redeemDashPass(Customer customer, Reservation reservation, DashPass dashPass) throws Exception {
         // Check if the reservation already has a DashPass

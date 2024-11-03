@@ -24,6 +24,19 @@
         <div th:if="${errorMessage}" class="error">
             <span th:text="${errorMessage}"></span>
         </div>
+        <!-- Section for Saved Payment Methods -->
+        <div th:if="${!#lists.isEmpty(paymentMethods)}">
+            <h3>Select a Saved Payment Method</h3>
+            <div th:each="paymentMethod : ${paymentMethods}">
+                <input type="radio" name="selectedPaymentMethodId" th:value="${paymentMethod.id}"
+                       onclick="toggleNewPaymentForm(false)" />
+                <p>Card ending in: <span th:text="${paymentMethod.displayCardNumber}">**** **** **** XXXX</span></p>
+                <p><strong>Name on Card:</strong> <span th:text="${paymentMethod.cardName}"></span></p>
+                <p><strong>Expiration:</strong> <span th:text="${paymentMethod.expirationDate}"></span></p>
+            </div>
+            <input type="radio" name="selectedPaymentMethodId" value="new" onclick="toggleNewPaymentForm(true)" />
+            Use a New Payment Method
+        </div>
 
         <div class="card-body">
             <form th:action="@{/customer/{customerID}/dashpasspaymentmethoddetails(customerID=${customer.id})}" th:object="${paymentDetailsDTO}" method="post">
@@ -32,7 +45,7 @@
                 <input type="hidden" name="customerID" th:value="${customer?.id}" />
                 <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}" />
                 <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
-                <input type="hidden" name="selectedReservationId" th:value="${reservation?.id}" />
+                <input type="hidden" name="selectedReservationId" th:value="${reservation?.reservationId}" />
 
                 <!-- Display Customer Info -->
                 <p><strong>Customer:</strong> <span th:text="${customer?.user?.firstName} + ' ' + ${customer?.user?.lastName}"></span></p>
@@ -40,7 +53,7 @@
                 <!-- Display Reservation Details (if available) -->
                 <div th:if="${reservation != null}">
                     <h3>Reservation Details</h3>
-                    <p><strong>Reservation ID:</strong> <span th:text="${reservation.id}"></span></p>
+                    <p><strong>Reservation ID:</strong> <span th:text="${reservation.reservationId}"></span></p>
                     <p><strong>Flight Date:</strong> <span th:text="${#temporals.format(reservation.flightDepartureDate, 'yyyy-MM-dd')}"></span></p>
                     <p><strong>Destination:</strong> <span th:text="${reservation.airportCode}"></span></p>
                 </div>

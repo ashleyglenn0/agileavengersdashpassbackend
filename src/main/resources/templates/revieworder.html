@@ -22,6 +22,8 @@
         <div class="section">
             <h3>Outbound Flight</h3>
             <p><strong>Flight Number:</strong> <span th:text="${outboundFlight.flightNumber}"></span></p>
+            <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(outboundFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+            <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outboundFlight.departureTime, 'hh:mm a')}">Time</span></p>
             <p><strong>Departure Airport:</strong> <span th:text="${outboundFlight.departureAirportCode}"></span></p>
             <p><strong>Arrival Airport:</strong> <span th:text="${outboundFlight.arrivalAirportCode}"></span></p>
             <!-- More outbound flight details if needed -->
@@ -31,6 +33,8 @@
         <div class="section" th:if="${returnFlight != null}">
             <h3>Return Flight</h3>
             <p><strong>Return Flight Number:</strong> <span th:text="${returnFlight.flightNumber}"></span></p>
+            <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+            <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
             <p><strong>Return Departure Airport:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
             <p><strong>Return Arrival Airport:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
             <!-- More return flight details -->
@@ -44,9 +48,9 @@
                 <p>DashPass ID: <span th:text="${dashPass.dashpassId}">[DashPass ID]</span></p>
                 <p>Expiration Date: <span th:text="${#temporals.format(dashPass.expirationDate, 'MM-dd-yyyy')}">[Expiration Date]</span></p>
             </div>
-            <div th:if="${dashPassOption == 'purchase'}">
+            <div th:if="${dashPassOption == 'new'}">
                 <p><strong>Purchasing New DashPass:</strong></p>
-                <p><strong>DashPass Price:</strong> $<span th:text="${#numbers.format(dashPass.price, 1, 'COMMA', 2, 'POINT')}"></span></p>
+                <p><strong>DashPass Price:</strong> $<span>50.00</span></p>
             </div>
             <div th:if="${dashPassOption == 'none'}">
                 <p><strong>No DashPass will be used for this trip.</strong></p>

@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.models;
 
+import agileavengers.southwest_dashpass.utils.EncryptionUtils;
 import jakarta.persistence.*;
 
 @Entity
@@ -45,6 +46,17 @@ public class PaymentDetails {
         this.encryptedCVV = encryptedCVV;
         this.encryptedBillingZip = encryptedBillingZip;
         this.encryptedNameOnCard = encryptedNameOnCard;
+    }
+    // New method to set decrypted details for display
+    public void loadDecryptedDetails(EncryptionUtils encryptionUtils) {
+        String decryptedCardNumber = encryptionUtils.decrypt(encryptedCardNumber);
+        this.displayCardNumber = "**** **** **** " + decryptedCardNumber.substring(decryptedCardNumber.length() - 4);
+
+        // Other decrypted fields can also be loaded here
+        this.encryptedExpirationDate = encryptionUtils.decrypt(encryptedExpirationDate);
+        this.encryptedNameOnCard = encryptionUtils.decrypt(encryptedNameOnCard);
+        this.encryptedBillingZip = encryptionUtils.decrypt(encryptedBillingZip);
+        this.encryptedCVV = "***"; // Mask CVV for security
     }
 
     // Getters

@@ -1,11 +1,14 @@
 package agileavengers.southwest_dashpass;
 
+import agileavengers.southwest_dashpass.services.FlightService;
 import agileavengers.southwest_dashpass.tools.FlightDataPopulator;
 import agileavengers.southwest_dashpass.utils.EncryptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -18,6 +21,8 @@ public class SouthwestDashpassApplication implements CommandLineRunner {
 
 	@Autowired
     private FlightDataPopulator flightDataPopulator;
+	@Autowired
+	private FlightService flightService;
 
 	public static void main(String[] args) {
 

@@ -144,5 +144,20 @@ public class FlightService {
         return roundTripFlights;
     }
 
+    public void updateExistingFlights() {
+        List<Flight> flights = flightRepository.findAll();
+        Random random = new Random();
+
+        for (Flight flight : flights) {
+            int maxSeats = 50 + random.nextInt(150);  // Randomly set between 50 and 200 for variation
+            flight.setAvailableSeats(maxSeats);
+            flight.setNumberOfSeatsAvailable(maxSeats - flight.getSeatsSold());  // Calculate based on seatsSold
+            flightRepository.save(flight);
+        }
+
+        System.out.println("Existing flights updated with new availableSeats and numberOfAvailableSeats values.");
+    }
+
+
 }
 

@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.services;
 
+import agileavengers.southwest_dashpass.dtos.DisplayPaymentDetailsDTO;
 import agileavengers.southwest_dashpass.dtos.PaymentDetailsDTO;
 import agileavengers.southwest_dashpass.models.Customer;
 import agileavengers.southwest_dashpass.models.PaymentDetails;
@@ -61,26 +62,46 @@ public class PaymentDetailsService {
             throw new IllegalArgumentException("Payment method not found for ID: " + paymentMethodID);
         }
     }
-    public List<PaymentDetailsDTO> getDecryptedPaymentDetailsList(Long customerId) {
+//    public List<PaymentDetailsDTO> getDecryptedPaymentDetailsList(Long customerId) {
+//        List<PaymentDetails> encryptedPaymentDetailsList = paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
+//
+//        return encryptedPaymentDetailsList.stream().map(paymentDetails -> {
+//            PaymentDetailsDTO dto = new PaymentDetailsDTO();
+//            dto.setId(paymentDetails.getId());  // Set ID here
+//
+//            // Decrypt and mask fields as necessary
+//            String decryptedCardNumber = encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber());
+//            dto.setCardNumber("**** **** **** " + decryptedCardNumber.substring(decryptedCardNumber.length() - 4));
+//
+//            dto.setExpirationDate(encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate()));
+//            dto.setCardName(encryptionUtils.decrypt(paymentDetails.getEncryptedNameOnCard()));
+//            dto.setZipCode(encryptionUtils.decrypt(paymentDetails.getEncryptedBillingZip()));
+//            dto.setCvv("***"); // Mask CVV for security
+//
+//            return dto;
+//        }).collect(Collectors.toList());
+//    }
+
+    public List<DisplayPaymentDetailsDTO> getDisplayPaymentDetails(Long customerId) {
         List<PaymentDetails> encryptedPaymentDetailsList = paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
 
         return encryptedPaymentDetailsList.stream().map(paymentDetails -> {
-            PaymentDetailsDTO dto = new PaymentDetailsDTO();
-
-            // Decrypt and mask fields as necessary
+            // Decrypt and format card details
             String decryptedCardNumber = encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber());
-            dto.setCardNumber("**** **** **** " + decryptedCardNumber.substring(decryptedCardNumber.length() - 4));
+            String maskedCardNumber = "**** **** **** " + decryptedCardNumber.substring(decryptedCardNumber.length() - 4);
 
-            dto.setExpirationDate(encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate()));
-            dto.setCardName(encryptionUtils.decrypt(paymentDetails.getEncryptedNameOnCard()));
-            dto.setZipCode(encryptionUtils.decrypt(paymentDetails.getEncryptedBillingZip()));
-            dto.setCvv("***"); // Mask CVV for security
-
-            return dto;
+            return new DisplayPaymentDetailsDTO(
+                    paymentDetails.getId(),
+                    maskedCardNumber,
+                    encryptionUtils.decrypt(paymentDetails.getEncryptedNameOnCard()),
+                    encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate())
+            );
         }).collect(Collectors.toList());
     }
+
 
     public List<PaymentDetails> findSavedPaymentMethodsForCustomer(Long customerId) {
         return paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
     }
+
 }

@@ -304,5 +304,15 @@ public class Flight {
     public void setDirection(String direction) {
         this.direction = direction;
     }
+
+    public boolean canAddExistingDashPass() {
+        // Only allow using an existing DashPass if there are available DashPasses on the flight
+        return numberOfDashPassesAvailable > 0 && canUseExistingDashPass;
+    }
+
+    public boolean canAddNewDashPass() {
+        // Only allow purchasing a new DashPass if there are available DashPasses on the flight
+        return numberOfDashPassesAvailable > 0 && canAddNewDashPass;
+    }
 }
 

@@ -39,8 +39,14 @@
     <div class="section" th:if="${reservation != null}">
         <h2>Reservation Details</h2>
         <p><strong>Reservation ID:</strong> <span th:text="${reservation.reservationId}"></span></p>
-        <p><strong>Flight Date:</strong> <span th:text="${#temporals.format(reservation.flightDepartureDate, 'yyyy-MM-dd')}"></span></p>
-        <p><strong>Airport Code:</strong> <span th:text="${reservation.airportCode}"></span></p>
+
+        <div th:each="flight : ${reservation.flights}">
+            <h3>Flight Details</h3>
+            <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}"></span></p>
+            <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(flight.departureDate, 'yyyy-MM-dd')}"></span></p>
+            <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}"></span></p>
+            <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}"></span></p>
+        </div>
     </div>
 
     <div class="section" th:if="${reservation == null}">

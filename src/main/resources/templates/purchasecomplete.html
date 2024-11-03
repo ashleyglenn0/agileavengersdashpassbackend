@@ -21,16 +21,25 @@
     <h2>Flight Details</h2>
     <div th:each="flight : ${reservation.flights}">
       <p>Flight Number: <span th:text="${flight.flightNumber}"></span></p>
-      <p>Departure: <span th:text="${flight.departureAirportCode}"></span></p>
-      <p>Arrival: <span th:text="${flight.arrivalAirportCode}"></span></p>
+      <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+      <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Time</span></p>
+      <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}"></span></p>
+      <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}"></span></p>
+      <p><strong>Outbound Flight Terminal:</strong> <span th:text="${reservation.getFlightTerminal(outboundFlight.flightID)}"></span></p>
+      <p><strong>Outbound Flight Gate:</strong> <span th:text="${reservation.getFlightGate(outboundFlight.flightID)}"></span></p>
     </div>
 
     <!-- Return Flight Details (if applicable) -->
     <div th:if="${returnFlight != null}">
       <h2>Return Flight Details</h2>
       <p>Flight Number: <span th:text="${returnFlight.flightNumber}"></span></p>
-      <p>Departure: <span th:text="${returnFlight.departureAirportCode}"></span></p>
-      <p>Arrival: <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
+      <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+      <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
+      <p><strong>Departure Airport:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
+      <p><strong>Arrival Airport:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
+      <p><strong>Return Flight Terminal:</strong> <span th:text="${reservation.getFlightTerminal(returnFlight.flightID)}"></span></p>
+      <p><strong>Return Flight Gate:</strong> <span th:text="${reservation.getFlightGate(returnFlight.flightID)}"></span></p>
+
     </div>
 
     <!-- DashPass Reservation Details -->

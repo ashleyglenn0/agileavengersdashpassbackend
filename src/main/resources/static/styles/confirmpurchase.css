@@ -1,101 +1,85 @@
-/* General Page Style */
+/* Southwest Theme Styling for Confirm Booking Page */
+
 body {
-    background-color: #00338D; /* Southwest Blue */
     font-family: Arial, sans-serif;
-    color: #004488; /* Southwest Blue font color */
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
 }
 
-/* Container Style */
 .container {
-    background-color: white;
-    border-radius: 8px; /* Rounded edges */
-    padding: 20px;
     max-width: 600px;
-    margin: 40px auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for contrast */
-}
-.navbar {
-    padding: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Heading Styles */
-.container h1, .container h2 {
-    color: #004488; /* Southwest Blue */
-}
-
-/* Section Padding */
-.section {
-    padding: 15px 0;
-    border-bottom: 1px solid #dcdcdc;
-}
-
-.section:last-child {
-    border-bottom: none;
-}
-
-/* Navbar and Footer */
-.navbar, footer {
-    background-color: #FFB612; /* Southwest Yellow */
-    color: #004488; /* Southwest Blue font color */
-    padding: 10px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #004287; /* Darker Southwest Blue */
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
+}
+
+h2, h3 {
+    color: #ffbf27; /* Southwest Yellow */
+}
+
+p {
+    margin: 5px 0;
+}
+
+.section {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    color: #004287; /* Text in Southwest Blue */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section h3 {
+    margin-bottom: 10px;
+    color: #ffbf27; /* Southwest Yellow */
+}
+
+/* Button Styling */
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
     font-weight: bold;
-}
-
-/* Button Styles */
-.button-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.confirm-button {
-    background-color: #FFB612; /* Southwest Yellow */
-    color: #004488; /* Text color on yellow button */
     border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    margin-top: 10px;
 }
 
-.confirm-button:hover {
-    background-color: #ffcb42; /* Slightly lighter yellow for hover */
+/* Confirm Button */
+button[type="submit"] {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #004287; /* Text color in Blue */
 }
 
+button[type="submit"]:hover {
+    background-color: #ffd966; /* Lighter Yellow on hover */
+}
+
+/* Cancel Button */
 .cancel-button {
-    background-color: #B0B0B0; /* Complementary neutral gray for cancel */
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    background-color: #f0f0f0;
+    color: #004287;
+    border: 1px solid #004287;
 }
 
 .cancel-button:hover {
-    background-color: #d3d3d3; /* Slightly lighter gray for hover */
+    background-color: #e6e6e6;
 }
 
-/* Responsive Design */
+/* Mobile Responsiveness */
 @media (max-width: 600px) {
     .container {
         padding: 15px;
-        width: 90%;
     }
-
-    .button-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .confirm-button, .cancel-button {
-        width: 100%;
+    button {
+        font-size: 14px;
+        padding: 10px;
     }
 }

@@ -1,6 +1,7 @@
 package agileavengers.southwest_dashpass.services;
 
 import agileavengers.southwest_dashpass.dtos.PaymentDetailsDTO;
+import agileavengers.southwest_dashpass.models.PaymentDetails;
 import agileavengers.southwest_dashpass.models.PaymentStatus;
 import agileavengers.southwest_dashpass.utils.ConfirmationNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,4 +48,5 @@ public class PaymentService {
         int randomIndex = (int) (Math.random() * PaymentStatus.values().length);
         return PaymentStatus.values()[randomIndex];
     }
+
 }

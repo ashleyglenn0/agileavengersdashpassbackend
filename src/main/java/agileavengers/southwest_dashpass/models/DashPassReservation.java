@@ -38,10 +38,11 @@ public class DashPassReservation {
         this.bookingDate = LocalDate.now();
     }
 
-    public DashPassReservation(Customer customer, DashPass dashpass, Flight flight, LocalDate bookingDate){
+    public DashPassReservation(Customer customer, DashPass dashpass, Reservation reservation, Flight flight, LocalDate bookingDate){
         this.customer = customer;
         this.dashPass = dashpass;
         this.bookingDate = bookingDate;
+        this.reservation = reservation;
         this.flight = flight;
     }
 
