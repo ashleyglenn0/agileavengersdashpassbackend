@@ -21,7 +21,7 @@ public class DashPass {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customerID", referencedColumnName = "ID")
     private Customer customer;
-    @OneToOne(mappedBy = "dashPass", cascade = CascadeType.ALL, optional = true)
+    @OneToOne(mappedBy = "dashPass", cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER)
     private DashPassReservation dashPassReservation;
     @Column(name = "confirmation_number")
     private String confirmationNumber;
@@ -89,6 +89,17 @@ public class DashPass {
     }
     public boolean isRedeemable() {
         return !isRedeemed && expirationDate.isAfter(LocalDate.now());
+    }
+
+    public DashPassReservation getDashPassReservation() {
+        return dashPassReservation;
+    }
+
+    public void setDashPassReservation(DashPassReservation dashPassReservation) {
+        this.dashPassReservation = dashPassReservation;
+    }
+    public boolean isExpired() {
+        return expirationDate != null && LocalDate.now().isAfter(expirationDate);
     }
 }
 

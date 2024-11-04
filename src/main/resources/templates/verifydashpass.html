@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify DashPass</title>
+  <link rel="stylesheet" href="/styles/verifydashpass.css">
+</head>
+<body>
+
+<header>
+  <h1>DashPass Verification</h1>
+</header>
+
+<div class="container">
+  <!-- Search Section with Separate Forms for Customer and DashPass Search -->
+  <section class="search-section">
+
+    <!-- Form to Search by Customer Name -->
+    <form th:action="@{/employee/{employeeId}/searchCustomer(employeeId=${employee.id})}" method="GET">
+      <input type="text" name="name" placeholder="Enter Customer Name" th:value="${customerName}">
+      <button type="submit">Search by Customer Name</button>
+    </form>
+
+    <!-- Form to Search by DashPass ID -->
+    <form th:action="@{/employee/{employeeId}/searchDashPass(employeeId=${employee.id})}" method="GET">
+      <input type="text" name="dashPassId" placeholder="Enter DashPass ID" th:value="${dashPassId}">
+      <button type="submit">Search by DashPass ID</button>
+    </form>
+
+  </section>
+
+  <!-- Back to Dashboard Button -->
+  <button type="button" class="back-button" onclick="window.history.back();">Back to Dashboard</button>
+
+  <!-- Thymeleaf Conditional Rendering -->
+  <section class="results-section">
+
+    <!-- DashPass Card (Displayed if dashPass is found) -->
+    <div th:if="${dashPass != null}" class="dashpass-card">
+      <h2>DashPass Details</h2>
+      <p><strong>Customer First Name:</strong> <span th:text="${dashPass.customer.user.firstName}"></span></p>
+      <p><strong>Customer Last Name:</strong> <span th:text="${dashPass.customer.user.lastName}"></span></p>
+      <p><strong>Date of Purchase:</strong> <span th:text="${dashPass.dateOfPurchase}"></span></p>
+      <p><strong>Redeemed:</strong> <span th:text="${dashPass.isRedeemed ? 'Yes' : 'No'}"></span></p>
+      <p><strong>Status:</strong>
+        <span th:text="${!dashPass.isExpired() ? 'Valid' : 'Invalid'}"
+              th:class="${!dashPass.isExpired() ? 'status-valid' : 'status-invalid'}">
+        </span>
+      </p>
+
+      <!-- Conditionally displayed reservation details -->
+      <div th:if="${dashPass.dashPassReservation != null}">
+        <h3>Reservation Details</h3>
+        <p><strong>Reservation ID:</strong> <span th:text="${dashPass.dashPassReservation.id}"></span></p>
+        <p><strong>Reservation Date:</strong> <span th:text="${dashPass.dashPassReservation.bookingDate}"></span></p>
+      </div>
+      <div th:if="${dashPass.dashPassReservation == null}">
+        <p><em>No reservation attached to this DashPass.</em></p>
+      </div>
+    </div>
+
+    <!-- Fallback message if no DashPass is found and a search was conducted -->
+    <div th:if="${searchPerformed}" th:unless="${dashPass != null}" class="no-results">
+      <p>No DashPass found.</p>
+    </div>
+
+    <!-- Customer Table (Displayed if customer search results are present) -->
+    <table th:if="${customers != null and !customers.isEmpty()}" class="results-table">
+      <thead>
+      <tr>
+        <th>Customer Name</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="customer : ${customers}">
+        <td th:text="${customer.user.firstName + ' ' + customer.user.lastName}"></td>
+        <td>
+          <button type="button" th:onclick="'location.href=/customer/' + ${customer.id} + '/dashpasses'">View DashPasses</button>
+          <button type="button" th:onclick="'location.href=/customer/' + ${customer.id} + '/dashpassreservations'">View Reservations</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Fallback message if no customers are found and a search was conducted -->
+    <div th:if="${searchPerformed}" th:unless="${customers != null and !customers.isEmpty()}" class="no-results">
+      <p>No customers found.</p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

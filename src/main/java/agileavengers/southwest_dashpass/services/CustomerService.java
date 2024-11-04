@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -63,5 +64,18 @@ public class CustomerService {
         return customerRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Customer not found for user: " + user.getUsername()));
     }
+
+    public List<Customer> findCustomersByName(String fullName) {
+        // Split the full name on spaces (assuming first name and last name)
+        String[] nameParts = fullName.trim().toLowerCase().split(" ");
+        String firstName = "%" + nameParts[0] + "%";
+        String lastName = nameParts.length > 1 ? "%" + nameParts[1] + "%" : firstName; // If only one part, search both as the same
+
+        System.out.println("Searching with first name pattern: " + firstName);
+        System.out.println("Searching with last name pattern: " + lastName);
+
+        return customerRepository.findCustomersByFirstNameOrLastName(firstName, lastName);
+    }
+
 
 }

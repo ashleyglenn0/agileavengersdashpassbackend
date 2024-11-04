@@ -43,12 +43,6 @@ public class PaymentDetailsService {
         }
     }
 
-    // Check if encrypted card number already exists to prevent duplicates
-    public boolean checkIfPaymentMethodExists(String cardNumber) {
-        String encryptedCardNumber = encryptionUtils.encrypt(cardNumber);
-        return paymentDetailsRepository.existsByEncryptedCardNumber(encryptedCardNumber);
-    }
-
     // Retrieve all payment methods for a given customer
     public List<PaymentDetails> findPaymentMethodsByCustomer(Long customerId) {
         return paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
@@ -62,25 +56,6 @@ public class PaymentDetailsService {
             throw new IllegalArgumentException("Payment method not found for ID: " + paymentMethodID);
         }
     }
-//    public List<PaymentDetailsDTO> getDecryptedPaymentDetailsList(Long customerId) {
-//        List<PaymentDetails> encryptedPaymentDetailsList = paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
-//
-//        return encryptedPaymentDetailsList.stream().map(paymentDetails -> {
-//            PaymentDetailsDTO dto = new PaymentDetailsDTO();
-//            dto.setId(paymentDetails.getId());  // Set ID here
-//
-//            // Decrypt and mask fields as necessary
-//            String decryptedCardNumber = encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber());
-//            dto.setCardNumber("**** **** **** " + decryptedCardNumber.substring(decryptedCardNumber.length() - 4));
-//
-//            dto.setExpirationDate(encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate()));
-//            dto.setCardName(encryptionUtils.decrypt(paymentDetails.getEncryptedNameOnCard()));
-//            dto.setZipCode(encryptionUtils.decrypt(paymentDetails.getEncryptedBillingZip()));
-//            dto.setCvv("***"); // Mask CVV for security
-//
-//            return dto;
-//        }).collect(Collectors.toList());
-//    }
 
     public List<DisplayPaymentDetailsDTO> getDisplayPaymentDetails(Long customerId) {
         List<PaymentDetails> encryptedPaymentDetailsList = paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
@@ -102,6 +77,27 @@ public class PaymentDetailsService {
 
     public List<PaymentDetails> findSavedPaymentMethodsForCustomer(Long customerId) {
         return paymentDetailsRepository.findPaymentDetailsByCustomerId(customerId);
+    }
+
+    public PaymentDetailsDTO findPaymentDetailsById(Long paymentMethodId) {
+        return paymentDetailsRepository.findById(paymentMethodId)
+                .map(this::convertToDTO)  // Convert entity to DTO if found
+                .orElse(null);            // Return null if not found
+    }
+
+    // Helper method to convert PaymentDetails to PaymentDetailsDTO
+    private PaymentDetailsDTO convertToDTO(PaymentDetails paymentDetails) {
+        PaymentDetailsDTO dto = new PaymentDetailsDTO();
+        dto.setId(paymentDetails.getId());
+
+        // Decrypt sensitive data before setting in the DTO
+        dto.setCardNumber("**** **** **** " + encryptionUtils.decrypt(paymentDetails.getEncryptedCardNumber()).substring(12));
+        dto.setCardName(encryptionUtils.decrypt(paymentDetails.getEncryptedNameOnCard()));
+        dto.setExpirationDate(encryptionUtils.decrypt(paymentDetails.getEncryptedExpirationDate()));
+        dto.setZipCode(encryptionUtils.decrypt(paymentDetails.getEncryptedBillingZip()));
+        dto.setSavePaymentDetails(paymentDetails.isSavePaymentDetails());
+
+        return dto;
     }
 
 }

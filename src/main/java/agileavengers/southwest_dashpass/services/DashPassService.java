@@ -102,57 +102,28 @@ public class DashPassService {
     }
 
 
-
-
-    @Transactional
-    public DashPass createAndAssignDashPassDuringPurchase(Customer customer, Flight flight) {
-        DashPass newDashPass = new DashPass();
-        newDashPass.setRedeemed(true);
-        newDashPass.setCustomer(customer);
-
-        // Save the DashPass first to persist it in the database
-        dashPassRepository.save(newDashPass);
-
-        // Now associate the DashPass with the DashPassReservation
-        DashPassReservation reservation = new DashPassReservation();
-        reservation.setDashPass(newDashPass);
-        reservation.setFlight(flight);
-        reservation.setCustomer(customer);
-
-        // Save the DashPassReservation after the DashPass has been persisted
-        dashPassReservationRepository.save(reservation);
-
-        return newDashPass;
-    }
-
-
     public DashPass save(DashPass dashPass) {
         return dashPassRepository.save(dashPass);  // This is where repository interaction happens
     }
 
-    public DashPass findDashPassById(Long dashPassId) {
+    public DashPass findDashPassById(Long dashpassId) {
         // Optional is used to avoid exceptions if the DashPass doesn't exist
-        return dashPassRepository.findById(dashPassId)
-                .orElseThrow(() -> new RuntimeException("DashPass not found for id: " + dashPassId));
+        return dashPassRepository.findById(dashpassId)
+                .orElseThrow(() -> new RuntimeException("DashPass not found for id: " + dashpassId));
     }
 
-    public Optional<DashPass> findAvailableDashPass(Customer customer) {
-        // Fetch the list of DashPasses for the customer and filter those that are not redeemed
-        return customer.getDashPasses()
-                .stream()
-                .filter(dashPass -> !dashPass.isRedeemed()) // Find DashPasses that are not redeemed
-                .findFirst(); // Return the first available DashPass (if any)
-    }
+    public DashPass findDashPassByIdWithReservation(Long dashPassId) {
+        DashPass dashPass = dashPassRepository.findById(dashPassId).orElse(null);
 
-    public DashPass findAvailableDashPassForCustomer(Customer customer) {
-        // Iterate through the list of DashPasses for the customer
-        for (DashPass dashPass : customer.getDashPasses()) {
-            // Check if the DashPass is not redeemed
-            if (!dashPass.isRedeemed()) {
-                return dashPass; // Return the first available (non-redeemed) DashPass
-            }
+        if (dashPass != null && dashPass.getDashPassReservation() != null) {
+            // Access a field on reservation to trigger initialization if it’s lazy-loaded
+            dashPass.getDashPassReservation().getId();
         }
-        // Return null if no available DashPass is found
-        return null;
+
+        return dashPass;  // Returns the DashPass with initialized reservation (if it exists)
     }
+    public DashPass findDashPassByIdWithCustomerUserAndReservation(Long dashPassId) {
+        return dashPassRepository.findDashPassByIdWithCustomerUserAndReservation(dashPassId);
+    }
+
 }
