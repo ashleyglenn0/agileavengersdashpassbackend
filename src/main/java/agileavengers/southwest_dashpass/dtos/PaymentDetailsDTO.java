@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class PaymentDetailsDTO {
+    Long id;
 
     @NotBlank(message = "Card number is required")
     @Size(min = 13, max = 19, message = "Card number must be between 13 and 19 digits")
@@ -37,6 +38,15 @@ public class PaymentDetailsDTO {
 
 
     // Getters and Setters
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getDisplayCardNumber() {
         return displayCardNumber;

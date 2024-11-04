@@ -30,6 +30,8 @@ public class PaymentDetails {
     @Column(name = "encrypted_name_on_card", nullable = false)
     private String encryptedNameOnCard;
 
+    private boolean savePaymentDetails;
+
     // Transient field for displaying the last 4 digits of the card
     @Transient
     private String displayCardNumber;
@@ -115,5 +117,12 @@ public class PaymentDetails {
 
     public void setDisplayCardNumber(String displayCardNumber) {
         this.displayCardNumber = displayCardNumber;
+    }
+    public boolean isSavePaymentDetails() {
+        return savePaymentDetails;
+    }
+
+    public void setSavePaymentDetails(boolean savePaymentDetails) {
+        this.savePaymentDetails = savePaymentDetails;
     }
 }

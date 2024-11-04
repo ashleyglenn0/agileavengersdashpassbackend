@@ -4,7 +4,9 @@ import agileavengers.southwest_dashpass.dtos.DisplayPaymentDetailsDTO;
 import agileavengers.southwest_dashpass.dtos.PaymentDetailsDTO;
 import agileavengers.southwest_dashpass.exceptions.PaymentFailedException;
 import agileavengers.southwest_dashpass.models.*;
+import agileavengers.southwest_dashpass.repository.PaymentDetailsRepository;
 import agileavengers.southwest_dashpass.services.*;
+import agileavengers.southwest_dashpass.utils.EncryptionUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,20 +26,27 @@ public class DashPassController {
     private final PaymentService paymentService;
     private final PaymentDetailsService paymentDetailsService;
     private final DashPassReservationService dashPassReservationService;
+    private final EncryptionUtils encryptionUtils;
+    private final PaymentDetailsRepository paymentDetailsRepository;
 
     // Constructor Injection
     @Autowired
     public DashPassController(CustomerService customerService, ReservationService reservationService,
                               DashPassService dashPassService, PaymentService paymentService,
                               PaymentDetailsService paymentDetailsService,
-                              DashPassReservationService dashPassReservationService) {
+                              DashPassReservationService dashPassReservationService,
+                              EncryptionUtils encryptionUtils, PaymentDetailsRepository paymentDetailsRepository) {
         this.customerService = customerService;
         this.reservationService = reservationService;
         this.dashPassService = dashPassService;
         this.paymentService = paymentService;
         this.paymentDetailsService = paymentDetailsService;
         this.dashPassReservationService = dashPassReservationService;
+        this.encryptionUtils = encryptionUtils;
+        this.paymentDetailsRepository = paymentDetailsRepository;
     }
+
+    //Customer DashPass Methods
 
     @GetMapping("/customer/{customerID}/purchasedashpass")
     public String showPurchaseDashPassForm(@PathVariable Long customerID, Model model) {
@@ -154,6 +163,8 @@ public class DashPassController {
                                            @RequestParam(value = "selectedReservationId", required = false) Long reservationId,
                                            @RequestParam("totalPrice") double totalPrice,
                                            @RequestParam("userSelectedStatus") String userSelectedStatus,
+                                           @RequestParam(value = "selectedPaymentMethodId", required = false) String selectedPaymentMethodId,
+                                           @RequestParam(value = "savePaymentDetails", required = false, defaultValue = "false") boolean savePaymentDetails,
                                            @Valid @ModelAttribute("paymentDetailsDTO") PaymentDetailsDTO paymentDetailsDTO,
                                            BindingResult bindingResult,
                                            Model model) throws InterruptedException, ExecutionException {
@@ -165,9 +176,35 @@ public class DashPassController {
 
         try {
             Customer customer = customerService.findCustomerById(customerID);
-
             if (customer == null) {
                 throw new IllegalStateException("Customer not found for ID: " + customerID);
+            }
+            System.out.println("(Controller) Calling purchaseFlightAsync for Customer ID: " + customerID);
+
+            // Determine which payment details to use
+            PaymentDetailsDTO paymentDetailsToUse;
+            if (selectedPaymentMethodId != null && !"new".equals(selectedPaymentMethodId)) {
+                // Use the saved payment method, convert ID to Long
+                Long paymentMethodId = Long.parseLong(selectedPaymentMethodId);
+                paymentDetailsToUse = paymentDetailsService.findPaymentDetailsById(paymentMethodId);
+                if (paymentDetailsToUse == null) {
+                    model.addAttribute("errorMessage", "Selected payment method not found.");
+                    return "paymentmethoddetails";
+                }
+            } else {
+                // Use new payment details from paymentDetailsDTO
+                paymentDetailsToUse = paymentDetailsDTO;
+                if (savePaymentDetails) {
+                    PaymentDetails newPaymentDetails = new PaymentDetails(
+                            customer,
+                            encryptionUtils.encrypt(paymentDetailsDTO.getCardNumber()),
+                            encryptionUtils.encrypt(paymentDetailsDTO.getExpirationDate()),
+                            encryptionUtils.encrypt(paymentDetailsDTO.getCvv()),
+                            encryptionUtils.encrypt(paymentDetailsDTO.getZipCode()),
+                            encryptionUtils.encrypt(paymentDetailsDTO.getCardName())
+                    );
+                    paymentDetailsRepository.save(newPaymentDetails);
+                }
             }
 
             // Process the payment asynchronously
@@ -290,6 +327,4 @@ public class DashPassController {
         // Reload the Redeem DashPass page with updated model
         return "redeemdashpass";
     }
-
-
 }
