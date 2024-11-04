@@ -1,17 +1,14 @@
 package agileavengers.southwest_dashpass.controllers;
 
-import agileavengers.southwest_dashpass.models.Customer;
-import agileavengers.southwest_dashpass.models.DashPass;
-import agileavengers.southwest_dashpass.models.DashPassReservation;
-import agileavengers.southwest_dashpass.models.Reservation;
-import agileavengers.southwest_dashpass.services.CustomerService;
-import agileavengers.southwest_dashpass.services.DashPassReservationService;
-import agileavengers.southwest_dashpass.services.ReservationService;
+import agileavengers.southwest_dashpass.models.*;
+import agileavengers.southwest_dashpass.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
@@ -21,14 +18,19 @@ public class CustomerDashboardController {
     private final CustomerService customerService;
     private final ReservationService reservationService;
     private final DashPassReservationService dashPassReservationService;
+    private final SupportRequestService supportRequestService;
+    private final EmployeeService employeeService;
 
     // Constructor Injection
     @Autowired
     public CustomerDashboardController(CustomerService customerService, ReservationService reservationService,
-                                       DashPassReservationService dashPassReservationService) {
+                                       DashPassReservationService dashPassReservationService, SupportRequestService supportRequestService,
+                                       EmployeeService employeeService) {
         this.customerService = customerService;
         this.reservationService = reservationService;
         this.dashPassReservationService = dashPassReservationService;
+        this.supportRequestService = supportRequestService;
+        this.employeeService = employeeService;
     }
 
     @GetMapping("/customer/{customerID}/customerdashboard")
@@ -76,4 +78,27 @@ public class CustomerDashboardController {
 
         return "customerdashboard";  // Return the dashboard view
     }
+
+    @PostMapping("/customer/{customerId}/submitSupportRequest")
+    public String submitSupportRequest(@PathVariable Long customerId,
+                                       @RequestParam Long employeeId, // ID of the assigned employee
+                                       @RequestParam String subject,
+                                       @RequestParam String message,
+                                       @RequestParam SupportRequest.Priority priority,
+                                       Model model) {
+        // Fetch the customer and employee by their IDs
+        Customer customer = customerService.findCustomerById(customerId);
+        Employee employee = employeeService.findEmployeeById(employeeId);
+
+        // Create the support request
+        supportRequestService.createSupportRequest(customer.getId(), employee.getId(), subject, message, priority);
+
+        // Add a success message to the model
+        model.addAttribute("successMessage", "Your support request has been submitted.");
+
+        // Return the appropriate view or redirect
+        return "customerDashboard"; // Replace with the view name for the customer dashboard or confirmation page
+    }
+
+
 }

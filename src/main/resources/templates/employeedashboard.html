@@ -40,13 +40,28 @@
                     <!-- Request Shift Change Button -->
                     <form th:action="@{/employee/{employeeId}/requestShiftChange(employeeId=${employee.id})}" method="post" style="display:inline;">
                         <input type="hidden" th:name="shiftId" th:value="${shift.id}">
-                        <button type="submit" class="button southwest-blue-bg text-white rounded-button-small">Request Shift Change</button>
+                        <button type="submit" class="button southwest-yellow-bg text-white rounded-button">Request Shift Change</button>
                     </form>
                 </li>
             </ul>
         </div>
     </section>
-
+    <!-- Support Requests Section (Conditionally Rendered) -->
+    <section th:if="${role == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or role == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+             class="support-section card-section white-bg rounded-container">
+        <h3>Support Requests</h3>
+        <ul th:if="${supportRequests != null}">
+            <li th:each="request : ${supportRequests}">
+                <strong th:text="${request.subject}"></strong>: <span th:text="${request.message}"></span>
+                <span th:text="${request.priority}" class="priority"></span>
+                <span th:text="${request.status}" class="status"></span>
+            </li>
+        </ul>
+        <button class="button southwest-yellow-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/supportrequests\''">
+            View All Requests
+        </button>
+    </section>
     <!-- Upcoming Holidays & Busy Days Section -->
     <section class="upcoming-holidays card-section white-bg rounded-container">
         <h3>Upcoming Holidays & Busy Days</h3>
@@ -70,10 +85,10 @@
     <!-- Dashboard Actions Section -->
     <section class="actions card-section white-bg rounded-container">
         <h3>Actions</h3>
-        <button class="button southwest-blue-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/addcustomer\''">
-            Add Customer
-        </button>
+        <a th:href="@{/employee/{employeeId}/addcustomer(employeeId=${employee.id})}">
+            <button class="button southwest-blue-bg text-white rounded-button">Add Customer</button>
+        </a>
+
         <a th:href="@{/employee/{employeeId}/verifydashpass(employeeId=${employee.id})}">
             <button class="button southwest-blue-bg text-white rounded-button">Validate DashPass</button>
         </a>
@@ -89,25 +104,6 @@
         <button class="button southwest-blue-bg text-white rounded-button"
                 th:onclick="'window.location.href=\'/employee/flightsearch\''">
             Search Flights
-        </button>
-    </section>
-
-    <!-- Support Requests Section (Conditionally Rendered) -->
-    <section th:if="${employee.role == 'SUPPORT' or employee.role == 'MANAGER'}" class="support-requests card-section white-bg rounded-container">
-        <h3>Support Requests</h3>
-        <ul th:if="${supportRequests != null}">
-            <li th:each="request : ${supportRequests}">
-                <strong th:text="${request.subject}"></strong>:
-                <span th:text="${request.message}"></span>
-                <small>(Date: <span th:text="${request.date}"></span>)</small>
-            </li>
-        </ul>
-        <div th:if="${supportRequests == null or supportRequests.isEmpty()}">
-            <p>No support requests found.</p>
-        </div>
-        <button class="button southwest-blue-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/supportrequests\''">
-            View All Requests
         </button>
     </section>
 </div>
