@@ -37,6 +37,11 @@
                     Date: <span th:text="${shift.date}"></span> |
                     Start: <span th:text="${shift.startTime}"></span> |
                     End: <span th:text="${shift.endTime}"></span>
+                    <!-- Request Shift Change Button -->
+                    <form th:action="@{/employee/{employeeId}/requestShiftChange(employeeId=${employee.id})}" method="post" style="display:inline;">
+                        <input type="hidden" th:name="shiftId" th:value="${shift.id}">
+                        <button type="submit" class="button southwest-blue-bg text-white rounded-button-small">Request Shift Change</button>
+                    </form>
                 </li>
             </ul>
         </div>
@@ -84,6 +89,25 @@
         <button class="button southwest-blue-bg text-white rounded-button"
                 th:onclick="'window.location.href=\'/employee/flightsearch\''">
             Search Flights
+        </button>
+    </section>
+
+    <!-- Support Requests Section (Conditionally Rendered) -->
+    <section th:if="${employee.role == 'SUPPORT' or employee.role == 'MANAGER'}" class="support-requests card-section white-bg rounded-container">
+        <h3>Support Requests</h3>
+        <ul th:if="${supportRequests != null}">
+            <li th:each="request : ${supportRequests}">
+                <strong th:text="${request.subject}"></strong>:
+                <span th:text="${request.message}"></span>
+                <small>(Date: <span th:text="${request.date}"></span>)</small>
+            </li>
+        </ul>
+        <div th:if="${supportRequests == null or supportRequests.isEmpty()}">
+            <p>No support requests found.</p>
+        </div>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/supportrequests\''">
+            View All Requests
         </button>
     </section>
 </div>
