@@ -5,6 +5,7 @@ import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.CustomerRepository;
 import agileavengers.southwest_dashpass.repository.DashPassRepository;
 import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
+import agileavengers.southwest_dashpass.repository.FlightRepository;
 import agileavengers.southwest_dashpass.utils.ConfirmationNumberGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class DashPassService {
     private CustomerRepository customerRepository;
     private DashPassReservationRepository dashPassReservationRepository;
     private ConfirmationNumberGenerator confirmationNumberGenerator;
+    private FlightRepository flightRepository;
 
     private static final Double DASH_PASS_PRICE = 50.0;
 
@@ -32,12 +34,13 @@ public class DashPassService {
     @Autowired
     public DashPassService(DashPassRepository dashPassRepository, CustomerService customerService, CustomerRepository customerRepository,
                            DashPassReservationRepository dashPassReservationRepository,
-                           ConfirmationNumberGenerator confirmationNumberGenerator){
+                           ConfirmationNumberGenerator confirmationNumberGenerator, FlightRepository flightRepository){
         this.dashPassRepository = dashPassRepository;
         this.customerService = customerService;
         this.customerRepository = customerRepository;
         this.dashPassReservationRepository = dashPassReservationRepository;
         this.confirmationNumberGenerator = confirmationNumberGenerator;
+        this.flightRepository = flightRepository;
     }
 
     @Transactional
@@ -51,7 +54,7 @@ public class DashPassService {
         // Loop over DashPass quantity
         for (int i = 0; i < dashPassQuantity; i++) {
             // Check if the customer has reached their max number of DashPasses
-            if (customer.getTotalDashPasses() >= customer.getMaxDashPasses()) {
+            if (customer.getTotalDashPassCount() >= customer.getMaxDashPasses()) {
                 throw new RuntimeException("Customer has reached the maximum number of DashPasses.");
             }
 
@@ -64,43 +67,50 @@ public class DashPassService {
             confirmationNumber = confirmationNumberGenerator.generateConfirmationNumber();
             dashPass.setConfirmationNumber(confirmationNumber);
 
-            // Add the DashPass to the customer's DashPasses list if not linked to a reservation
             if (reservation == null) {
-                customer.addDashPass(dashPass);  // Use the method to manually add to list and set the relationship
-                System.out.println("DashPass added to customer list");
-            }
-
-            // If attaching to a reservation, check if the flight allows more DashPasses
-            if (reservation != null) {
+                // DashPass is not linked to a reservation, add it directly to the customer
+                customer.addDashPass(dashPass);
+                System.out.println("DashPass added to customer list.");
+            } else {
+                // Attach the DashPass to the flight(s) within the reservation
                 for (Flight flight : reservation.getFlights()) {
                     if (flight.getDashPassReservations().size() >= flight.getMaxNumberOfDashPassesForFlight()) {
                         throw new RuntimeException("No more DashPasses can be added to flight: " + flight.getFlightNumber());
                     }
 
-                    // Attach the DashPass to the reservation
+                    // Create and link a new DashPassReservation
                     DashPassReservation dashPassReservation = new DashPassReservation();
                     dashPassReservation.setDashPass(dashPass);
                     dashPassReservation.setReservation(reservation);
-                    dashPassReservation.setBookingDate(LocalDate.now()); // Set the booking date for the reservation
-                    customer.addDashPassReservation(dashPassReservation);
+                    dashPassReservation.setFlight(flight);
+                    dashPassReservation.setBookingDate(LocalDate.now());
 
-                    // Save the DashPassReservation entity
+                    // Add the DashPassReservation to customer and flight
+                    customer.addDashPassReservation(dashPassReservation);
+                    flight.getDashPassReservations().add(dashPassReservation);
+
+                    // Update available DashPass count for the flight
+                    flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
+
+                    // Save the DashPassReservation and flight
                     dashPassReservationRepository.save(dashPassReservation);
+                    flightRepository.save(flight);
+
+                    System.out.println("DashPass linked to flight " + flight.getFlightNumber());
                 }
             }
 
-            // If the DashPass is not attached to a reservation, make it available for future use
-            if (reservation == null) {
-                customer.setDashPassesForPurchase(customer.getDashPassesForPurchase() - 1);
-            }
-
-            // Save the updated customer and their DashPasses
+            // Save the new DashPass to persist it in the database
             dashPassRepository.save(dashPass);
-            customerRepository.save(customer);
         }
+
+        // Save the updated customer information
+        customerRepository.save(customer);
 
         return confirmationNumber;
     }
+
+
 
 
     public DashPass save(DashPass dashPass) {
@@ -125,25 +135,6 @@ public class DashPassService {
     }
     public DashPass findDashPassByIdWithCustomerUserAndReservation(Long dashPassId) {
         return dashPassRepository.findDashPassByIdWithCustomerUserAndReservation(dashPassId);
-    }
-
-    public DashPassSummary calculateDashPassSummary(Customer customer) {
-        // Get all DashPasses the customer owns
-        List<DashPass> dashPasses = dashPassRepository.findByCustomer(customer);
-
-        // Count DashPasses currently attached to active reservations
-        long inUseDashPasses = dashPassReservationRepository.findByCustomerAndIsActive(customer, true)
-                .stream()
-                .filter(reservation -> reservation.getDashPass() != null && !reservation.getBookingDate().isBefore(LocalDate.now()))
-                .count();
-
-        // Calculate the total DashPasses in the customer’s possession
-        int totalDashPasses = dashPasses.size() + (int) inUseDashPasses;
-
-        // Calculate how many DashPasses are still available for purchase
-        int availableForPurchase = customer.getMaxDashPasses() - totalDashPasses;
-
-        return new DashPassSummary(totalDashPasses, (int) inUseDashPasses, availableForPurchase);
     }
 
 }

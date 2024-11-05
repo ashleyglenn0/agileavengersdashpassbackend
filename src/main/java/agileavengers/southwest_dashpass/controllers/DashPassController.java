@@ -82,7 +82,7 @@ public class DashPassController {
         }
 
         // Check if the customer has reached the maximum number of DashPasses
-        if (customer.getTotalDashPasses() >= customer.getMaxDashPasses()) {
+        if (customer.getTotalDashPassCount() >= customer.getMaxDashPasses()) {
             model.addAttribute("errorMessage", "You have reached the maximum number of DashPasses allowed.");
             model.addAttribute("customer", customer);  // Add customer info to show on the purchase page if needed
             // Re-display the purchase form with the error message

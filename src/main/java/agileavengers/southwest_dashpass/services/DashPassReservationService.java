@@ -38,30 +38,33 @@ public class DashPassReservationService {
         // Create a new DashPass, mark it as redeemed, and associate it with the customer
         DashPass newDashPass = new DashPass();
         newDashPass.setRedeemed(true);
-        newDashPass.setCustomer(customer);
 
-        // Save the new DashPass first to persist it in the database
+        // Use addDashPass to add the DashPass to the customer and update summary
+        customer.addDashPass(newDashPass);
+
+        // Save the new DashPass in the database
         dashPassRepository.save(newDashPass);
 
-        // Create the DashPassReservation
+        // Create the DashPassReservation and associate it with the flight and reservation
         DashPassReservation reservation = new DashPassReservation(customer, newDashPass, flightReservation, flight, LocalDate.now());
 
-        // Add the reservation to the flight's dashPassReservations
+        // Add the reservation to the flight's DashPassReservations and adjust availability
         flight.getDashPassReservations().add(reservation);
         flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
         flightRepository.save(flight);
 
-        // Add the reservation to the customer's dashPassReservations
-        customer.getDashPassReservations().add(reservation);
+        // Use addDashPassReservation to add to the customer's dashPassReservations and update summary
+        customer.addDashPassReservation(reservation);
 
-        // Save the reservation and persist the changes
+        // Save the reservation in the database
         dashPassReservationRepository.save(reservation);
 
-        // Save the updated customer information
+        // Save the updated customer with all DashPass and reservation updates
         customerService.save(customer);
 
         return reservation;
     }
+
 
 
     public DashPassReservation createNewDashPassReservationAndAssignExistingDashPass(Customer customer, Reservation flightReservation, Flight flight) {
@@ -92,8 +95,8 @@ public class DashPassReservationService {
         flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
         flightRepository.save(flight);
 
-        // Add the reservation to the customer's dashPassReservations
-        customer.getDashPassReservations().add(reservation);
+        // Use addDashPassReservation to add to the customer's dashPassReservations and update summary
+        customer.addDashPassReservation(reservation);
 
         // Persist changes in DashPass status and new reservation
         dashPassReservationRepository.save(reservation);
@@ -101,6 +104,7 @@ public class DashPassReservationService {
 
         return reservation;
     }
+
 
 
     @Transactional

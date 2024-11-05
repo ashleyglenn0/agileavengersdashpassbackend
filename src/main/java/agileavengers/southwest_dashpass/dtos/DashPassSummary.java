@@ -1,39 +1,29 @@
 package agileavengers.southwest_dashpass.dtos;
 
+import agileavengers.southwest_dashpass.models.Customer;
+
 public class DashPassSummary {
-    private int totalDashPasses;
-    private int inUseDashPasses;
-    private int availableForPurchase;
+    private int totalDashPassCount;
+    private int dashPassInUseCount;
+    private int availableDashPassCount;
 
-    public DashPassSummary(int totalDashPasses, int inUseDashPasses, int availableForPurchase) {
-        this.totalDashPasses = totalDashPasses;
-        this.inUseDashPasses = inUseDashPasses;
-        this.availableForPurchase = availableForPurchase;
+    public DashPassSummary(Customer customer) {
+        // Fetch already calculated values
+        this.totalDashPassCount = customer.getTotalDashPassCount();
+        this.dashPassInUseCount = customer.getDashPassInUseCount();
+        this.availableDashPassCount = customer.getAvailableDashPassCount();
     }
 
-    // Getters and setters...
-
-    public int getTotalDashPasses() {
-        return totalDashPasses;
+    // Getters for the fields
+    public int getTotalDashPassCount() {
+        return totalDashPassCount;
     }
 
-    public void setTotalDashPasses(int totalDashPasses) {
-        this.totalDashPasses = totalDashPasses;
+    public int getDashPassInUseCount() {
+        return dashPassInUseCount;
     }
 
-    public int getInUseDashPasses() {
-        return inUseDashPasses;
-    }
-
-    public void setInUseDashPasses(int inUseDashPasses) {
-        this.inUseDashPasses = inUseDashPasses;
-    }
-
-    public int getAvailableForPurchase() {
-        return availableForPurchase;
-    }
-
-    public void setAvailableForPurchase(int availableForPurchase) {
-        this.availableForPurchase = availableForPurchase;
+    public int getAvailableDashPassCount() {
+        return availableDashPassCount;
     }
 }

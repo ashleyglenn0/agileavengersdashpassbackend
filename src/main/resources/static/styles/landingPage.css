@@ -86,12 +86,18 @@ h3 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 600px;
-    text-align: left;
+    text-align: center; /* Center-aligns content inside card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* List and Button Centering */
 .cardlist {
     list-style-type: disc;
     padding-left: 20px;
+    text-align: left;
+    margin: 0 auto 20px auto;
 }
 
 .cardlist strong {
@@ -99,7 +105,6 @@ h3 {
     color: var(--southwest-blue);
 }
 
-/* Action Button */
 .button {
     background-color: var(--southwest-yellow);
     color: var(--southwest-blue);

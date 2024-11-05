@@ -73,6 +73,30 @@ button[type="submit"]:hover {
     background-color: #e6e6e6;
 }
 
+.dashpass-terms {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    color: #333333;
+}
+
+.dashpass-terms h4 {
+    color: #00338D; /* Southwest blue */
+    margin-bottom: 10px;
+}
+
+.dashpass-terms ul {
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.dashpass-terms li {
+    margin-bottom: 8px;
+}
+
+
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
     .container {

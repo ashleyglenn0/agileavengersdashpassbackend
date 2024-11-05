@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Participating Airports</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/styles/participatingairport.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<!-- Navigation Bar -->
+<nav class="navbar southwest-yellow-bg">
+  <a href="/customer/dashboard" class="navbar-brand text-dark">Home</a>
+</nav>
+
+<!-- Main Content Container -->
+<div class="container">
+  <div class="card">
+    <h2 class="title southwest-yellow-text">Participating Airports</h2>
+
+    <!-- List of Airports -->
+    <ul class="airport-list">
+      <li>Los Angeles International Airport - Los Angeles, CA</li>
+      <li>John F. Kennedy International Airport - New York, NY</li>
+      <li>O'Hare International Airport - Chicago, IL</li>
+      <li>Hartsfield-Jackson Atlanta International Airport - Atlanta, GA</li>
+      <li>San Francisco International Airport - San Francisco, CA</li>
+      <li>Miami International Airport - Miami, FL</li>
+      <li>Dallas/Fort Worth International Airport - Dallas/Fort Worth, TX</li>
+      <li>Seattle-Tacoma International Airport - Seattle, WA</li>
+      <li>St. Louis Lambert International Airport - St. Louis, MO</li>
+      <li>Ronald Reagan Washington National Airport - Arlington, VA</li>
+      <li>Louis Armstrong New Orleans International Airport - New Orleans, LA</li>
+      <li>McCarran International Airport - Las Vegas, NV</li>
+      <li>Detroit Metropolitan Wayne County Airport - Detroit, MI</li>
+      <li>Austin-Bergstrom International Airport - Austin, TX</li>
+      <li>George Bush Intercontinental Airport - Houston, TX</li>
+      <li>Memphis International Airport - Memphis, TN</li>
+      <li>Fort Lauderdale - Hollywood International Airport - Fort Lauderdale, FL</li>
+      <li>Orlando International Airport - Orlando, FL</li>
+      <li>Philadelphia International Airport - Philadelphia, PA</li>
+      <li>San Diego International Airport - San Diego, CA</li>
+    </ul>
+
+    <!-- Additional Information -->
+    <p class="more-info southwest-yellow-text">More airports being added in 2025!</p>
+
+    <!-- Back Button -->
+    <button class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="southwest-yellow-bg footer">
+  <p>For educational purposes only. All trademarks are the property of their respective owners.</p>
+</footer>
+
+</body>
+</html>

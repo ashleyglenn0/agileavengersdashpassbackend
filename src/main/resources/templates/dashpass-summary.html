@@ -17,16 +17,16 @@
 <div class="container">
   <div class="card dashpass-summary-card">
     <h3 class="title">DashPass Summary</h3>
-    <p>Total DashPasses: <span th:text="${dashPassSummary.totalDashPasses}"></span></p>
-    <p>In Use DashPasses: <span th:text="${dashPassSummary.inUseDashPasses}"></span></p>
-    <p>Available for Purchase: <span th:text="${dashPassSummary.availableForPurchase}"></span></p>
+    <p>Total DashPasses: <span th:text="${dashPassSummary.totalDashPassCount}"></span></p>
+    <p>In Use DashPasses: <span th:text="${dashPassSummary.dashPassInUseCount}"></span></p>
+    <p>Available for Purchase: <span th:text="${dashPassSummary.availableDashPassCount}"></span></p>
 
     <!-- Back Button -->
     <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
 
     <!-- Purchase DashPass Button (conditionally rendered) -->
     <button type="button" class="button southwest-yellow-bg text-blue rounded-button"
-            th:if="${dashPassSummary.availableForPurchase > 0}"
+            th:if="${dashPassSummary.availableDashPassCount > 0}"
             th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchasedashpass\''">
       Purchase Dash Pass
     </button>

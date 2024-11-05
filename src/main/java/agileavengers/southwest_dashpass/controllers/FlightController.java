@@ -130,7 +130,7 @@ public class FlightController {
                                     flight.canAddExistingDashPass());
 
                     showNewDashPassMap.put(flight.getFlightID(),
-                            customer.getDashPassesForPurchase() > 0 &&
+                            customer.getAvailableDashPassCount() > 0 &&
                                     flight.getNumberOfDashPassesAvailable() > 0 &&
                                     flight.canAddNewDashPass());
 
@@ -154,7 +154,7 @@ public class FlightController {
                                 flight.canAddExistingDashPass());
 
                 showNewDashPassMap.put(flight.getFlightID(),
-                        customer.getDashPassesForPurchase() > 0 &&
+                        customer.getAvailableDashPassCount() > 0 &&
                                 flight.getNumberOfDashPassesAvailable() > 0 &&
                                 flight.canAddNewDashPass());
 

@@ -47,11 +47,31 @@
             <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}"></span></p>
             <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}"></span></p>
         </div>
+        <div class="dashpass-terms">
+            <h4>DashPass Terms and Conditions</h4>
+            <ul>
+                <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+                <li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li>
+                <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+                <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+                <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+            </ul>
+        </div>
     </div>
 
     <div class="section" th:if="${reservation == null}">
         <h2>Reservation</h2>
         <p>No reservation attached.</p>
+        <div class="dashpass-terms">
+            <h4>DashPass Terms and Conditions</h4>
+            <ul>
+                <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+                <li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li>
+                <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+                <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+                <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+            </ul>
+        </div>
     </div>
 
     <!-- Continue to payment method details -->

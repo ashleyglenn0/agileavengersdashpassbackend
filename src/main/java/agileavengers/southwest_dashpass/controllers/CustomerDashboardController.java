@@ -104,12 +104,17 @@ public class CustomerDashboardController {
 
     @GetMapping("/customer/{customerID}/dashpass-summary")
     public String getDashPassSummary(@PathVariable Long customerID, Model model) {
+        // Retrieve the customer
         Customer customer = customerService.findCustomerById(customerID);
         model.addAttribute("customer", customer);
-        DashPassSummary dashPassSummary = dashPassService.calculateDashPassSummary(customer);
+
+        // Create DashPassSummary directly using the Customer entity
+        DashPassSummary dashPassSummary = new DashPassSummary(customer);
         model.addAttribute("dashPassSummary", dashPassSummary);
-        return "dashpass-summary";  // or wherever you want to display the summary
+
+        return "dashpass-summary";  // View to display the DashPass summary
     }
+
 
     @GetMapping("/customer/{customerID}/send-support-request")
     public String showSendSupportRequestForm(@PathVariable Long customerID, Model model) {

@@ -66,7 +66,7 @@ public class UserController {
             Customer customer = new Customer();
             customer.setUser(user);
             customer.setCanFly(true);
-            customer.setCanPurchaseDashPass(true);
+            customer.setCanBuyDashPass(true);
             customer.setCanPurchaseFlight(true);
 
             // Save Customer
@@ -129,12 +129,27 @@ public class UserController {
         // Create and set up the Customer entity, linking it to the User
         Customer customer = new Customer();
         customer.setUser(user);  // Associate the User with the Customer
+
+        // Initialize DashPass-related values to prevent nulls and set default states
+        customer.setAvailableDashPassCount(customer.getAvailableDashPassCount());    // Initially 0 DashPasses available for purchase
+        customer.setTotalDashPassCount(0);          // Initially 0 total DashPasses owned
+        customer.setDashPassInUseCount(0);          // Initially 0 DashPasses in use
+        customer.setCanPurchaseFlight(true);
+        customer.setCanFly(true);
+        customer.setCanBuyDashPass(true);
+
+
         customerService.saveCustomer(customer);
 
         // Delete the PendingCustomer record to clean up
         pendingCustomerService.deletePendingCustomer(pendingCustomer);
 
         return "redirect:/login";  // Redirect to the login page upon successful registration
+    }
+
+    @GetMapping("/participatingairports")
+    public String showParticipatingAirports() {
+        return "participatingairports"; // The Thymeleaf template name
     }
 
 
