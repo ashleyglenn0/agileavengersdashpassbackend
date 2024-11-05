@@ -3,6 +3,7 @@ package agileavengers.southwest_dashpass.controllers;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.services.CustomerService;
 import agileavengers.southwest_dashpass.services.EmployeeService;
+import agileavengers.southwest_dashpass.services.PendingCustomerService;
 import agileavengers.southwest_dashpass.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Optional;
+
 @Controller
 public class UserController {
     @Autowired
@@ -24,6 +27,11 @@ public class UserController {
     private UserService userService;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PendingCustomerService pendingCustomerService;
+
     @GetMapping("/signup")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
@@ -91,5 +99,43 @@ public class UserController {
         // Redirect to the login page after successful registration
         return "redirect:/login";
     }
+
+    // Complete registration method
+    @GetMapping("/complete-registration")
+    public String showCompleteRegistrationForm() {
+        return "completeregistration"; // The Thymeleaf template name
+    }
+
+    @PostMapping("/complete-registration")
+    public String completeRegistration(@RequestParam String email,
+                                       @RequestParam String username,
+                                       @RequestParam String password) {
+        Optional<PendingCustomer> pendingCustomerOpt = pendingCustomerService.findByEmail(email);
+        if (pendingCustomerOpt.isEmpty()) {
+            return "error"; // Or handle this case with an error message
+        }
+
+        PendingCustomer pendingCustomer = pendingCustomerOpt.get();
+
+        // Create and set up the User entity
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);  // Encrypt the password
+        user.setFirstName(pendingCustomer.getFirstName());
+        user.setLastName(pendingCustomer.getLastName());
+        user.setEmail(pendingCustomer.getEmail());
+        userService.saveUser(user);
+
+        // Create and set up the Customer entity, linking it to the User
+        Customer customer = new Customer();
+        customer.setUser(user);  // Associate the User with the Customer
+        customerService.saveCustomer(customer);
+
+        // Delete the PendingCustomer record to clean up
+        pendingCustomerService.deletePendingCustomer(pendingCustomer);
+
+        return "redirect:/login";  // Redirect to the login page upon successful registration
+    }
+
 
 }

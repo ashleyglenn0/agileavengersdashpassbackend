@@ -3,6 +3,7 @@ package agileavengers.southwest_dashpass.controllers;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.ShiftRepository;
 import agileavengers.southwest_dashpass.services.EmployeeService;
+import agileavengers.southwest_dashpass.services.PendingCustomerService;
 import agileavengers.southwest_dashpass.services.SupportRequestService;
 import agileavengers.southwest_dashpass.utils.AnnouncementGenerator;
 import agileavengers.southwest_dashpass.utils.ShiftGenerator;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -30,6 +32,9 @@ public class EmployeeDashboardController {
     private ShiftGenerator shiftGenerator;
     @Autowired
     private SupportRequestService supportRequestService;
+    @Autowired
+    private PendingCustomerService pendingCustomerService;
+
     @GetMapping("/employee/{employeeId}/employeedashboard")
     public String showEmployeeDashboard(@PathVariable Long employeeId, Model model, Principal principal) {
         // Fetch employee by ID
@@ -72,7 +77,7 @@ public class EmployeeDashboardController {
     public String requestShiftChange(@PathVariable Long employeeId) {
         Employee employee = employeeService.findEmployeeById(employeeId); // Assuming you have this method
         supportRequestService.createShiftChangeRequest(employee);
-        return "redirect:/employee/{employeeId}/dashboard"; // Redirect to dashboard with a message if needed
+        return "redirect:/employee/{employeeId}/employeedashboard"; // Redirect to dashboard with a message if needed
     }
 
     @GetMapping("/employee/{employeeId}/addcustomer")
@@ -126,7 +131,18 @@ public class EmployeeDashboardController {
         return "archived-support-requests";
     }
 
+    @PostMapping("/employee/{employeeId}/add-customer")
+    public String addPendingCustomer(@PathVariable Long employeeId, Model model, @ModelAttribute PendingCustomer pendingCustomer) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        if (employee == null) {
+            model.addAttribute("error", "Employee not found.");
+            return "error";  // Return an error view if the employee doesn't exist
+        }
 
+        model.addAttribute("employee", employee);
+        pendingCustomerService.savePendingCustomer(pendingCustomer);
 
+        return "redirect:/employee/" + employeeId + "/employeedashboard";  // Redirect to employee's dashboard
+    }
 
 }

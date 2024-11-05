@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/landingpage").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/complete-registration").permitAll()
                         .requestMatchers("/styles/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/admin/cleanupPage").permitAll()
