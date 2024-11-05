@@ -137,6 +137,39 @@ footer {
     font-size: 0.9rem;
 }
 
+/* Button */
+.button {
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.button:hover {
+    background-color: #e6b82c;
+}
+
+.southwest-yellow-bg {
+    background-color: var(--southwest-yellow);
+}
+
+.text-white {
+    color: white;
+}
+
+.rounded-button {
+    padding: 12px 20px; /* Consistent padding */
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+
 /* Responsiveness */
 @media (max-width: 768px) {
     .actions, .additional-actions {

@@ -1,0 +1,91 @@
+/* Southwest theme colors */
+:root {
+    --southwest-blue: #00338D;
+    --southwest-yellow: #FFC72C;
+    --white: #FFFFFF;
+    --light-gray: #F3F4F6;
+}
+
+/* General Page Styling */
+body.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    font-family: Arial, sans-serif;
+    color: var(--southwest-blue);
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+    background-color: var(--southwest-yellow);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--southwest-blue);
+    text-decoration: none;
+}
+
+.title {
+    color: var(--southwest-blue);
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.support-requests-card {
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.support-requests-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.support-requests-table th,
+.support-requests-table td {
+    padding: 10px;
+    text-align: left;
+}
+
+.support-requests-table th {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    font-weight: bold;
+}
+
+.support-requests-table tr:nth-child(even) {
+    background-color: var(--light-gray);
+}
+
+.button {
+    margin-top: 20px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+}
+
+footer {
+    padding: 10px 20px;
+    text-align: center;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 20px;
+}

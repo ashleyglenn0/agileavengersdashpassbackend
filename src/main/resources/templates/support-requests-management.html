@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Support Requests</title>
+  <link rel="stylesheet" th:href="@{/styles/support-requests-management.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar southwest-yellow-bg">
+    <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-brand text-dark">Dashboard</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card support-requests-card">
+    <h2 class="title">Support Requests Management</h2>
+
+    <!-- Display message if there are no support requests -->
+    <div th:if="${supportRequests == null or supportRequests.isEmpty()}">
+      <p>No support requests found.</p>
+    </div>
+
+    <!-- Table for support requests -->
+    <table class="support-requests-table" th:if="${supportRequests != null and !supportRequests.isEmpty()}">
+      <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="request : ${supportRequests}">
+        <td th:text="${request.subject}"></td>
+        <td th:text="${request.priority}"></td>
+        <td th:text="${request.status}"></td>
+        <td>
+          <!-- View details button -->
+          <button class="button southwest-yellow-bg text-blue rounded-button-small"
+                  th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/supportrequest/' + ${request.id} + '/details\''">
+            View Details
+          </button>
+
+          <!-- Close request button -->
+          <form th:action="@{/employee/{employeeId}/supportrequest/{supportRequestId}/close(employeeId=${employee.id}, supportRequestId=${request.id})}"
+                method="POST" style="display:inline;">
+            <button type="submit" class="button southwest-blue-bg text-white rounded-button-small">Close</button>
+          </form>
+
+          <!-- Escalate request button -->
+          <form th:action="@{/employee/{employeeId}/supportrequest/{supportRequestId}/escalate(employeeId=${employee.id}, supportRequestId=${request.id})}"
+                method="POST" style="display:inline;">
+            <button type="submit" class="button southwest-yellow-bg text-blue rounded-button-small">Escalate</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Back Button -->
+    <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

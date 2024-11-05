@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.services;
 
+import agileavengers.southwest_dashpass.dtos.DashPassSummary;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.CustomerRepository;
 import agileavengers.southwest_dashpass.repository.DashPassRepository;
@@ -124,6 +125,25 @@ public class DashPassService {
     }
     public DashPass findDashPassByIdWithCustomerUserAndReservation(Long dashPassId) {
         return dashPassRepository.findDashPassByIdWithCustomerUserAndReservation(dashPassId);
+    }
+
+    public DashPassSummary calculateDashPassSummary(Customer customer) {
+        // Get all DashPasses the customer owns
+        List<DashPass> dashPasses = dashPassRepository.findByCustomer(customer);
+
+        // Count DashPasses currently attached to active reservations
+        long inUseDashPasses = dashPassReservationRepository.findByCustomerAndIsActive(customer, true)
+                .stream()
+                .filter(reservation -> reservation.getDashPass() != null && !reservation.getBookingDate().isBefore(LocalDate.now()))
+                .count();
+
+        // Calculate the total DashPasses in the customer’s possession
+        int totalDashPasses = dashPasses.size() + (int) inUseDashPasses;
+
+        // Calculate how many DashPasses are still available for purchase
+        int availableForPurchase = customer.getMaxDashPasses() - totalDashPasses;
+
+        return new DashPassSummary(totalDashPasses, (int) inUseDashPasses, availableForPurchase);
     }
 
 }

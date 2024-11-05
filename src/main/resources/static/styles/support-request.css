@@ -1,0 +1,147 @@
+/* Southwest theme colors */
+:root {
+    --southwest-blue: #00338D;
+    --southwest-yellow: #FFC72C;
+    --white: #FFFFFF;
+    --light-gray: #F3F4F6;
+}
+
+/* General Page Styling */
+body.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    font-family: Arial, sans-serif;
+    color: var(--southwest-blue);
+}
+
+/* Container and Card Styling */
+.container {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.support-request-card {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    color: var(--southwest-blue);
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title Styling */
+.title {
+    color: var(--southwest-blue);
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--southwest-blue);
+}
+
+input[type="text"],
+select,
+textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--light-gray);
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Alert Messages */
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.alert.success {
+    background-color: #D4EDDA;
+    color: #155724;
+}
+
+.alert.error {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+/* Button Group Styling */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    color: var(--white);
+}
+
+.southwest-yellow-bg {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+}
+
+.button:hover {
+    background-color: #e6b82c;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--southwest-yellow);
+    border-radius: 0;
+    margin-bottom: 20px;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--southwest-blue);
+    text-decoration: none;
+    margin-right: auto;
+}
+
+/* Footer Styling */
+footer {
+    padding: 10px 20px;
+    text-align: center;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    font-size: 0.9rem;
+    margin-top: 20px;
+}

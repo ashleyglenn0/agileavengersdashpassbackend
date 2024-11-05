@@ -169,8 +169,8 @@ public class DashPassController {
                                            BindingResult bindingResult,
                                            Model model) throws InterruptedException, ExecutionException {
 
-        // Check for validation errors in the form
-        if (bindingResult.hasErrors()) {
+        // Check for validation errors only if using new payment details
+        if ("new".equals(selectedPaymentMethodId) && bindingResult.hasErrors()) {
             return handleDashPassPaymentError(model, customerID, reservationId, dashPassQuantity, totalPrice, userSelectedStatus);
         }
 
@@ -179,7 +179,6 @@ public class DashPassController {
             if (customer == null) {
                 throw new IllegalStateException("Customer not found for ID: " + customerID);
             }
-            System.out.println("(Controller) Calling purchaseFlightAsync for Customer ID: " + customerID);
 
             // Determine which payment details to use
             PaymentDetailsDTO paymentDetailsToUse;
@@ -207,8 +206,8 @@ public class DashPassController {
                 }
             }
 
-            // Process the payment asynchronously
-            CompletableFuture<PaymentStatus> futurePaymentStatus = paymentService.processPaymentAsync(paymentDetailsDTO, userSelectedStatus);
+            // Process the payment asynchronously with the correct payment details
+            CompletableFuture<PaymentStatus> futurePaymentStatus = paymentService.processPaymentAsync(paymentDetailsToUse, userSelectedStatus);
             PaymentStatus paymentStatus = futurePaymentStatus.get();
 
             // If payment is successful, proceed to complete purchase
@@ -232,6 +231,10 @@ public class DashPassController {
             return handleDashPassPaymentError(model, customerID, reservationId, dashPassQuantity, totalPrice, userSelectedStatus);
         }
     }
+
+
+
+
 
     // Helper method to handle payment errors and add the required attributes
     private String handleDashPassPaymentError(Model model, Long customerID, Long reservationId,
