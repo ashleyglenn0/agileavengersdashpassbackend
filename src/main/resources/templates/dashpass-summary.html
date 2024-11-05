@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DashPass Summary</title>
+  <link rel="stylesheet" th:href="@{/styles/dashpass-summary.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar southwest-yellow-bg">
+    <a href="/customer/dashboard" class="navbar-brand text-dark">Home</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card dashpass-summary-card">
+    <h3 class="title">DashPass Summary</h3>
+    <p>Total DashPasses: <span th:text="${dashPassSummary.totalDashPasses}"></span></p>
+    <p>In Use DashPasses: <span th:text="${dashPassSummary.inUseDashPasses}"></span></p>
+    <p>Available for Purchase: <span th:text="${dashPassSummary.availableForPurchase}"></span></p>
+
+    <!-- Back Button -->
+    <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
+
+    <!-- Purchase DashPass Button (conditionally rendered) -->
+    <button type="button" class="button southwest-yellow-bg text-blue rounded-button"
+            th:if="${dashPassSummary.availableForPurchase > 0}"
+            th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchasedashpass\''">
+      Purchase Dash Pass
+    </button>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

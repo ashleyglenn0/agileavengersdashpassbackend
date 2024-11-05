@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Support Request</title>
+  <link rel="stylesheet" th:href="@{/styles/support-request.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar southwest-yellow-bg">
+    <a href="/customer/{customerID}/customerdashboard" class="navbar-brand text-dark">Home</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card support-request-card">
+    <h2 class="title">Send Support Request</h2>
+
+    <!-- Display success or error messages -->
+    <div th:if="${successMessage != null}" class="alert success">
+      <p th:text="${successMessage}"></p>
+    </div>
+    <div th:if="${errorMessage != null}" class="alert error">
+      <p th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- Support Request Form -->
+    <form th:action="@{/customer/{customerID}/send-support-request(customerID=${customerID})}" method="POST">
+      <!-- Subject -->
+      <label for="subject">Subject</label>
+      <input type="text" id="subject" name="subject" placeholder="Enter subject" required>
+
+      <!-- Priority Dropdown -->
+      <label for="priority">Priority</label>
+      <select id="priority" name="priority" required>
+        <option value="NORMAL">Normal</option>
+        <option value="URGENT">Urgent</option>
+      </select>
+
+      <!-- Message -->
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="4" placeholder="Enter your message" required></textarea>
+
+      <!-- Buttons -->
+      <div class="button-group">
+        <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Cancel</button>
+        <button type="submit" class="button southwest-yellow-bg text-blue rounded-button">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

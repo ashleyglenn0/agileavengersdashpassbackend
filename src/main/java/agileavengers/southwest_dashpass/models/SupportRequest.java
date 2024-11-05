@@ -36,7 +36,7 @@ public class SupportRequest {
 
     // Employee assigned to handle the request
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
+    @JoinColumn(name = "employee_id", nullable = true)
     private Employee createdBy;
 
     // Constructor with the specified parameters

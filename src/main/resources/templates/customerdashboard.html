@@ -114,6 +114,18 @@
                 th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchaseflight\''">
             Purchase Flight
         </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/dashpass-summary\''">
+            View Dash Pass Summary
+        </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/send-support-request\''">
+            Send Support Request
+        </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customer-support-requests\''">
+            Track Support Request
+        </button>
     </section>
 
     <!-- Manage Payment Methods Section -->

@@ -30,6 +30,8 @@ public class DashPassReservation {
     private Reservation reservation;
     @Column(name = "confirmation_number")
     private String confirmationNumber;
+    @Column(name= "isActive", nullable = false)
+    private boolean isActive;
 
 
 
@@ -100,6 +102,14 @@ public class DashPassReservation {
 
     public void setConfirmationNumber(String confirmationNumber) {
         this.confirmationNumber = confirmationNumber;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
 

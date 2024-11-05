@@ -1,14 +1,14 @@
 package agileavengers.southwest_dashpass.controllers;
 
+import agileavengers.southwest_dashpass.dtos.DashPassSummary;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.services.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -20,17 +20,19 @@ public class CustomerDashboardController {
     private final DashPassReservationService dashPassReservationService;
     private final SupportRequestService supportRequestService;
     private final EmployeeService employeeService;
+    private final DashPassService dashPassService;
 
     // Constructor Injection
     @Autowired
     public CustomerDashboardController(CustomerService customerService, ReservationService reservationService,
                                        DashPassReservationService dashPassReservationService, SupportRequestService supportRequestService,
-                                       EmployeeService employeeService) {
+                                       EmployeeService employeeService, DashPassService dashPassService) {
         this.customerService = customerService;
         this.reservationService = reservationService;
         this.dashPassReservationService = dashPassReservationService;
         this.supportRequestService = supportRequestService;
         this.employeeService = employeeService;
+        this.dashPassService = dashPassService;
     }
 
     @GetMapping("/customer/{customerID}/customerdashboard")
@@ -100,5 +102,68 @@ public class CustomerDashboardController {
         return "customerDashboard"; // Replace with the view name for the customer dashboard or confirmation page
     }
 
+    @GetMapping("/customer/{customerID}/dashpass-summary")
+    public String getDashPassSummary(@PathVariable Long customerID, Model model) {
+        Customer customer = customerService.findCustomerById(customerID);
+        model.addAttribute("customer", customer);
+        DashPassSummary dashPassSummary = dashPassService.calculateDashPassSummary(customer);
+        model.addAttribute("dashPassSummary", dashPassSummary);
+        return "dashpass-summary";  // or wherever you want to display the summary
+    }
+
+    @GetMapping("/customer/{customerID}/send-support-request")
+    public String showSendSupportRequestForm(@PathVariable Long customerID, Model model) {
+        Customer customer = customerService.findCustomerById(customerID); // Fetch customer by ID
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer not found with ID: " + customerID);
+        }
+
+        model.addAttribute("customer", customer); // Add customer to model
+        model.addAttribute("customerID", customerID); // Add customerID directly to model
+        model.addAttribute("supportRequest", new SupportRequest()); // Initialize empty support request
+
+        return "send-support-request"; // Render template
+    }
+
+    @PostMapping("/customer/{customerID}/send-support-request")
+    public String submitSupportRequest(
+            @PathVariable Long customerID,
+            @RequestParam("subject") String subject,
+            @RequestParam("message") String message,
+            @RequestParam("priority") SupportRequest.Priority priority,
+            Model model) {
+
+        // Find the customer by ID
+        Customer customer = customerService.findCustomerById(customerID);
+        if (customer == null) {
+            model.addAttribute("errorMessage", "Customer not found.");
+            return "send-support-request";
+        }
+
+        // Create the support request without an employee
+        try {
+            supportRequestService.createSupportRequest(customerID, null, subject, message, priority);
+            model.addAttribute("successMessage", "Your support request has been submitted successfully.");
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "An error occurred while submitting your request. Please try again.");
+            e.printStackTrace();
+        }
+
+        return "send-support-request";
+    }
+
+    @GetMapping("/customer/{customerID}/customer-support-requests")
+    public String viewSupportRequests(@PathVariable Long customerID, Principal principal, Model model) {
+        Customer customer = customerService.findCustomerById(customerID);
+        if (customer == null || !customer.getUser().getUsername().equals(principal.getName())) {
+            return "error/403";  // Unauthorized access error page
+        }
+
+        List<SupportRequest> supportRequests = supportRequestService.getSupportRequestsForCustomer(customer);
+        model.addAttribute("supportRequests", supportRequests);
+        model.addAttribute("customer", customer);
+
+        return "customer-support-requests";  // Name of the template
+    }
 
 }

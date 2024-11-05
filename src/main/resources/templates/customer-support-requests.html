@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Requests</title>
+  <link rel="stylesheet" th:href="@{/styles/customer-support-requests.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar southwest-yellow-bg">
+    <a th:href="@{/customer/{customerID}/customerdashboard(customerID=${customer.id})}" class="navbar-brand text-dark">Home</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card support-requests-card">
+    <h2 class="title">Your Support Requests</h2>
+
+    <!-- Conditional display if there are no support requests -->
+    <div th:if="${supportRequests == null or supportRequests.isEmpty()}">
+      <p>No support requests found.</p>
+    </div>
+
+    <!-- Display support requests in table if available -->
+    <table class="support-requests-table" th:if="${supportRequests != null and !supportRequests.isEmpty()}">
+      <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Priority</th>
+        <th>Status</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="request : ${supportRequests}">
+        <td th:text="${request.subject}"></td>
+        <td th:text="${request.priority}"></td>
+        <td th:text="${request.status}"></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Back Button -->
+    <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

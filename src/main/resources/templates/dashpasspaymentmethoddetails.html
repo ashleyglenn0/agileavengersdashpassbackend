@@ -46,7 +46,7 @@
             </div>
 
             <!-- Payment Form -->
-            <form th:action="@{/customer/{customerID}/dashpasspurchasecomplete(customerID=${customer?.id})}" method="POST">
+            <form th:action="@{/customer/{customerID}/dashpasspaymentmethoddetails(customerID=${customer.id})}" th:object="${paymentDetailsDTO}" method="POST">
                 <input type="hidden" th:value="${customer?.id}" name="customerId">
                 <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}" />
                 <input type="hidden" name="totalPrice" th:value="${totalPrice}" />

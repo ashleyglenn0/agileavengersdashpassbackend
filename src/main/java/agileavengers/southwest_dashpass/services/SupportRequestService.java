@@ -35,31 +35,31 @@ public class SupportRequestService {
     }
 
     public SupportRequest createSupportRequest(Long customerId, Long employeeId, String subject, String message, SupportRequest.Priority priority) {
-        // Find customer
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + customerId));
 
-        // Find employee
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found with ID: " + employeeId));
+        // If employeeId is provided, find the employee; otherwise, leave as null
+        Employee employee = (employeeId != null) ? employeeRepository.findById(employeeId)
+                .orElse(null) : null;
 
-        // Create and initialize SupportRequest
         SupportRequest supportRequest = new SupportRequest();
         supportRequest.setSubject(subject);
         supportRequest.setMessage(message);
-        supportRequest.setStatus(SupportRequest.Status.OPEN); // Default status
+        supportRequest.setStatus(SupportRequest.Status.OPEN);
         supportRequest.setPriority(priority);
-        supportRequest.setCustomer(customer); // Attach customer
-        supportRequest.setCreatedBy(employee); // Attach employee as creator
+        supportRequest.setCustomer(customer);
+        supportRequest.setCreatedBy(employee); // employee is null if not provided
         supportRequest.setCreatedDate(LocalDateTime.now());
 
-        // Save the support request to the database
-        SupportRequest savedRequest = supportRequestRepository.save(supportRequest);
-
-        return savedRequest;
+        return supportRequestRepository.save(supportRequest);
     }
+
     public List<SupportRequest> getRecentSupportRequests(int limit) {
         return supportRequestRepository.findRecentSupportRequests(limit);
+    }
+
+    public List<SupportRequest> getSupportRequestsForCustomer(Customer customer) {
+        return supportRequestRepository.findByCustomerOrderByCreatedDateDesc(customer);
     }
 
 
