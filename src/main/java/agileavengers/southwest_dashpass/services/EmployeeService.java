@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class EmployeeService {
     @Autowired
@@ -39,7 +41,11 @@ public class EmployeeService {
     }
     public Employee findEmployeeById(Long employeeId) {
         return employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + employeeId));
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + employeeId));
+    }
+
+    public Optional<Employee> findById(Long employeeId) {
+        return employeeRepository.findById(employeeId);
     }
 
 }

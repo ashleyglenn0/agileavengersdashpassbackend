@@ -2,6 +2,7 @@ package agileavengers.southwest_dashpass.controllers;
 
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.ShiftRepository;
+import agileavengers.southwest_dashpass.services.CustomerService;
 import agileavengers.southwest_dashpass.services.EmployeeService;
 import agileavengers.southwest_dashpass.services.PendingCustomerService;
 import agileavengers.southwest_dashpass.services.SupportRequestService;
@@ -9,18 +10,17 @@ import agileavengers.southwest_dashpass.utils.AnnouncementGenerator;
 import agileavengers.southwest_dashpass.utils.ShiftGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class EmployeeDashboardController {
@@ -34,6 +34,8 @@ public class EmployeeDashboardController {
     private SupportRequestService supportRequestService;
     @Autowired
     private PendingCustomerService pendingCustomerService;
+    @Autowired
+    private CustomerService customerService;
 
     @GetMapping("/employee/{employeeId}/employeedashboard")
     public String showEmployeeDashboard(@PathVariable Long employeeId, Model model, Principal principal) {
@@ -70,7 +72,6 @@ public class EmployeeDashboardController {
 
         return "employeedashboard";
     }
-
 
 
     @PostMapping("/employee/{employeeId}/requestShiftChange")
@@ -144,5 +145,66 @@ public class EmployeeDashboardController {
 
         return "redirect:/employee/" + employeeId + "/employeedashboard";  // Redirect to employee's dashboard
     }
+
+    @GetMapping("/employee/{employeeId}/viewcustomer/customer/{customerId}/details")
+    public String showCustomerDetails(@PathVariable Long employeeId,
+                                      @PathVariable Long customerId,
+                                      Model model,
+                                      Authentication authentication) {
+        // Retrieve the customer by ID
+        Optional<Customer> customerOpt = customerService.findById(customerId);
+        if (customerOpt.isPresent()) {
+            Customer customer = customerOpt.get();
+            model.addAttribute("customer", customer);
+        } else {
+            model.addAttribute("error", "Customer not found.");
+            return "error";  // Redirect or display an error page if the customer doesn't exist
+        }
+
+        // Retrieve the employee by ID
+        Optional<Employee> employeeOpt = employeeService.findById(employeeId);
+        if (employeeOpt.isPresent()) {
+            Employee employee = employeeOpt.get();
+            model.addAttribute("employee", employee);
+        } else {
+            model.addAttribute("error", "Employee not found.");
+            return "error";  // Redirect or display an error page if the employee doesn't exist
+        }
+
+        // Check if the user has support or manager roles
+        boolean canEditUsernameAndEmail = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPPORT") ||
+                        grantedAuthority.getAuthority().equals("ROLE_MANAGER"));
+        model.addAttribute("canEditUsernameAndEmail", canEditUsernameAndEmail);
+
+        return "customerdetails";
+    }
+
+    @GetMapping("/employee/{employeeId}/search-customer")
+    public String searchCustomer(@PathVariable Long employeeId,
+                                 @RequestParam(value = "name", required = false) String name,
+                                 Model model) {
+        // Retrieve the employee to add to the model
+        Optional<Employee> employeeOpt = employeeService.findById(employeeId);
+        if (employeeOpt.isPresent()) {
+            model.addAttribute("employee", employeeOpt.get());
+        } else {
+            model.addAttribute("error", "Employee not found.");
+            return "error";  // Display an error page if the employee doesn't exist
+        }
+
+        // Check if a search term was provided
+        if (name != null && !name.isEmpty()) {
+            // Perform the search if a name is provided
+            List<Customer> customers = customerService.findCustomersByName(name);
+            model.addAttribute("customers", customers);
+            model.addAttribute("customerName", name);  // Prepopulate the search input with the search term
+        }
+
+        // Return the template for customer search
+        return "searchcustomer";
+    }
+
+
 
 }

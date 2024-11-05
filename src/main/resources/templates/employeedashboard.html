@@ -103,7 +103,7 @@
     <section class="additional-actions card-section white-bg rounded-container">
         <h3>Additional Tools</h3>
         <button class="button southwest-blue-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/customersearch\''">
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/search-customer\''">
             Search Customer
         </button>
         <button class="button southwest-blue-bg text-white rounded-button"
