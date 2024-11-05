@@ -62,5 +62,29 @@ public class SupportRequestService {
         return supportRequestRepository.findByCustomerOrderByCreatedDateDesc(customer);
     }
 
+    public List<SupportRequest> findAllRequests() {
+        return supportRequestRepository.findAll(); // Adjust to any specific filtering needs
+    }
+
+    // Method to find a support request by ID
+    public SupportRequest findSupportRequestById(Long supportRequestId) {
+        return supportRequestRepository.findById(supportRequestId)
+                .orElseThrow(() -> new IllegalArgumentException("Support request not found with ID: " + supportRequestId));
+    }
+
+    // Method to update the status of a support request
+    public void updateStatus(Long supportRequestId, SupportRequest.Status newStatus) {
+        SupportRequest supportRequest = findSupportRequestById(supportRequestId);
+        supportRequest.setStatus(newStatus);
+        supportRequestRepository.save(supportRequest);
+    }
+
+    public List<SupportRequest> findActiveSupportRequests() {
+        return supportRequestRepository.findByStatusNot(SupportRequest.Status.CLOSED);
+    }
+
+    public List<SupportRequest> findClosedSupportRequests() {
+        return supportRequestRepository.findByStatus(SupportRequest.Status.CLOSED);
+    }
 
 }

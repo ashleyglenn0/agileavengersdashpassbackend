@@ -58,9 +58,14 @@
             </li>
         </ul>
         <button class="button southwest-yellow-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/supportrequests\''">
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/managerequests\''">
             View All Requests
         </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/archivedrequests\''">
+            View Archived Requests
+        </button>
+
     </section>
     <!-- Upcoming Holidays & Busy Days Section -->
     <section class="upcoming-holidays card-section white-bg rounded-container">

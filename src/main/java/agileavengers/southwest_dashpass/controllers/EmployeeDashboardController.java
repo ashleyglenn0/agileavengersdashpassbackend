@@ -82,5 +82,51 @@ public class EmployeeDashboardController {
         return "addcustomer"; // This is the name of your Thymeleaf template for the Add Customer form
     }
 
+    @GetMapping("/employee/{employeeId}/managerequests")
+    public String showManageRequests(@PathVariable Long employeeId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        if (employee == null) {
+            model.addAttribute("error", "Employee not found.");
+            return "error";
+        }
+
+        List<SupportRequest> supportRequests = supportRequestService.findActiveSupportRequests(); // Fetch all requests for management
+        model.addAttribute("employee", employee);
+        model.addAttribute("supportRequests", supportRequests);
+
+        return "support-requests-management"; // View name
+    }
+
+    @GetMapping("/employee/{employeeId}/supportrequest/{supportRequestId}/details")
+    public String showSupportRequestDetails(@PathVariable Long employeeId,
+                                            @PathVariable Long supportRequestId,
+                                            Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        SupportRequest supportRequest = supportRequestService.findSupportRequestById(supportRequestId);
+
+        if (supportRequest == null) {
+            model.addAttribute("error", "Support request not found.");
+            return "error";
+        }
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("supportRequest", supportRequest);
+
+        return "support-requests-details";
+    }
+
+    @GetMapping("/employee/{employeeId}/archivedrequests")
+    public String showArchivedRequests(@PathVariable Long employeeId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        List<SupportRequest> closedRequests = supportRequestService.findClosedSupportRequests();
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("closedRequests", closedRequests);
+
+        return "archived-support-requests";
+    }
+
+
+
 
 }

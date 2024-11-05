@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.awt.print.Pageable;
 import java.util.List;
+import java.util.Optional;
 
 public interface SupportRequestRepository extends JpaRepository<SupportRequest, Long> {
     // Fetch the most recent support requests in descending order of creation date
@@ -15,4 +16,12 @@ public interface SupportRequestRepository extends JpaRepository<SupportRequest, 
     List<SupportRequest> findRecentSupportRequests(@Param("limit") int limit);
 
     List<SupportRequest> findByCustomerOrderByCreatedDateDesc(Customer customer);
+
+    Optional<SupportRequest> findById(Long id);
+
+    // Repository method to retrieve only open or escalated support requests
+    List<SupportRequest> findByStatusNot(SupportRequest.Status status);
+
+    List<SupportRequest> findByStatus(SupportRequest.Status status);
+
 }

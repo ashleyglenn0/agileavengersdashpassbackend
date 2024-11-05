@@ -1,0 +1,111 @@
+/* Southwest theme colors */
+:root {
+    --southwest-blue: #00338D;
+    --southwest-yellow: #FFC72C;
+    --white: #FFFFFF;
+}
+
+/* General Page Styling */
+body.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    font-family: Arial, sans-serif;
+    color: var(--southwest-blue);
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header and Navigation */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--southwest-yellow);
+    margin-bottom: 20px;
+}
+
+.navbar a.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--southwest-blue);
+    text-decoration: none;
+}
+
+/* Card Styling */
+.card {
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    color: var(--southwest-blue);
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+/* Table Styling */
+.support-requests-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.support-requests-table th, .support-requests-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.support-requests-table th {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+}
+
+.support-requests-table tr:hover {
+    background-color: #f2f2f2;
+}
+
+/* Buttons */
+.button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.button.southwest-yellow-bg {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+}
+
+.button.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    color: var(--white);
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+/* Footer */
+footer {
+    padding: 10px 20px;
+    text-align: center;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    border-radius: 8px;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}

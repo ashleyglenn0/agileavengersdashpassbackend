@@ -1,0 +1,121 @@
+/* Southwest Theme Colors */
+:root {
+    --southwest-blue: #00338D;
+    --southwest-yellow: #FFC72C;
+    --white: #FFFFFF;
+    --light-gray: #F3F4F6;
+}
+
+/* General Page Styling */
+body.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    font-family: Arial, sans-serif;
+    color: var(--southwest-blue);
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header and Navigation */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--southwest-yellow);
+    border-radius: 0;
+}
+
+.navbar a.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--southwest-blue);
+    text-decoration: none;
+}
+
+/* Card Styling */
+.archived-requests-card {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.title {
+    color: var(--southwest-blue);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Support Requests Table */
+.support-requests-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.support-requests-table th,
+.support-requests-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.support-requests-table th {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    font-weight: bold;
+}
+
+.support-requests-table tbody tr:hover {
+    background-color: var(--light-gray);
+}
+
+/* Buttons */
+.button {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    text-align: center;
+}
+
+.button.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    color: var(--white);
+}
+
+.button.southwest-yellow-bg {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+}
+
+.button.southwest-yellow-bg:hover {
+    background-color: #e6b82c;
+}
+
+.button.southwest-blue-bg:hover {
+    background-color: #002767;
+}
+
+/* Footer */
+footer {
+    padding: 10px;
+    text-align: center;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    font-size: 0.9rem;
+    margin-top: 20px;
+}

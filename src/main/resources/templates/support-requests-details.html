@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Request Details</title>
+  <link rel="stylesheet" th:href="@{/styles/support-requests-details.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar southwest-yellow-bg">
+    <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-brand text-dark">Home</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card support-request-details-card">
+    <h2 class="title">Support Request Details</h2>
+
+    <!-- Display support request details -->
+    <div class="request-info">
+      <p><strong>Subject:</strong> <span th:text="${supportRequest.subject}"></span></p>
+      <p><strong>Message:</strong> <span th:text="${supportRequest.message}"></span></p>
+      <p><strong>Priority:</strong> <span th:text="${supportRequest.priority}"></span></p>
+      <p><strong>Status:</strong> <span th:text="${supportRequest.status}"></span></p>
+      <p><strong>Created By:</strong> <span th:text="${supportRequest.customer.user.firstName + ' ' + supportRequest.customer.user.lastName}"></span></p>
+      <p><strong>Date Created:</strong> <span th:text="${supportRequest.createdDate}"></span></p>
+    </div>
+
+    <!-- Buttons for actions -->
+    <div class="button-group">
+      <button type="button" class="button southwest-blue-bg text-white rounded-button"
+              onclick="window.history.back();">Back</button>
+      <form th:action="@{/employee/{employeeId}/supportrequest/{supportRequestId}/close(employeeId=${employee.id}, supportRequestId=${supportRequest.id})}"
+            method="POST" style="display:inline;">
+        <button type="submit" class="button southwest-blue-bg text-white rounded-button-small">Close Request</button>
+      </form>
+      <form th:action="@{/employee/{employeeId}/supportrequest/{supportRequestId}/escalate(employeeId=${employee.id}, supportRequestId=${supportRequest.id})}"
+            method="POST" style="display:inline;">
+        <button type="submit" class="button southwest-yellow-bg text-blue rounded-button-small">Escalate Request</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>
