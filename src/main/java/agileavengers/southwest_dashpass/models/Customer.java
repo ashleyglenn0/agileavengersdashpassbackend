@@ -140,13 +140,18 @@ public class Customer {
 
     // Methods to calculate based on DashPass data
     public void updateDashPassSummary() {
-        this.totalDashPassCount = dashPasses.size(); // total unredeemed DashPasses
+        this.totalDashPassCount = dashPasses.size(); // Only non-attached DashPasses
         this.dashPassInUseCount = (int) dashPassReservations.stream()
                 .filter(reservation -> reservation.getBookingDate().isAfter(LocalDate.now().minusDays(1)))
-                .count(); // active DashPasses in reservations
-        this.availableDashPassCount = MAX_DASHPASSES - (totalDashPassCount + dashPassInUseCount); // for purchase
-        this.canBuyDashPass = availableDashPassCount > 0;
+                .count();
+        this.availableDashPassCount = MAX_DASHPASSES - (totalDashPassCount + dashPassInUseCount);
+
+        // Debug output to check calculations
+        System.out.println("Total DashPass Count (owned, not attached): " + totalDashPassCount);
+        System.out.println("DashPass In Use Count: " + dashPassInUseCount);
+        System.out.println("Available DashPass Count (Calculated): " + availableDashPassCount);
     }
+
 
 
     // Method to get list of past DashPass reservations

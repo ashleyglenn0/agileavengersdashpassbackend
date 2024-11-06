@@ -135,14 +135,17 @@ public class DashPassReservationService {
         dashPassReservation.setBookingDate(LocalDate.now());
 
         // Add the DashPassReservation to the customer's list of reservations
-        customer.getDashPassReservations().add(dashPassReservation);
+        customer.addDashPassReservation(dashPassReservation);
 
         // Save the updated DashPass and DashPassReservation
         dashPassService.save(dashPass);
         dashPassReservationRepository.save(dashPassReservation);
 
-        // Optionally, update the reservation or notify the customer
+        // Update DashPass summary counts in the Customer
+        customer.updateDashPassSummary();
+        customerService.save(customer); // Persist the updated counts
     }
+
 
     public List<DashPassReservation> findPastDashPassReservations(Customer customer) {
         LocalDate today = LocalDate.now();

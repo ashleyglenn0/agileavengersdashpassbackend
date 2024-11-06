@@ -74,7 +74,7 @@
             <div th:each="roundTrip : ${roundTripFlights}">
                 <h4 class="section-header" th:text="'Trip ID: ' + ${roundTrip.tripId}">Trip ID</h4>
 
-                <!-- Outbound Flight for Round Trip -->
+                <!-- Outbound Flights for Round Trip -->
                 <div class="flight-card">
                     <h5 class="section-title">Outbound Flight</h5>
                     <div class="flight-details" th:each="outbound : ${roundTrip.outboundFlights}">
@@ -114,7 +114,28 @@
                         </div>
                     </div>
                 </div>
-                <!-- Rest of the template remains the same -->
+
+                <!-- Return Flights for Round Trip -->
+                <div class="flight-card">
+                    <h5 class="section-title">Return Flights</h5>
+                    <div class="flight-details" th:each="returnFlight : ${roundTrip.returnFlights}">
+                        <p><strong>Flight Number:</strong> <span th:text="${returnFlight.flightNumber}">FL0000</span></p>
+                        <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+                        <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
+                        <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(returnFlight.arrivalTime, 'hh:mm a')}">Time</span></p>
+                        <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(returnFlight.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
+
+                        <!-- Seat Availability Flag for Return Flight -->
+                        <div th:if="${returnFlight.numberOfSeatsAvailable <= 15}">
+                            <p class="seat-warning">Only <span th:text="${returnFlight.numberOfSeatsAvailable}"></span> seats left! Book soon!</p>
+                        </div>
+
+                        <!-- Select Return Flight -->
+                        <div>
+                            <input type="radio" name="returnFlightId" th:value="${returnFlight.flightID}" required> Select this Return Flight
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

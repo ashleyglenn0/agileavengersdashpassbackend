@@ -52,6 +52,9 @@ public class Reservation {
     @ElementCollection
     private Map<Long, String> flightGates = new HashMap<>(); // Map to store flight ID and gate info
 
+    @Column(name = "isValidated")
+    private Boolean isValidated;
+
 
     public Reservation(Customer customer, LocalDate bookingDate){
         this.customer = customer;
@@ -180,6 +183,14 @@ public class Reservation {
 
     public String getFlightGate(Long flightId) {
         return flightGates.get(flightId);
+    }
+
+    public Boolean getValidated() {
+        return isValidated;
+    }
+
+    public void setValidated(Boolean validated) {
+        isValidated = validated;
     }
 }
 
