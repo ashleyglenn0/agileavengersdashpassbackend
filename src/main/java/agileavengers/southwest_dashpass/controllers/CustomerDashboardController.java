@@ -5,6 +5,7 @@ import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.services.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -169,6 +170,25 @@ public class CustomerDashboardController {
         model.addAttribute("customer", customer);
 
         return "customer-support-requests";  // Name of the template
+    }
+
+    @GetMapping("/customer/{customerId}/ticket/{reservationId}")
+    public String viewTicket(@PathVariable Long customerId, @PathVariable Long reservationId, Model model) {
+        Customer customer = customerService.findCustomerById(customerId);
+        model.addAttribute("customer", customer);
+        // Retrieve the reservation from the service
+        Reservation reservation = reservationService.findById(reservationId);
+
+        // Verify that the reservation belongs to the specified customer
+        if (!reservation.getCustomer().getId().equals(customerId)) {
+            throw new AccessDeniedException("This reservation does not belong to the customer.");
+        }
+
+        // Add the reservation and DashPass reservations to the model
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("dashPassReservations", reservation.getDashPassReservations());
+
+        return "ticket"; // Thymeleaf template name
     }
 
 }

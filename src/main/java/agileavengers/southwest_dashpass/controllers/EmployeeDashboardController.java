@@ -2,10 +2,7 @@ package agileavengers.southwest_dashpass.controllers;
 
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.ShiftRepository;
-import agileavengers.southwest_dashpass.services.CustomerService;
-import agileavengers.southwest_dashpass.services.EmployeeService;
-import agileavengers.southwest_dashpass.services.PendingCustomerService;
-import agileavengers.southwest_dashpass.services.SupportRequestService;
+import agileavengers.southwest_dashpass.services.*;
 import agileavengers.southwest_dashpass.utils.AnnouncementGenerator;
 import agileavengers.southwest_dashpass.utils.ShiftGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +33,8 @@ public class EmployeeDashboardController {
     private PendingCustomerService pendingCustomerService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private ReservationService reservationService;
 
     @GetMapping("/employee/{employeeId}/employeedashboard")
     public String showEmployeeDashboard(@PathVariable Long employeeId, Model model, Principal principal) {
@@ -205,6 +204,34 @@ public class EmployeeDashboardController {
         return "searchcustomer";
     }
 
+    @GetMapping("/employee/{employeeId}/customer/{customerId}/reservations")
+    public String viewCustomerReservations(@PathVariable Long employeeId, @PathVariable Long customerId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        Customer customer = customerService.findCustomerById(customerId);
+        List<Reservation> reservations = reservationService.getReservationsForCustomer(customerId);
+        Role role = employee.getRole();
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("customer", customer);
+        model.addAttribute("reservations", reservations);
+        model.addAttribute("userRole", role); // Assuming Role has a getName() method
+        System.out.println(role);
+
+        return "reservationList"; // This is the template name for your reservation list view
+    }
+
+    @GetMapping("/employee/{employeeId}/validateReservation/customer/{customerId}/reservations/{reservationId}")
+    public String viewEmployeeReservationValidation(@PathVariable Long employeeId, @PathVariable Long customerId, @PathVariable Long reservationId, Model model) {
+        Customer customer = customerService.findCustomerById(customerId);
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        Reservation reservation = reservationService.findById(reservationId);
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("employee", employee);
+        model.addAttribute("reservation", reservation);
+
+        return "employeereservationvalidation";
+    }
 
 
 }

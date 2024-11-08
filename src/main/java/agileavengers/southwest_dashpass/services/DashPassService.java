@@ -51,48 +51,51 @@ public class DashPassService {
 
         String confirmationNumber = "";
 
-        // Loop over DashPass quantity
         for (int i = 0; i < dashPassQuantity; i++) {
-            // Check if the customer has reached their max number of DashPasses
+            // Check if customer has reached the maximum number of DashPasses
             if (customer.getTotalDashPassCount() >= customer.getMaxDashPasses()) {
                 throw new RuntimeException("Customer has reached the maximum number of DashPasses.");
             }
 
-            // Create a new DashPass
             DashPass dashPass = new DashPass();
             dashPass.setDateOfPurchase(LocalDate.now());
-            dashPass.setRedeemed(false); // Set redeemed to false since it hasn't been used yet
+            dashPass.setRedeemed(false); // Not redeemed yet
 
-            // Generate a confirmation number and set it for the DashPass
+            // Generate a unique confirmation number
             confirmationNumber = confirmationNumberGenerator.generateConfirmationNumber();
             dashPass.setConfirmationNumber(confirmationNumber);
 
             if (reservation == null) {
-                // DashPass is not linked to a reservation, add it directly to the customer
+                // DashPass is not linked to a reservation, add to unattached list
                 customer.addDashPass(dashPass);
-                System.out.println("DashPass added to customer list.");
+                System.out.println("DashPass added to customer's unattached DashPass list.");
             } else {
-                // Attach the DashPass to the flight(s) within the reservation
+                // Attach DashPass to reservation flights, checking limits
                 for (Flight flight : reservation.getFlights()) {
                     if (flight.getDashPassReservations().size() >= flight.getMaxNumberOfDashPassesForFlight()) {
                         throw new RuntimeException("No more DashPasses can be added to flight: " + flight.getFlightNumber());
                     }
 
-                    // Create and link a new DashPassReservation
+                    // Check if DashPass is already attached to this reservation
+                    if (reservation.hasDashPass()) {
+                        throw new RuntimeException("This reservation already has a DashPass attached.");
+                    }
+
+                    // Create and associate a new DashPassReservation
                     DashPassReservation dashPassReservation = new DashPassReservation();
                     dashPassReservation.setDashPass(dashPass);
                     dashPassReservation.setReservation(reservation);
                     dashPassReservation.setFlight(flight);
                     dashPassReservation.setBookingDate(LocalDate.now());
+                    dashPassReservation.setValidated(false);
 
-                    // Add the DashPassReservation to customer and flight
-                    customer.addDashPassReservation(dashPassReservation);
+                    customer.addDashPassReservation(dashPassReservation); // Move to reservations list
                     flight.getDashPassReservations().add(dashPassReservation);
 
-                    // Update available DashPass count for the flight
+                    // Update flight's DashPass availability count
                     flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
 
-                    // Save the DashPassReservation and flight
+                    // Save DashPassReservation and flight
                     dashPassReservationRepository.save(dashPassReservation);
                     flightRepository.save(flight);
 
@@ -100,16 +103,16 @@ public class DashPassService {
                 }
             }
 
-            // Save the new DashPass to persist it in the database
+            // Save the new DashPass
             dashPassRepository.save(dashPass);
         }
 
-        // Save the updated customer information
+        // Save updated customer information and summary
+        customer.updateDashPassSummary();
         customerRepository.save(customer);
 
         return confirmationNumber;
     }
-
 
 
 
@@ -133,6 +136,7 @@ public class DashPassService {
 
         return dashPass;  // Returns the DashPass with initialized reservation (if it exists)
     }
+
     public DashPass findDashPassByIdWithCustomerUserAndReservation(Long dashPassId) {
         return dashPassRepository.findDashPassByIdWithCustomerUserAndReservation(dashPassId);
     }

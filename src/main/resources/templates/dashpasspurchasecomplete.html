@@ -22,11 +22,11 @@
         <p><strong>DashPasses Purchased:</strong> <span th:text="${dashPassQuantity}"></span></p>
         <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
 
-        <!-- Button to return to the customer dashboard -->
-        <button class="confirm-button" type="button"
-                th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">
+        <!-- Button to return to the appropriate dashboard -->
+        <a th:href="${employee != null ? '/employee/' + employee.id + '/employeedashboard' : '/customer/' + customer.id + '/customerdashboard'}"
+           class="confirm-button">
             Return to Dashboard
-        </button>
+        </a>
     </div>
 </div>
 

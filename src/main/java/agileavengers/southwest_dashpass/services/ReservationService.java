@@ -38,30 +38,6 @@ public class ReservationService {
         return reservation.orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
     }
 
-    public Reservation createReservation(Customer customer, Flight flight, Optional<DashPass> optionalDashPass, double totalCost) {
-        Reservation reservation = new Reservation();
-
-        // Set customer and flight details
-        reservation.setCustomer(customer);
-        reservation.setFlights((List<Flight>) flight);
-        reservation.setDateBooked(LocalDate.now()); // Set booking date to current date
-
-        // If DashPass is present, associate it with the reservation
-        if (optionalDashPass.isPresent()) {
-            DashPass dashPass = optionalDashPass.get();
-            DashPassReservation dashPassReservation = new DashPassReservation();
-            dashPassReservation.setDashPass(dashPass);
-            dashPassReservation.setReservation(reservation);
-
-            // Save the DashPassReservation
-            dashPassReservationRepository.save(dashPassReservation);
-        }
-
-        // Save the reservation in the database
-        reservationRepository.save(reservation);
-
-        return reservation;
-    }
 
     public Reservation save(Reservation reservation){
         return reservationRepository.save(reservation);
@@ -124,5 +100,52 @@ public class ReservationService {
             throw new IllegalArgumentException("Reservation not found for ID: " + reservationId);
         }
     }
+
+    @Transactional
+    public void validateReservation(Long customerId, Long reservationId) {
+        // Fetch the reservation by ID
+        Reservation reservation = findById(reservationId);
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation not found with ID: " + reservationId);
+        }
+
+        // Fetch the customer by ID
+        Customer customer = customerService.findCustomerById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer not found with ID: " + customerId);
+        }
+
+        // Check if a DashPass is attached to the reservation
+        boolean hasDashPass = reservation.getDashPassReservations() != null && !reservation.getDashPassReservations().isEmpty();
+
+        if (hasDashPass) {
+            // Iterate through attached DashPass reservations
+            for (DashPassReservation dashPassReservation : reservation.getDashPassReservations()) {
+                // Only update if DashPass reservation isn't already validated
+                if (!dashPassReservation.getValidated()) {
+                    dashPassReservation.setValidated(true); // Mark DashPass reservation as validated
+
+                    // Save the updated DashPass reservation
+                    dashPassReservationRepository.save(dashPassReservation);
+                }
+            }
+        }
+
+        // Mark the reservation as validated
+        reservation.setValidated(true);
+
+        // Save the updated reservation
+        reservationRepository.save(reservation);
+
+        // Update DashPass summary on the customer to refresh counts based on validated reservations
+        customer.updateDashPassSummary();
+        customerService.save(customer); // Persist the updated counts in the database
+    }
+
+
+
+
+
+
 
 }

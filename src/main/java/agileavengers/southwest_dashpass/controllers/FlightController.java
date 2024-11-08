@@ -121,10 +121,6 @@ public class FlightController {
                     departureDate.minusDays(3), departureDate.plusDays(3),
                     returnDate.minusDays(5), returnDate.plusDays(5)
             );
-            System.out.println("RoundTrip Flights: " + roundTripFlights);
-            System.out.println("Outbound Flights in each Trip: " + roundTripFlights.stream().map(rt -> rt.getOutboundFlights().size()).collect(Collectors.toList()));
-            System.out.println("Return Flights in each Trip: " + roundTripFlights.stream().map(rt -> rt.getReturnFlights().size()).collect(Collectors.toList()));
-
 
             roundTripFlights.forEach(roundTrip -> {
                 roundTrip.getOutboundFlights().forEach(flight -> {
@@ -436,4 +432,3 @@ public class FlightController {
     }
 
 }
-

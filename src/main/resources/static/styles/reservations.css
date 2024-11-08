@@ -100,3 +100,35 @@ button[type="button"] {
 button[type="button"]:hover {
     background-color: #ffd966;
 }
+
+/* Align buttons side by side in Actions column */
+/* Align buttons side by side in Actions column */
+.actions {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    justify-content: center;
+    align-items: center;
+}
+
+.actions a {
+    text-decoration: none;
+}
+
+/* Button Styling for Action Buttons */
+.actions .button {
+    display: inline-block;
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+}
+
+.actions .button:hover {
+    background-color: #ffd966; /* Lighter yellow on hover */
+}
+
+

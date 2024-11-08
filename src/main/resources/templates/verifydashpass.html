@@ -65,29 +65,6 @@
       <p>No DashPass found.</p>
     </div>
 
-    <!-- Customer Table (Displayed if customer search results are present) -->
-    <table th:if="${customers != null and !customers.isEmpty()}" class="results-table">
-      <thead>
-      <tr>
-        <th>Customer Name</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="customer : ${customers}">
-        <td th:text="${customer.user.firstName + ' ' + customer.user.lastName}"></td>
-        <td>
-          <button type="button" th:onclick="'location.href=/customer/' + ${customer.id} + '/dashpasses'">View DashPasses</button>
-          <button type="button" th:onclick="'location.href=/customer/' + ${customer.id} + '/dashpassreservations'">View Reservations</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <!-- Fallback message if no customers are found and a search was conducted -->
-    <div th:if="${searchPerformed}" th:unless="${customers != null and !customers.isEmpty()}" class="no-results">
-      <p>No customers found.</p>
-    </div>
   </section>
 </div>
 

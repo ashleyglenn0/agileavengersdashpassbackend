@@ -60,6 +60,7 @@ public class BookingService {
                 reservation.setTripType(TripType.valueOf(tripType));
                 reservation.setPaymentStatus(PaymentStatus.PAID);
                 reservation.setStatus(ReservationStatus.VALID);
+                reservation.setValidated(false);
 
                 // Populate reservation with flight details
                 Flight outboundFlight = flightService.findFlightById(outboundFlightId);
@@ -68,7 +69,7 @@ public class BookingService {
                 outboundFlight.setReservation(reservation);
 
                 if (outboundFlight.getAvailableSeats() > 0) {
-                    outboundFlight.setAvailableSeats(outboundFlight.getAvailableSeats() - 1);
+                    outboundFlight.setAvailableSeats(outboundFlight.getSeatsRemaining() - 1);
                     outboundFlight.setSeatsSold(outboundFlight.getSeatsSold() + 1);
                 } else {
                     throw new IllegalStateException("No available seats for outbound flight");
@@ -83,10 +84,10 @@ public class BookingService {
                     finalPrice += returnFlight.getPrice();
 
                     if (returnFlight.getAvailableSeats() > 0) {
-                        returnFlight.setAvailableSeats(returnFlight.getAvailableSeats() - 1);
+                        returnFlight.setAvailableSeats(outboundFlight.getSeatsRemaining() - 1);
                         returnFlight.setSeatsSold(returnFlight.getSeatsSold() + 1);
                     } else {
-                        throw new IllegalStateException("No available seats for return flight");
+                        throw new IllegalStateException("No available seats for outbound flight");
                     }
                 }
                 System.out.println("Final price for reservation: $" + finalPrice);
@@ -110,26 +111,20 @@ public class BookingService {
                 reservationService.save(reservation);
                 System.out.println("Reservation saved successfully for Customer ID " + currentCustomer.getId());
 
-                // Process DashPass based on selection and update DashPass counts for the flight
+                // Process DashPass based on selection
                 if (isNewPurchase) {
                     DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(
-                            currentCustomer, reservation, outboundFlight
+                            currentCustomer, reservation, outboundFlight // Link the DashPassReservation to the entire reservation, not just the flight
                     );
-                    reservation.getDashPassReservations().add(dashPassReservation);
-                    outboundFlight.setNumberOfDashPassesAvailable(outboundFlight.getNumberOfDashPassesAvailable() - 1); // Decrement available DashPasses
-                    System.out.println("New DashPass created, linked to reservation, and flight DashPass count updated.");
+                    reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
+                    System.out.println("New DashPass created and linked to reservation.");
                 } else if ("existing".equals(dashPassOption)) {
                     DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(
                             currentCustomer, reservation, outboundFlight
                     );
-                    reservation.getDashPassReservations().add(dashPassReservation);
-                    outboundFlight.setNumberOfDashPassesAvailable(outboundFlight.getNumberOfDashPassesAvailable() - 1); // Decrement available DashPasses
-                    System.out.println("Existing DashPass linked to reservation, and flight DashPass count updated.");
+                    reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
+                    System.out.println("Existing DashPass linked to reservation.");
                 }
-
-                // Save the updated flight and reservation
-                flightService.save(outboundFlight);
-                reservationService.save(reservation);
 
                 return reservation;
             } else {
@@ -138,7 +133,6 @@ public class BookingService {
             }
         });
     }
-
 
     // Helper method to generate terminal based on airport
     private String generateTerminal(String airportCode) {
@@ -152,4 +146,3 @@ public class BookingService {
     }
 
 }
-

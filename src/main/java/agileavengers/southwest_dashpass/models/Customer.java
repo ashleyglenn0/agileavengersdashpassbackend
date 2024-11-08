@@ -140,18 +140,26 @@ public class Customer {
 
     // Methods to calculate based on DashPass data
     public void updateDashPassSummary() {
-        this.totalDashPassCount = dashPasses.size(); // Only non-attached DashPasses
+        // Count unattached DashPasses
+        int unattachedDashPassCount = dashPasses.size();
+
+        // Count DashPasses attached to validated reservations
         this.dashPassInUseCount = (int) dashPassReservations.stream()
-                .filter(reservation -> reservation.getBookingDate().isAfter(LocalDate.now().minusDays(1)))
+                .filter(DashPassReservation::getValidated)
                 .count();
-        this.availableDashPassCount = MAX_DASHPASSES - (totalDashPassCount + dashPassInUseCount);
+
+        // Total DashPass count includes unattached and validated in-use DashPasses
+        this.totalDashPassCount = unattachedDashPassCount + dashPassInUseCount;
+
+        // Available DashPass count based on maximum limit
+        this.availableDashPassCount = MAX_DASHPASSES - totalDashPassCount;
 
         // Debug output to check calculations
-        System.out.println("Total DashPass Count (owned, not attached): " + totalDashPassCount);
+        System.out.println("Unattached DashPass Count: " + unattachedDashPassCount);
         System.out.println("DashPass In Use Count: " + dashPassInUseCount);
-        System.out.println("Available DashPass Count (Calculated): " + availableDashPassCount);
+        System.out.println("Total DashPass Count: " + totalDashPassCount);
+        System.out.println("Available DashPass Count: " + availableDashPassCount);
     }
-
 
 
     // Method to get list of past DashPass reservations
@@ -163,14 +171,26 @@ public class Customer {
     }
 
     public void addDashPass(DashPass dashPass) {
-        dashPasses.add(dashPass);       // Add the DashPass to the list
+        dashPasses.add(dashPass);       // Add the DashPass to unattached list
         dashPass.setCustomer(this);      // Link the DashPass to this customer
         updateDashPassSummary();         // Recalculate DashPass counts
     }
 
+
     public void addDashPassReservation(DashPassReservation dashPassReservation) {
-        dashPassReservations.add(dashPassReservation);   // Add the reservation to the list
-        dashPassReservation.setCustomer(this);           // Link the reservation to this customer
-        updateDashPassSummary();                         // Recalculate DashPass counts
+        dashPassReservations.add(dashPassReservation);
+        dashPassReservation.setCustomer(this);
+
+        // Only increase in-use count if the reservation is validated
+        if (dashPassReservation.getValidated()) {
+            dashPassInUseCount++;
+        }
+
+        // Update summary based on new counts
+        updateDashPassSummary();
+    }
+
+    public void incrementDashPassInUseCount() {
+        this.dashPassInUseCount += 1;
     }
 }

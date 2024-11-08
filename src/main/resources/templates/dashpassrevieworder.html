@@ -75,8 +75,12 @@
     </div>
 
     <!-- Continue to payment method details -->
-    <form th:action="@{/customer/{customerID}/dashpasspaymentmethoddetails(customerID=${customer.id})}" method="get">
-        <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}">
+    <form th:action="${employee != null ?
+                  '/employee/' + employee.id + '/customer/' + customer.id + '/dashpasspaymentmethoddetails?customerID=' + customer.id + '&employeeId=' + employee.id :
+                  '/customer/' + customer.id + '/dashpasspaymentmethoddetails?customerID=' + customer.id}"
+          method="get">
+    <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}">
+        <input type="hidden" name="employeeId" th:value="${employee != null ? employee.id : null}">
         <input type="hidden" name="totalPrice" th:value="${totalPrice}">
         <input type="hidden" name="selectedReservationId" th:value="${reservation != null ? reservation.reservationId : null}">
 

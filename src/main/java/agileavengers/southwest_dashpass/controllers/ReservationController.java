@@ -68,4 +68,15 @@ public class ReservationController {
         return "reservationlist";
     }
 
+    @PostMapping("/employee/{employeeId}/validateReservation/customer/{customerId}/reservations")
+    public String validateReservation(@PathVariable Long employeeId,
+                                      @PathVariable Long customerId,
+                                      @PathVariable Long reservationId) {
+        // Call the service method to validate the reservation
+        reservationService.validateReservation(customerId, reservationId);
+
+        // Redirect back to the reservation list or dashboard after validation
+        return "redirect:/employee/" + employeeId + "/customer/" + customerId + "/reservationList";
+    }
+
 }

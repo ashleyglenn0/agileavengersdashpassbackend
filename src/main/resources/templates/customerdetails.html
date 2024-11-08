@@ -48,11 +48,17 @@
 
         <!-- All Buttons in a Row at the Bottom -->
         <div class="bottom-buttons">
-            <button id="editButton" class="button southwest-yellow-bg text-dark" onclick="toggleEditMode()">Edit</button>
-            <button class="button delete-button">Delete</button>
             <button class="button southwest-yellow-bg text-dark">Go Back</button>
-            <button class="button southwest-yellow-bg text-dark">Add DashPass</button>
+            <button id="editButton" class="button southwest-yellow-bg text-dark" onclick="toggleEditMode()">Edit</button>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/purchaseDashPass(employeeId=${employee.id}, customerId=${customer.id})}">
+                <button class="button southwest-yellow-bg text-dark">Add DashPass</button>
+            </a>
             <button class="button southwest-yellow-bg text-dark">Add Flight</button>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/reservations(employeeId=${employee.id}, customerId=${customer.id})}"
+               class="button southwest-yellow-bg text-dark">
+                Search Reservations
+            </a>
+
         </div>
     </div>
 </div>
