@@ -55,15 +55,15 @@
             <!-- Manager-specific buttons for viewing sales data -->
             <div class="manager-buttons">
                 <button class="button southwest-yellow-bg text-white rounded-button"
-                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/allflightsales\''">
+                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=flight\''">
                     View All Flight Sales
                 </button>
-                <button class="button southwest-blue-bg text-white rounded-button"
-                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/alldashpasssales\''">
+                <button class="button southwest-yellow-bg text-white rounded-button"
+                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=dashpass\''">
                     View All DashPass Sales
                 </button>
                 <button class="button southwest-yellow-bg text-white rounded-button"
-                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/allsales\''">
+                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=all\''">
                     View All Sales
                 </button>
             </div>
@@ -72,7 +72,7 @@
         <!-- Conditionally render personal sales data for sales associates -->
         <div th:if="${role == T(agileavengers.southwest_dashpass.models.Role).SALES}" class="sales-buttons">
             <button class="button southwest-yellow-bg text-white rounded-button"
-                    th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/mysales\''">
+                    th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=mySales\''">
                 Track My Sales
             </button>
         </div>

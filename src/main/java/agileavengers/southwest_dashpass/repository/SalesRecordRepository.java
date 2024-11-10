@@ -63,4 +63,10 @@ public interface SalesRecordRepository extends JpaRepository<SalesRecord, Long> 
     @Query("SELECT sr.employee.id, COUNT(sr) AS salesCount FROM SalesRecord sr WHERE sr.employee IS NOT NULL GROUP BY sr.employee.id ORDER BY salesCount DESC")
     List<Object[]> findTopPerformingEmployees();
 
+    @Query("SELECT s FROM SalesRecord s WHERE " +
+            "(:salesType = 'flight' AND s.flight IS NOT NULL) OR " +
+            "(:salesType = 'dashpass' AND s.dashPass IS NOT NULL) OR " +
+            "(:salesType = 'all')")
+    List<SalesRecord> findSalesByType(@Param("salesType") String salesType);
+
 }

@@ -47,13 +47,28 @@ public class SalesRecordService {
         SalesRecord salesRecord = new SalesRecord(dashPass, customer, employee, LocalDate.now());
         salesRecordRepository.save(salesRecord);
     }
-
-    public List<SalesRecord> getFlightSalesOnly() {
-        return salesRecordRepository.findFlightSalesOnly();
+    public List<SalesRecord> findSalesByType(String salesType) {
+        return salesRecordRepository.findSalesByType(salesType);
     }
 
-    public List<SalesRecord> getDashPassSalesOnly() {
-        return salesRecordRepository.findDashPassSalesOnly();
+    public List<SalesRecord> findSalesByEmployee(Long employeeId) {
+        return salesRecordRepository.findByEmployeeId(employeeId);
+    }
+
+    public List<SalesRecord> getAllFlightSales() {
+        return salesRecordRepository.findSalesByType("flight");
+    }
+
+    public List<SalesRecord> getAllDashPassSales() {
+        return salesRecordRepository.findSalesByType("dashpass");
+    }
+
+    public List<SalesRecord> getAllSales() {
+        return salesRecordRepository.findAll();
+    }
+
+    public List<SalesRecord> getSalesByEmployee(Long employeeId) {
+        return salesRecordRepository.findByEmployeeId(employeeId);
     }
 
     public List<SalesRecord> getSalesWithBothDashPassAndFlight() {
@@ -83,32 +98,6 @@ public class SalesRecordService {
     public List<SalesRecord> getSalesByDateRange(LocalDate startDate, LocalDate endDate) {
         return salesRecordRepository.findByDateRange(startDate, endDate);
     }
-
-//    public Map<String, Object> getTopPerformer() {
-//        List<Object[]> results = salesRecordRepository.findTopPerformers();
-//        if (results.isEmpty()) {
-//            return null; // No sales records found
-//        }
-//
-//        Object[] topPerformer = results.get(0); // Get the first entry as the top performer
-//        Long employeeId = (Long) topPerformer[0];
-//        Long totalSales = (Long) topPerformer[1];
-//
-//        if (employeeId == null) {
-//            return null; // No valid employee ID found, return null or handle as needed
-//        }
-//
-//        Employee employee = employeeService.findEmployeeById(employeeId); // Fetch employee details
-//        if (employee == null) {
-//            return null; // Employee not found, handle this case if necessary
-//        }
-//
-//        Map<String, Object> topPerformerData = new HashMap<>();
-//        topPerformerData.put("employee", employee);
-//        topPerformerData.put("totalSales", totalSales);
-//
-//        return topPerformerData;
-//    }
 
 
     // Retrieves all sales records for managers

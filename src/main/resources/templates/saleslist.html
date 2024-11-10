@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sales List</title>
+    <link rel="stylesheet" type="text/css" href="/styles/saleslist.css"/>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+    <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/flights">Flights</a></li>
+        <li><a href="/dashpass">DashPass</a></li>
+        <li><a href="/support">Support</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <!-- Page Title -->
+    <h2 th:text="${salesType == 'flight' ? 'All Flight Sales' :
+                          (salesType == 'dashpass' ? 'All DashPass Sales' :
+                          (salesType == 'all' ? 'All Sales' : 'My Sales'))}"></h2>
+
+    <!-- Sales Table -->
+    <table class="sales-table">
+        <thead>
+        <tr>
+            <th>Sale ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th th:if="${salesType == 'flight' || salesType == 'all'}">Flight</th>
+            <th th:if="${salesType == 'dashPass' || salesType == 'all'}">DashPass</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sale : ${salesRecords}">
+            <td th:text="${sale.id}">1</td>
+            <td th:text="${sale.customer.user.firstName + ' ' + sale.customer.user.lastName}">John Doe</td>
+            <td th:text="${salesDateMap[sale.id]}">2024-11-07</td>
+            <td th:if="${sale.flight != null}" th:text="${sale.flight.flightNumber}">FL123</td>
+            <td th:if="${sale.flight == null}">N/A</td>
+            <td th:if="${sale.dashPass != null}" th:text="${sale.dashPass.dashpassId}">FL123</td>
+            <td th:if="${sale.dashPass == null}">N/A</td>
+            <td class="actions">
+                <button class="button"
+                        th:onclick="'window.location.href=\'/employee/' + ${employeeId} + '/sale/' + ${sale.id} + '/details\''">
+                    View Details
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Back Button -->
+    <div class="back-button">
+        <button type="button" class="button" onclick="window.history.back();">Back</button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2024 Southwest DashPass. All rights reserved.</p>
+</footer>
+</body>
+</html>

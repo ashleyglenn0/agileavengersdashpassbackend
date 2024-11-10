@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class EmployeeDashboardController {
@@ -251,61 +252,40 @@ public class EmployeeDashboardController {
         return "reservationList"; // This is the template name for your reservation list view
     }
 
-    @GetMapping("/employee/{employeeId}/allflightsales")
-    public String viewAllFlightSales(@PathVariable Long employeeId, Model model) {
-        List<SalesRecord> flightSales = salesRecordService.getFlightSalesOnly();
-        model.addAttribute("salesRecords", flightSales);
-        model.addAttribute("employeeId", employeeId);
-        return "employee-sales"; // Template for displaying sales records
-    }
-
-    @GetMapping("/employee/{employeeId}/alldashpasssales")
-    public String viewAllDashPassSales(@PathVariable Long employeeId, Model model) {
-        List<SalesRecord> dashPassSales = salesRecordService.getDashPassSalesOnly();
-        model.addAttribute("salesRecords", dashPassSales);
-        model.addAttribute("employeeId", employeeId);
-        return "employee-sales";
-    }
-
     @GetMapping("/employee/{employeeId}/sales")
-    public String viewSales(@PathVariable Long employeeId, Model model) {
+    public String viewSalesByType(
+            @PathVariable Long employeeId,
+            @RequestParam(name = "salesType", defaultValue = "all") String salesType,
+            Model model) {
+
+        // Get the employee information
         Employee employee = employeeService.findEmployeeById(employeeId);
-        Role employeeRole = employee.getRole();
-
-        if (employeeRole == Role.MANAGER) {
-            // For managers, show all sales records
-            List<SalesRecord> allSales = salesRecordService.getAllSalesRecords();
-            Map<String, Object> topPerformerData = salesRecordService.getTopPerformingEmployee();
-
-            model.addAttribute("salesRecords", allSales);
-            model.addAttribute("totalSales", allSales.size());
-            model.addAttribute("topPerformer", topPerformerData != null ? topPerformerData.get("employee") : null);
-            model.addAttribute("topSales", topPerformerData != null ? topPerformerData.get("totalSales") : 0);
-        } else {
-            // For sales associates, show only their own sales records
-            List<SalesRecord> mySales = salesRecordService.getSalesByEmployeeId(employeeId);
-
-            model.addAttribute("salesRecords", mySales);
-            model.addAttribute("totalSales", mySales.size());
+        if (employee == null) {
+            model.addAttribute("error", "Employee not found.");
+            return "error";
         }
 
-        model.addAttribute("employee", employee);
-        return "employee-sales";
-    }
+        // Fetch sales based on the salesType parameter
+        List<SalesRecord> salesRecords;
+        if (salesType.equals("mySales")) {
+            salesRecords = salesRecordService.findSalesByEmployee(employeeId);
+        } else {
+            salesRecords = salesRecordService.findSalesByType(salesType);
+        }
 
-    @GetMapping("/employee/{employeeId}/mysales")
-    public String viewMySales(@PathVariable Long employeeId, Model model) {
-        List<SalesRecord> mySales = salesRecordService.getSalesWithBothDashPassAndFlightByEmployee(employeeId);
-        model.addAttribute("salesRecords", mySales);
+        Map<Long, String> salesDateMap = salesRecords.stream()
+                .collect(Collectors.toMap(
+                        SalesRecord::getId,
+                        record -> record.getSaleDate() != null ? record.getSaleDate().toString() : "N/A"
+                ));
+
+        // Add necessary attributes to the model
         model.addAttribute("employeeId", employeeId);
-        return "employee-sales";
-    }
+        model.addAttribute("salesType", salesType);
+        model.addAttribute("salesRecords", salesRecords);
+        model.addAttribute("salesDateMap", salesDateMap);
 
-    // Example controller method for manager view
-    @GetMapping("/employee/{employeeId}/allsales")
-    public String viewAllSalesRecords(@PathVariable Long employeeId, Model model) {
-        model.addAttribute("salesRecords", salesRecordService.getAllSalesRecords());
-        return "allSalesView"; // Replace with your actual view template
+        return "saleslist"; // Return the shared template for displaying sales records
     }
 
 }

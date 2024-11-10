@@ -31,6 +31,9 @@ public class SalesRecord {
     // Constructor, getters, and setters
 
     // Constructor for DashPass and flight sale
+    public SalesRecord() {
+    }
+
     public SalesRecord(DashPass dashPass, Flight flight, Customer customer, Employee employee, LocalDate saleDate) {
         this.dashPass = dashPass;
         this.flight = flight;
