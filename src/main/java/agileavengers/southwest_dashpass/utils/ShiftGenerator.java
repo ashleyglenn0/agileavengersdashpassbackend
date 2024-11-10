@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,22 +18,30 @@ public class ShiftGenerator {
     private ShiftRepository shiftRepository;
 
     // Generate random shifts for a specific employee
-    public List<Shift> generateRandomShiftsForEmployee(Employee employee, int count) {
+    public List<Shift> generateShifts(Employee employee, int count) {
         List<Shift> shifts = new ArrayList<>();
-        LocalDate today = LocalDate.now();
+        LocalDateTime today = LocalDateTime.now();
 
-        // Generate the specified number of shifts within the next 7 days with random times
         for (int i = 0; i < count; i++) {
             Shift shift = new Shift();
             shift.setEmployee(employee);
-            shift.setDate(today.plusDays((long) (Math.random() * 7)));  // Shift within the next week
-            shift.setStartTime(LocalTime.of(9 + (int) (Math.random() * 3), 0));  // Start time between 9-11 AM
-            shift.setEndTime(shift.getStartTime().plusHours(8));  // 8-hour shift
+
+            // Generate a random shift date within the next week
+            LocalDateTime shiftDate = today.plusDays((long) (Math.random() * 7));
+            shift.setDate(shiftDate);
+
+            // Generate a random start time between 9 AM and 11 AM
+            int startHour = 9 + (int) (Math.random() * 3);
+            LocalDateTime startTime = LocalDateTime.of(LocalDate.from(shiftDate), LocalTime.of(startHour, 0));
+            shift.setStartTime(startTime);
+
+            // Set an 8-hour shift duration
+            LocalDateTime endTime = startTime.plusHours(8);
+            shift.setEndTime(endTime);
+
             shifts.add(shift);
         }
 
-        // Save generated shifts to the database and return
-        shiftRepository.saveAll(shifts);
         return shifts;
     }
 }

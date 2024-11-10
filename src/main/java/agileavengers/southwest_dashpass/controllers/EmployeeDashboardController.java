@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.controllers;
 
+import agileavengers.southwest_dashpass.dtos.EmployeeDTO;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.ShiftRepository;
 import agileavengers.southwest_dashpass.services.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -35,27 +37,44 @@ public class EmployeeDashboardController {
     private CustomerService customerService;
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private SalesRecordService salesRecordService;
+    @Autowired
+    private ShiftService shiftService;
 
     @GetMapping("/employee/{employeeId}/employeedashboard")
     public String showEmployeeDashboard(@PathVariable Long employeeId, Model model, Principal principal) {
-        // Fetch employee by ID
         Employee employee = employeeService.findEmployeeById(employeeId);
 
-        // If employee is not found, show a custom error page
-        if (employee == null) {
-            model.addAttribute("error", "Employee not found with ID: " + employeeId);
-            return "error/customer-not-found";  // You should have a custom error page
+        if (employee == null || !employee.getUser().getUsername().equals(principal.getName())) {
+            return "error/403"; // Unauthorized
         }
+        // Generate today's shifts for all employees if missing
+        shiftService.generateAndSaveShiftsForAllEmployees();
 
-        // Ensure the employee belongs to the currently logged-in user
-        if (!employee.getUser().getUsername().equals(principal.getName())) {
-            return "error/403";  // Show a 403 error page if access is unauthorized
-        }
+        // Fetch sales data
+        Long teamTotalSales = salesRecordService.calculateTeamTotalSales();
+        Map<String, Object> topPerformerData = salesRecordService.getTopPerformingEmployee();
+        Map<String, Long> salesBreakdown = salesRecordService.getSalesBreakdown();
 
-        // Fetch shifts, announcements, and role
         List<Shift> shifts = shiftRepository.findByEmployeeId(employeeId);
         List<Announcement> announcements = AnnouncementGenerator.generateRandomAnnouncements(3);
         Role role = employee.getRole();
+        LocalDate date = LocalDate.now();
+
+        // Get scheduled employees for today
+        List<EmployeeDTO> scheduledEmployees = shiftService.getScheduledEmployeesForToday(date);
+
+        System.out.println("Scheduled Employees for Today:");
+        for (EmployeeDTO scheduledEmployee : scheduledEmployees) {
+            System.out.println("Employee ID: " + scheduledEmployee.getId());
+            System.out.println("First Name: " + scheduledEmployee.getFirstName());
+            System.out.println("Last Name: " + scheduledEmployee.getLastName());
+            System.out.println("Role: " + scheduledEmployee.getRole());
+            System.out.println("Shift Start Time: " + scheduledEmployee.getShiftStartTime());
+            System.out.println("Shift End Time: " + scheduledEmployee.getShiftEndTime());
+            System.out.println("-----------------------------");
+        }
 
         // Fetch only the first 3 or 4 support requests if the employee is SUPPORT or MANAGER
         if (role == Role.SUPPORT || role == Role.MANAGER) {
@@ -63,14 +82,26 @@ public class EmployeeDashboardController {
             model.addAttribute("supportRequests", supportRequests);
         }
 
-        // Add employee data to the model
+        System.out.println("Role logged in: " + employee.getRole());
+        System.out.println("Team Sales: " + teamTotalSales);
+        System.out.println("Top Performer: " + topPerformerData);
+        System.out.println("Employee Sales: " + salesBreakdown.get("employeeSales"));
+        System.out.println("Customer Sales: " + salesBreakdown.get("customerSales"));
+
+        // Add attributes to the model
+        model.addAttribute("role", role);
         model.addAttribute("employee", employee);
+        model.addAttribute("teamTotalSales", teamTotalSales);
+        model.addAttribute("topPerformer", topPerformerData);
+        model.addAttribute("employeeSalesCount", salesBreakdown.get("employeeSales"));
+        model.addAttribute("customerSalesCount", salesBreakdown.get("customerSales"));
         model.addAttribute("shifts", shifts);
         model.addAttribute("announcements", announcements);
-        model.addAttribute("role", role);
+        model.addAttribute("scheduledEmployees", scheduledEmployees); // Add scheduled employees
 
         return "employeedashboard";
     }
+
 
 
     @PostMapping("/employee/{employeeId}/requestShiftChange")
@@ -220,18 +251,61 @@ public class EmployeeDashboardController {
         return "reservationList"; // This is the template name for your reservation list view
     }
 
-    @GetMapping("/employee/{employeeId}/validateReservation/customer/{customerId}/reservations/{reservationId}")
-    public String viewEmployeeReservationValidation(@PathVariable Long employeeId, @PathVariable Long customerId, @PathVariable Long reservationId, Model model) {
-        Customer customer = customerService.findCustomerById(customerId);
-        Employee employee = employeeService.findEmployeeById(employeeId);
-        Reservation reservation = reservationService.findById(reservationId);
-
-        model.addAttribute("customer", customer);
-        model.addAttribute("employee", employee);
-        model.addAttribute("reservation", reservation);
-
-        return "employeereservationvalidation";
+    @GetMapping("/employee/{employeeId}/allflightsales")
+    public String viewAllFlightSales(@PathVariable Long employeeId, Model model) {
+        List<SalesRecord> flightSales = salesRecordService.getFlightSalesOnly();
+        model.addAttribute("salesRecords", flightSales);
+        model.addAttribute("employeeId", employeeId);
+        return "employee-sales"; // Template for displaying sales records
     }
 
+    @GetMapping("/employee/{employeeId}/alldashpasssales")
+    public String viewAllDashPassSales(@PathVariable Long employeeId, Model model) {
+        List<SalesRecord> dashPassSales = salesRecordService.getDashPassSalesOnly();
+        model.addAttribute("salesRecords", dashPassSales);
+        model.addAttribute("employeeId", employeeId);
+        return "employee-sales";
+    }
+
+    @GetMapping("/employee/{employeeId}/sales")
+    public String viewSales(@PathVariable Long employeeId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        Role employeeRole = employee.getRole();
+
+        if (employeeRole == Role.MANAGER) {
+            // For managers, show all sales records
+            List<SalesRecord> allSales = salesRecordService.getAllSalesRecords();
+            Map<String, Object> topPerformerData = salesRecordService.getTopPerformingEmployee();
+
+            model.addAttribute("salesRecords", allSales);
+            model.addAttribute("totalSales", allSales.size());
+            model.addAttribute("topPerformer", topPerformerData != null ? topPerformerData.get("employee") : null);
+            model.addAttribute("topSales", topPerformerData != null ? topPerformerData.get("totalSales") : 0);
+        } else {
+            // For sales associates, show only their own sales records
+            List<SalesRecord> mySales = salesRecordService.getSalesByEmployeeId(employeeId);
+
+            model.addAttribute("salesRecords", mySales);
+            model.addAttribute("totalSales", mySales.size());
+        }
+
+        model.addAttribute("employee", employee);
+        return "employee-sales";
+    }
+
+    @GetMapping("/employee/{employeeId}/mysales")
+    public String viewMySales(@PathVariable Long employeeId, Model model) {
+        List<SalesRecord> mySales = salesRecordService.getSalesWithBothDashPassAndFlightByEmployee(employeeId);
+        model.addAttribute("salesRecords", mySales);
+        model.addAttribute("employeeId", employeeId);
+        return "employee-sales";
+    }
+
+    // Example controller method for manager view
+    @GetMapping("/employee/{employeeId}/allsales")
+    public String viewAllSalesRecords(@PathVariable Long employeeId, Model model) {
+        model.addAttribute("salesRecords", salesRecordService.getAllSalesRecords());
+        return "allSalesView"; // Replace with your actual view template
+    }
 
 }

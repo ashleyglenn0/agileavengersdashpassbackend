@@ -348,7 +348,7 @@ public class FlightController {
 
             // Process the payment asynchronously
             CompletableFuture<Reservation> futureReservation = bookingService.purchaseFlightAsync(
-                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus
+                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus, null
             );
 
             // Wait for payment completion and handle reservation status

@@ -1,8 +1,10 @@
 package agileavengers.southwest_dashpass.controllers;
 
 import agileavengers.southwest_dashpass.models.Customer;
+import agileavengers.southwest_dashpass.models.Employee;
 import agileavengers.southwest_dashpass.models.Reservation;
 import agileavengers.southwest_dashpass.services.CustomerService;
+import agileavengers.southwest_dashpass.services.EmployeeService;
 import agileavengers.southwest_dashpass.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,11 +20,13 @@ import java.util.List;
 public class ReservationController {
     private final CustomerService customerService;
     private final ReservationService reservationService;
+    private final EmployeeService employeeService;
 
     @Autowired
-    public ReservationController(CustomerService customerService, ReservationService reservationService){
+    public ReservationController(CustomerService customerService, ReservationService reservationService, EmployeeService employeeService){
         this.customerService = customerService;
         this.reservationService = reservationService;
+        this.employeeService = employeeService;
 
     }
     @GetMapping("/customer/{customerID}/reservations")
@@ -68,7 +72,20 @@ public class ReservationController {
         return "reservationlist";
     }
 
-    @PostMapping("/employee/{employeeId}/validateReservation/customer/{customerId}/reservations")
+    @GetMapping("/employee/{employeeId}/validateReservation/customer/{customerId}/reservations/{reservationId}")
+    public String viewEmployeeReservationValidation(@PathVariable Long employeeId, @PathVariable Long customerId, @PathVariable Long reservationId, Model model) {
+        Customer customer = customerService.findCustomerById(customerId);
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        Reservation reservation = reservationService.findById(reservationId);
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("employee", employee);
+        model.addAttribute("reservation", reservation);
+
+        return "employeereservationvalidation";
+    }
+
+    @PostMapping("/employee/{employeeId}/validateReservation/customer/{customerId}/reservation/{reservationId}")
     public String validateReservation(@PathVariable Long employeeId,
                                       @PathVariable Long customerId,
                                       @PathVariable Long reservationId) {
@@ -76,7 +93,21 @@ public class ReservationController {
         reservationService.validateReservation(customerId, reservationId);
 
         // Redirect back to the reservation list or dashboard after validation
-        return "redirect:/employee/" + employeeId + "/customer/" + customerId + "/reservationList";
+        return "redirect:/employee/" + employeeId + "/customer/" + customerId + "/reservations/reservationlist";
+    }
+
+    @GetMapping("/employee/{employeeId}/customer/{customerId}/reservations/reservationlist")
+    public String showEmployeeReservationList(@PathVariable Long employeeId,
+                                              @PathVariable Long customerId,
+                                              Model model) {
+        // Add necessary attributes for the reservation list
+        Customer customer = customerService.findCustomerById(customerId);
+        List<Reservation> reservations = reservationService.getReservationsForCustomer(customerId);
+        model.addAttribute("reservations", reservations);
+        model.addAttribute("employeeId", employeeId);
+        model.addAttribute("customerId", customerId);
+        model.addAttribute("customer", customer);
+        return "reservationlist";  // Make sure this template exists
     }
 
 }

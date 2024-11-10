@@ -10,11 +10,11 @@ public class SalesRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "dash_pass_id")
     private DashPass dashPass;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "flight_id")
     private Flight flight;
 
@@ -52,6 +52,16 @@ public class SalesRecord {
         this.customer = customer;
         this.employee = employee;
         this.saleDate = saleDate;
+    }
+
+    public SalesRecord(Flight flight, Customer customer) {
+        this.flight = flight;
+        this.customer = customer;
+    }
+    public SalesRecord(DashPass dashPass, Customer customer, LocalDate redeemDate){
+        this.dashPass = dashPass;
+        this.customer = customer;
+        this.saleDate = redeemDate;
     }
 
     public Long getId() {

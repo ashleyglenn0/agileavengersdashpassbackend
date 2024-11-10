@@ -52,7 +52,7 @@
 
   <!-- Validate Reservation Button -->
   <div>
-    <form th:action="@{/employee/{employeeId}/validateReservation/customer/{customerId}/reservations(employeeId=${employee.id}, customerId=${customer.id}, reservationId=${reservation.reservationId})}" method="POST">
+    <form th:action="@{/employee/{employeeId}/validateReservation/customer/{customerId}/reservation/{reservationId}(employeeId=${employee.id}, customerId=${customer.id}, reservationId=${reservation.reservationId})}" method="POST">
       <button type="submit" class="validate-button">Validate Reservation</button>
     </form>
   </div>

@@ -18,21 +18,22 @@ public class DashPassReservationService {
 
     @Autowired
     private DashPassReservationRepository dashPassReservationRepository;
-
     @Autowired
     private DashPassRepository dashPassRepository;
-
     @Autowired
     private CustomerService customerService;
-
     @Autowired
     private FlightService flightService;
-
     @Autowired
     private DashPassService dashPassService;
-
     @Autowired
     private FlightRepository flightRepository;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private AuditTrailService auditTrailService;
+    @Autowired
+    private SalesRecordService salesRecordService;
 
     public DashPassReservation createNewDashPassAndSaveNewDashPassReservation(Customer customer, Reservation flightReservation, Flight flight) {
         // Create a new DashPass, mark it as redeemed, and associate it with the customer
@@ -111,7 +112,7 @@ public class DashPassReservationService {
     }
 
 
-    public void redeemDashPass(Customer customer, Reservation reservation, DashPass dashPass) throws Exception {
+    public void redeemDashPass(Customer customer, Reservation reservation, DashPass dashPass, Employee employeeId) throws Exception {
         // Check if the reservation already has a DashPass
         if (reservation.hasDashPass()) {
             throw new Exception("This reservation already has a DashPass attached.");
@@ -146,6 +147,14 @@ public class DashPassReservationService {
         // Update DashPass summary counts in the Customer
         customer.updateDashPassSummary();
         customerService.save(customer); // Persist the updated counts
+
+        if (employeeId != null) {
+            Employee employee = employeeService.findEmployeeById(employeeId.getId());
+            salesRecordService.logDashPassSaleByEmployee(dashPass, customer, employee);
+        } else {
+            salesRecordService.logCustomerDashPassSale(dashPass, customer);
+        }
+        auditTrailService.logAction("Existing DashPass linked to reservation.", dashPass.getDashpassId(), customer.getId(), employeeId.getId());
     }
 
     public List<DashPassReservation> findPastDashPassReservations(Customer customer) {

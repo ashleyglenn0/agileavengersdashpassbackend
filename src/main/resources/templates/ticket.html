@@ -54,13 +54,6 @@
         </div>
     </div>
 
-    <!-- Validate Reservation Button -->
-    <div th:if="${employee != null}">
-        <form th:action="@{/employee/{employeeId}/validateReservation(employeeId=${employee.id}, reservationId=${reservation.reservationId})}" method="POST">
-            <button type="submit" class="validate-button">Validate Reservation</button>
-        </form>
-    </div>
-
     <div class="back-button-container">
         <a href="#" onclick="history.back()" class="back-button">Back</a>
     </div>

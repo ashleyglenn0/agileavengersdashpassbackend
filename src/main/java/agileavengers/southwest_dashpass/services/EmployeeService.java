@@ -1,17 +1,21 @@
 package agileavengers.southwest_dashpass.services;
 
-import agileavengers.southwest_dashpass.models.Customer;
-import agileavengers.southwest_dashpass.models.Employee;
-import agileavengers.southwest_dashpass.models.Role;
-import agileavengers.southwest_dashpass.models.User;
+import agileavengers.southwest_dashpass.dtos.EmployeeDTO;
+import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.EmployeeRepository;
+import agileavengers.southwest_dashpass.repository.TimeOffRequestRepository;
 import agileavengers.southwest_dashpass.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -21,6 +25,8 @@ public class EmployeeService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private TimeOffRequestRepository timeOffRequestRepository;
 
     @Transactional
     public void registerEmployee(Employee employee, User user) {
@@ -46,6 +52,31 @@ public class EmployeeService {
 
     public Optional<Employee> findById(Long employeeId) {
         return employeeRepository.findById(employeeId);
+    }
+
+    // Get all employees scheduled for today
+    public List<EmployeeDTO> getScheduledEmployeesForToday() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        return employeeRepository.findEmployeesScheduledForDate(startOfDay, endOfDay)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private EmployeeDTO convertToDTO(Employee employee) {
+        EmployeeDTO dto = new EmployeeDTO();
+        dto.setId(employee.getId());
+        dto.setRole(employee.getRole());
+        dto.setShiftStartTime(dto.getShiftStartTime());
+        dto.setShiftEnd(dto.getShiftEndTime());
+        return dto;
+    }
+
+    public List<TimeOffRequest> getAllTimeOffRequests() {
+        return timeOffRequestRepository.findAll();
     }
 
 }

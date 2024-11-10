@@ -6,27 +6,180 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SalesRecordService {
 
     @Autowired
     private SalesRecordRepository salesRecordRepository;
+    @Autowired
+    private EmployeeService employeeService;
 
-    public void logDashPassSale(DashPass dashPass, Customer customer, Employee employee) {
-        SalesRecord salesRecord = new SalesRecord(dashPass, customer, employee, LocalDate.now());
+    public void logCustomerFlightSale(Flight flight, Customer customer) {
+        SalesRecord salesRecord = new SalesRecord(flight, customer, null, LocalDate.now());
         salesRecordRepository.save(salesRecord);
     }
 
-    public void logFlightSale(Flight flight, Customer customer, Employee employee) {
+    public void logFlightSaleByEmployee(Flight flight, Customer customer, Employee employee) {
         SalesRecord salesRecord = new SalesRecord(flight, customer, employee, LocalDate.now());
         salesRecordRepository.save(salesRecord);
     }
 
-    public void logDashPassSaleWithFlight(DashPass dashPass, Flight flight, Customer customer, Employee employee) {
-        SalesRecord salesRecord = new SalesRecord(dashPass, flight, customer, employee, LocalDate.now());
+    public void logCustomerDashPassSale(DashPass dashPass, Customer customer) {
+        SalesRecord salesRecord = new SalesRecord(dashPass, customer, null, LocalDate.now());
         salesRecordRepository.save(salesRecord);
     }
 
-    // Additional methods for generating reports, querying by employee, etc.
+    public void logDashPassSaleByEmployee(DashPass dashPass, Customer customer, Employee employee) {
+        SalesRecord salesRecord = new SalesRecord(dashPass, customer, employee, LocalDate.now());
+        salesRecordRepository.save(salesRecord);
+    }
+
+    public void logCustomerRedeemDashPass(DashPass dashPass, Customer customer){
+        SalesRecord salesRecord = new SalesRecord(dashPass, customer, LocalDate.now());
+        salesRecordRepository.save(salesRecord);
+    }
+
+    public void logRedeemDashPassByEmployee(DashPass dashPass, Customer customer, Employee employee){
+        SalesRecord salesRecord = new SalesRecord(dashPass, customer, employee, LocalDate.now());
+        salesRecordRepository.save(salesRecord);
+    }
+
+    public List<SalesRecord> getFlightSalesOnly() {
+        return salesRecordRepository.findFlightSalesOnly();
+    }
+
+    public List<SalesRecord> getDashPassSalesOnly() {
+        return salesRecordRepository.findDashPassSalesOnly();
+    }
+
+    public List<SalesRecord> getSalesWithBothDashPassAndFlight() {
+        return salesRecordRepository.findSalesWithBothDashPassAndFlight();
+    }
+
+    public List<SalesRecord> getSalesWithBothDashPassAndFlightByEmployee(Long employeeId) {
+        return salesRecordRepository.findSalesWithBothDashPassAndFlightByEmployee(employeeId);
+    }
+
+    public List<SalesRecord> getFlightSalesWithinDateRange(LocalDate startDate, LocalDate endDate) {
+        return salesRecordRepository.findFlightSalesWithinDateRange(startDate, endDate);
+    }
+
+    public List<SalesRecord> getSalesByCustomer(Long customerId) {
+        return salesRecordRepository.findSalesByCustomer(customerId);
+    }
+
+    public List<SalesRecord> getByEmployeeIdAndDateRange(Long employeeId, LocalDate startDate, LocalDate endDate) {
+        return salesRecordRepository.findByEmployeeIdAndDateRange(employeeId, startDate, endDate);
+    }
+
+    public List<SalesRecord> getByCustomerIdAndDateRange(Long customerId, LocalDate startDate, LocalDate endDate) {
+        return salesRecordRepository.findByCustomerIdAndDateRange(customerId, startDate, endDate);
+    }
+
+    public List<SalesRecord> getSalesByDateRange(LocalDate startDate, LocalDate endDate) {
+        return salesRecordRepository.findByDateRange(startDate, endDate);
+    }
+
+//    public Map<String, Object> getTopPerformer() {
+//        List<Object[]> results = salesRecordRepository.findTopPerformers();
+//        if (results.isEmpty()) {
+//            return null; // No sales records found
+//        }
+//
+//        Object[] topPerformer = results.get(0); // Get the first entry as the top performer
+//        Long employeeId = (Long) topPerformer[0];
+//        Long totalSales = (Long) topPerformer[1];
+//
+//        if (employeeId == null) {
+//            return null; // No valid employee ID found, return null or handle as needed
+//        }
+//
+//        Employee employee = employeeService.findEmployeeById(employeeId); // Fetch employee details
+//        if (employee == null) {
+//            return null; // Employee not found, handle this case if necessary
+//        }
+//
+//        Map<String, Object> topPerformerData = new HashMap<>();
+//        topPerformerData.put("employee", employee);
+//        topPerformerData.put("totalSales", totalSales);
+//
+//        return topPerformerData;
+//    }
+
+
+    // Retrieves all sales records for managers
+    public List<SalesRecord> getAllSalesRecords() {
+        return salesRecordRepository.findAll(); // Fetches all sales records
+    }
+
+    // Retrieves sales records for a specific employee
+    public List<SalesRecord> getSalesByEmployeeId(Long employeeId) {
+        return salesRecordRepository.findByEmployeeId(employeeId);
+    }
+
+    // Audit method to retrieve sales records based on specific filters
+    public List<SalesRecord> auditSales(LocalDate startDate, LocalDate endDate, Long employeeId, Long customerId) {
+        if (employeeId != null) {
+            // Retrieve sales by a specific employee within a date range
+            return salesRecordRepository.findByEmployeeIdAndDateRange(employeeId, startDate, endDate);
+        } else if (customerId != null) {
+            // Retrieve sales for a specific customer within a date range
+            return salesRecordRepository.findByCustomerIdAndDateRange(customerId, startDate, endDate);
+        } else {
+            // Retrieve all sales within a date range
+            return salesRecordRepository.findByDateRange(startDate, endDate);
+        }
+    }
+
+    // Calculate team total sales (customer + employee sales)
+    public Long calculateTeamTotalSales() {
+        Long employeeSales = salesRecordRepository.countEmployeeSales();
+        Long customerSales = salesRecordRepository.countCustomerSales();
+        return (employeeSales != null ? employeeSales : 0) + (customerSales != null ? customerSales : 0);
+    }
+
+    // Get top performing employee with sales count
+    public Map<String, Object> getTopPerformingEmployee() {
+        List<Object[]> topPerformers = salesRecordRepository.findTopPerformingEmployees();
+        if (topPerformers.isEmpty()) {
+            return null;
+        }
+
+        Object[] topPerformerData = topPerformers.get(0);
+        Long employeeId = (Long) topPerformerData[0];
+        Long salesCount = (Long) topPerformerData[1];
+
+        if (employeeId == null) {
+            return null; // No valid employee ID found, return null or handle as needed
+        }
+
+        Employee employee = employeeService.findEmployeeById(employeeId); // Fetch employee details
+        if (employee == null) {
+            return null; // Employee not found, handle this case if necessary
+        }
+
+        Employee topEmployee = employeeService.findEmployeeById(employeeId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("employee", topEmployee);
+        result.put("totalSales", salesCount);
+        return result;
+    }
+
+    // Get customer and employee sales counts separately
+    public Map<String, Long> getSalesBreakdown() {
+        Long employeeSalesCount = salesRecordRepository.countEmployeeSales();
+        Long customerSalesCount = salesRecordRepository.countCustomerSales();
+
+        Map<String, Long> salesBreakdown = new HashMap<>();
+        salesBreakdown.put("employeeSales", employeeSalesCount != null ? employeeSalesCount : 0);
+        salesBreakdown.put("customerSales", customerSalesCount != null ? customerSalesCount : 0);
+
+        return salesBreakdown;
+    }
 }
+

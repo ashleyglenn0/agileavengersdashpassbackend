@@ -24,6 +24,9 @@ public class DashPassService {
     private DashPassReservationRepository dashPassReservationRepository;
     private ConfirmationNumberGenerator confirmationNumberGenerator;
     private FlightRepository flightRepository;
+    private final EmployeeService employeeService;
+    private final AuditTrailService auditTrailService;
+    private final SalesRecordService salesRecordService;
 
     private static final Double DASH_PASS_PRICE = 50.0;
 
@@ -34,17 +37,21 @@ public class DashPassService {
     @Autowired
     public DashPassService(DashPassRepository dashPassRepository, CustomerService customerService, CustomerRepository customerRepository,
                            DashPassReservationRepository dashPassReservationRepository,
-                           ConfirmationNumberGenerator confirmationNumberGenerator, FlightRepository flightRepository){
+                           ConfirmationNumberGenerator confirmationNumberGenerator, FlightRepository flightRepository,
+                           EmployeeService employeeService, AuditTrailService auditTrailService, SalesRecordService salesRecordService){
         this.dashPassRepository = dashPassRepository;
         this.customerService = customerService;
         this.customerRepository = customerRepository;
         this.dashPassReservationRepository = dashPassReservationRepository;
         this.confirmationNumberGenerator = confirmationNumberGenerator;
         this.flightRepository = flightRepository;
+        this.salesRecordService = salesRecordService;
+        this.employeeService = employeeService;
+        this.auditTrailService = auditTrailService;
     }
 
     @Transactional
-    public String purchaseDashPass(Customer customer, Reservation reservation, int dashPassQuantity, PaymentStatus paymentStatus) {
+    public String purchaseDashPass(Customer customer, Reservation reservation, int dashPassQuantity, PaymentStatus paymentStatus, Employee employeeId) {
         if (paymentStatus != PaymentStatus.PAID) {
             throw new RuntimeException("Payment was not successful. DashPass purchase cannot be processed.");
         }
@@ -105,6 +112,14 @@ public class DashPassService {
 
             // Save the new DashPass
             dashPassRepository.save(dashPass);
+            if (employeeId != null) {
+                Employee employee = employeeService.findEmployeeById(employeeId.getId());
+                salesRecordService.logDashPassSaleByEmployee(dashPass, customer, employee);
+                auditTrailService.logAction("New DashPass linked to reservation.", dashPass.getDashpassId(), customer.getId(), employee.getId());
+            } else {
+                salesRecordService.logCustomerDashPassSale(dashPass, customer);
+                auditTrailService.logAction("New DashPass purchased by customer.", dashPass.getDashpassId(), customer.getId(), null);
+            }
         }
 
         // Save updated customer information and summary
@@ -113,6 +128,7 @@ public class DashPassService {
 
         return confirmationNumber;
     }
+
 
 
 

@@ -169,6 +169,23 @@ footer {
     border-radius: 6px;
 }
 
+.team-sales-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Adds space between each item */
+    justify-content: space-between; /* Aligns items to utilize available space */
+     margin-bottom: 20px; /* Adds space between sales data and buttons */
+}
+
+.sales-metric {
+    flex: 1 1 22%; /* Adjusts the width of each item, allowing flexibility */
+    min-width: 180px; /* Sets a minimum width to ensure readability */
+    padding: 10px;
+    background-color: #f9f9f9; /* Optional: Adds background color for styling */
+    border-radius: 8px; /* Optional: Adds rounded corners */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds subtle shadow */
+}
+
 
 /* Responsiveness */
 @media (max-width: 768px) {

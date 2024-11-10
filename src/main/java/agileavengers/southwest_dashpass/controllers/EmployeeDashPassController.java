@@ -297,7 +297,7 @@ public class EmployeeDashPassController {
             if (paymentStatus == PaymentStatus.PAID) {
                 Reservation reservation = reservationId != null ? reservationService.findById(reservationId) : null;
 
-                String confirmationNumber = dashPassService.purchaseDashPass(customer, reservation, dashPassQuantity, paymentStatus);
+                String confirmationNumber = dashPassService.purchaseDashPass(customer, reservation, dashPassQuantity, paymentStatus, employee);
 
                 // Redirect to confirmation page with required parameters
                 return "redirect:/employee/" + employeeId + "/customer/" + customerID + "/dashpasspurchasecomplete" +
@@ -394,18 +394,20 @@ public class EmployeeDashPassController {
     @PostMapping("/employee/{employeeId}/customer/{customerId}/redeemDashPass")
     public String redeemDashPass(
             @PathVariable Long customerId,
+            @PathVariable Long employeeId,
             @RequestParam Long reservationId,
             @RequestParam Long dashPassId,
             Model model) {
 
         try {
             // Find the customer, reservation, and dashpass
+            Employee employee = employeeService.findEmployeeById(employeeId);
             Customer customer = customerService.findCustomerById(customerId);
             Reservation reservation = reservationService.findById(reservationId);
             DashPass dashPass = dashPassService.findDashPassById(dashPassId);
 
             // Redeem the DashPass
-            dashPassReservationService.redeemDashPass(customer, reservation, dashPass);
+            dashPassReservationService.redeemDashPass(customer, reservation, dashPass, employee);
 
             // Set success alert in model
             model.addAttribute("dashPassAdded", true);
