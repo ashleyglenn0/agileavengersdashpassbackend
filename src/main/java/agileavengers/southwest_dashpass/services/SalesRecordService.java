@@ -110,6 +110,7 @@ public class SalesRecordService {
         return salesRecordRepository.findByEmployeeId(employeeId);
     }
 
+
     // Audit method to retrieve sales records based on specific filters
     public List<SalesRecord> auditSales(LocalDate startDate, LocalDate endDate, Long employeeId, Long customerId) {
         if (employeeId != null) {
@@ -170,5 +171,18 @@ public class SalesRecordService {
 
         return salesBreakdown;
     }
+
+    public Map<String, Long> getIndividualSalesBreakdown(Long employeeId) {
+        Long dashPassSalesCount = salesRecordRepository.countDashPassSalesForEmployee(employeeId);
+        Long flightSalesCount = salesRecordRepository.countFlightSalesForEmployee(employeeId);
+
+        Map<String, Long> salesBreakdown = new HashMap<>();
+        salesBreakdown.put("dashPassSales", dashPassSalesCount != null ? dashPassSalesCount : 0);
+        salesBreakdown.put("flightSales", flightSalesCount != null ? flightSalesCount : 0);
+
+        return salesBreakdown;
+
+    }
+
 }
 

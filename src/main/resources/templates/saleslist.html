@@ -18,7 +18,7 @@
 <div class="container">
     <!-- Page Title -->
     <h2 th:text="${salesType == 'flight' ? 'All Flight Sales' :
-                          (salesType == 'dashpass' ? 'All DashPass Sales' :
+                          (salesType == 'dashPass' ? 'All DashPass Sales' :
                           (salesType == 'all' ? 'All Sales' : 'My Sales'))}"></h2>
 
     <!-- Sales Table -->
@@ -28,8 +28,8 @@
             <th>Sale ID</th>
             <th>Customer</th>
             <th>Date</th>
-            <th th:if="${salesType == 'flight' || salesType == 'all'}">Flight</th>
-            <th th:if="${salesType == 'dashPass' || salesType == 'all'}">DashPass</th>
+            <th>Flight</th>
+            <th>DashPass</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -40,7 +40,7 @@
             <td th:text="${salesDateMap[sale.id]}">2024-11-07</td>
             <td th:if="${sale.flight != null}" th:text="${sale.flight.flightNumber}">FL123</td>
             <td th:if="${sale.flight == null}">N/A</td>
-            <td th:if="${sale.dashPass != null}" th:text="${sale.dashPass.dashpassId}">FL123</td>
+            <td th:if="${sale.dashPass != null}" th:text="${sale.dashPass.dashpassId}">123</td>
             <td th:if="${sale.dashPass == null}">N/A</td>
             <td class="actions">
                 <button class="button"

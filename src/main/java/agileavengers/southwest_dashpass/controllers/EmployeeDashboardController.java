@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -57,8 +54,17 @@ public class EmployeeDashboardController {
         Long teamTotalSales = salesRecordService.calculateTeamTotalSales();
         Map<String, Object> topPerformerData = salesRecordService.getTopPerformingEmployee();
         Map<String, Long> salesBreakdown = salesRecordService.getSalesBreakdown();
+        // Calculate individual counts
+        Map<String, Long> individualSalesBreakdown = salesRecordService.getIndividualSalesBreakdown(employeeId);
 
-        List<Shift> shifts = shiftRepository.findByEmployeeId(employeeId);
+        List<Shift> allShifts = shiftRepository.findByEmployeeId(employeeId);
+        List<Shift> uniqueShifts = allShifts.stream()
+                .filter(shift -> shift.getDate().isAfter(LocalDate.now().atStartOfDay()) || shift.getDate().isEqual(LocalDate.now().atStartOfDay()))
+                .filter(new HashSet<>()::add) // Ensures only unique dates are kept
+                .limit(4) // Only take the first 4 unique upcoming shifts
+                .collect(Collectors.toList());
+        model.addAttribute("shifts", uniqueShifts);
+
         List<Announcement> announcements = AnnouncementGenerator.generateRandomAnnouncements(3);
         Role role = employee.getRole();
         LocalDate date = LocalDate.now();
@@ -66,16 +72,6 @@ public class EmployeeDashboardController {
         // Get scheduled employees for today
         List<EmployeeDTO> scheduledEmployees = shiftService.getScheduledEmployeesForToday(date);
 
-        System.out.println("Scheduled Employees for Today:");
-        for (EmployeeDTO scheduledEmployee : scheduledEmployees) {
-            System.out.println("Employee ID: " + scheduledEmployee.getId());
-            System.out.println("First Name: " + scheduledEmployee.getFirstName());
-            System.out.println("Last Name: " + scheduledEmployee.getLastName());
-            System.out.println("Role: " + scheduledEmployee.getRole());
-            System.out.println("Shift Start Time: " + scheduledEmployee.getShiftStartTime());
-            System.out.println("Shift End Time: " + scheduledEmployee.getShiftEndTime());
-            System.out.println("-----------------------------");
-        }
 
         // Fetch only the first 3 or 4 support requests if the employee is SUPPORT or MANAGER
         if (role == Role.SUPPORT || role == Role.MANAGER) {
@@ -83,11 +79,6 @@ public class EmployeeDashboardController {
             model.addAttribute("supportRequests", supportRequests);
         }
 
-        System.out.println("Role logged in: " + employee.getRole());
-        System.out.println("Team Sales: " + teamTotalSales);
-        System.out.println("Top Performer: " + topPerformerData);
-        System.out.println("Employee Sales: " + salesBreakdown.get("employeeSales"));
-        System.out.println("Customer Sales: " + salesBreakdown.get("customerSales"));
 
         // Add attributes to the model
         model.addAttribute("role", role);
@@ -96,9 +87,10 @@ public class EmployeeDashboardController {
         model.addAttribute("topPerformer", topPerformerData);
         model.addAttribute("employeeSalesCount", salesBreakdown.get("employeeSales"));
         model.addAttribute("customerSalesCount", salesBreakdown.get("customerSales"));
-        model.addAttribute("shifts", shifts);
         model.addAttribute("announcements", announcements);
         model.addAttribute("scheduledEmployees", scheduledEmployees); // Add scheduled employees
+        model.addAttribute("dashPassSalesCount", individualSalesBreakdown.get("dashPassSales"));
+        model.addAttribute("flightSalesCount", individualSalesBreakdown.get("flightSales"));
 
         return "employeedashboard";
     }
@@ -161,6 +153,16 @@ public class EmployeeDashboardController {
         model.addAttribute("closedRequests", closedRequests);
 
         return "archived-support-requests";
+    }
+    @GetMapping("/employee/{employeeId}/escalatedrequests")
+    public String showEscalatedRequests(@PathVariable Long employeeId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        List<SupportRequest> escalatedRequests = supportRequestService.findEscalatedSupportRequests();
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("escalatedRequests", escalatedRequests);
+
+        return "escalated-support-requests";
     }
 
     @PostMapping("/employee/{employeeId}/add-customer")

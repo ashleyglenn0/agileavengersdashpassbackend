@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archived Support Requests</title>
+  <link rel="stylesheet" th:href="@{/styles/archived-support-requests.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar southwest-yellow-bg">
+    <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-brand text-dark">Dashboard</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card archived-requests-card">
+    <h2 class="title">Escalated Support Requests</h2>
+
+    <!-- Display message if there are no closed requests -->
+    <div th:if="${escalatedRequests == null or escalatedRequests.isEmpty()}">
+      <p>No escalated requests found.</p>
+    </div>
+
+    <!-- Table for closed support requests -->
+    <table class="support-requests-table" th:if="${escalatedRequests != null and !escalatedRequests.isEmpty()}">
+      <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="request : ${escalatedRequests}">
+        <td th:text="${request.subject}"></td>
+        <td th:text="${request.priority}"></td>
+        <td th:text="${request.status}"></td>
+        <td>
+          <!-- View details button for archived request -->
+          <button class="button southwest-yellow-bg text-blue rounded-button-small"
+                  th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/supportrequest/' + ${request.id} + '/details\''">
+            View Details
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Back Button -->
+    <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

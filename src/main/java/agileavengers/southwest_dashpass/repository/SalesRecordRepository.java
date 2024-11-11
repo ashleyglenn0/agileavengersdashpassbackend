@@ -10,12 +10,6 @@ import java.util.List;
 
 public interface SalesRecordRepository extends JpaRepository<SalesRecord, Long> {
 
-    @Query("SELECT sr FROM SalesRecord sr WHERE sr.flight IS NOT NULL AND sr.dashPass IS NULL")
-    List<SalesRecord> findFlightSalesOnly();
-
-    @Query("SELECT sr FROM SalesRecord sr WHERE sr.dashPass IS NOT NULL AND sr.flight IS NULL")
-    List<SalesRecord> findDashPassSalesOnly();
-
     @Query("SELECT sr FROM SalesRecord sr WHERE sr.dashPass IS NOT NULL AND sr.flight IS NOT NULL")
     List<SalesRecord> findSalesWithBothDashPassAndFlight();
 
@@ -37,19 +31,9 @@ public interface SalesRecordRepository extends JpaRepository<SalesRecord, Long> 
     @Query("SELECT s FROM SalesRecord s WHERE s.saleDate BETWEEN :startDate AND :endDate")
     List<SalesRecord> findByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-
-    @Query("SELECT sr.employee.id AS employeeId, COUNT(sr) AS totalSales " +
-            "FROM SalesRecord sr " +
-            "GROUP BY sr.employee.id " +
-            "ORDER BY totalSales DESC")
-    List<Object[]> findTopPerformers();
-
     // Retrieves all sales records by employee ID
     @Query("SELECT s FROM SalesRecord s WHERE s.employee.id = :employeeId")
     List<SalesRecord> findByEmployeeId(@Param("employeeId") Long employeeId);
-
-    @Query("SELECT COUNT(sr) FROM SalesRecord sr")
-    Integer calculateTotalSales();
 
     // Get total sales count for records with a non-null employee (employee sales)
     @Query("SELECT COUNT(sr) FROM SalesRecord sr WHERE sr.employee IS NOT NULL")
@@ -68,5 +52,15 @@ public interface SalesRecordRepository extends JpaRepository<SalesRecord, Long> 
             "(:salesType = 'dashpass' AND s.dashPass IS NOT NULL) OR " +
             "(:salesType = 'all')")
     List<SalesRecord> findSalesByType(@Param("salesType") String salesType);
+
+
+    @Query("SELECT COUNT(s) FROM SalesRecord s WHERE s.dashPass IS NOT NULL AND s.employee.id = :employeeId")
+    Long countDashPassSalesForEmployee(@Param("employeeId") Long employeeId);
+
+    // Count records where flight is not null, representing Flight sales
+    @Query("SELECT COUNT(s) FROM SalesRecord s WHERE s.flight IS NOT NULL AND s.employee.id = :employeeId")
+    Long countFlightSalesForEmployee(@Param("employeeId") Long employeeId);
+
+
 
 }

@@ -71,23 +71,22 @@
 
         <!-- Conditionally render personal sales data for sales associates -->
         <div th:if="${role == T(agileavengers.southwest_dashpass.models.Role).SALES}" class="sales-buttons">
+            <div class="sales-data">
+                <h4 th:text="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER ? 'All Sales Records' : 'My Sales Records'}"></h4>
+
+                <!-- Check if salesRecords is not empty -->
+                <div class="sales-summary">
+                    <h4>Summary</h4>
+                    <p><strong>Dash Pass Sales:</strong> <span th:text="${dashPassSalesCount}">0</span></p>
+                    <p><strong>Flight Sales:</strong> <span th:text="${flightSalesCount}">0</span></p>
+                    <hr />
+                </div>
+            </div>
+
             <button class="button southwest-yellow-bg text-white rounded-button"
                     th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=mySales\''">
                 Track My Sales
             </button>
-        </div>
-
-        <!-- Display individual sales records -->
-        <div class="sales-data" th:if="${salesRecords != null}">
-            <h4 th:text="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER ? 'All Sales Records' : 'My Sales Records'}"></h4>
-            <ul>
-                <li th:each="record : ${salesRecords}">
-                    <p><strong>Type:</strong> <span th:text="${record.saleType}">Dash Pass</span></p>
-                    <p><strong>Quantity:</strong> <span th:text="${record.quantity}"></span></p>
-                    <p><strong>Date:</strong> <span th:text="${#dates.format(record.date, 'yyyy-MM-dd')}">2024-11-10</span></p>
-                    <hr />
-                </li>
-            </ul>
         </div>
     </section>
     <!-- At A Glance Section -->
@@ -137,9 +136,9 @@
             </div>
             <ul th:each="shift : ${shifts}">
                 <li>
-                    Date: <span th:text="${shift.date}"></span> |
-                    Start: <span th:text="${shift.startTime}"></span> |
-                    End: <span th:text="${shift.endTime}"></span>
+                    Date: <span th:text="${#temporals.format(shift.date, 'MM/dd/yyyy')}"></span> |
+                    Start: <span th:text="${#temporals.format(shift.startTime, 'HH:mm')}"></span> |
+                    End: <span th:text="${#temporals.format(shift.endTime, 'HH:mm')}"></span>
                     <!-- Request Shift Change Button -->
                     <form th:action="@{/employee/{employeeId}/requestShiftChange(employeeId=${employee.id})}" method="post" style="display:inline;">
                         <input type="hidden" th:name="shiftId" th:value="${shift.id}">
@@ -168,6 +167,12 @@
                 th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/archivedrequests\''">
             View Archived Requests
         </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:if="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/escalatedrequests\''">
+            View Escalated Requests
+        </button>
+
 
     </section>
     <!-- Upcoming Holidays & Busy Days Section -->
