@@ -45,6 +45,12 @@ public class FlightService {
 
     // Helper method to check if the customer can use an existing DashPass
     private boolean checkCustomerDashPasses(Customer customer, Flight flight) {
+        // Return false if customer is null to indicate no available DashPasses
+        if (customer == null) {
+            return false;
+        }
+
+        // Check if the customer has any available DashPasses that are not redeemed
         return customer.getDashPasses().stream().anyMatch(dashPass -> !dashPass.isRedeemed());
     }
 
@@ -101,7 +107,7 @@ public class FlightService {
             }
 
             departingFlights.forEach(flight -> {
-                flight.setCanUseExistingDashPass(checkCustomerDashPasses(customer, flight));
+                flight.setCanUseExistingDashPass(customer != null && checkCustomerDashPasses(customer, flight));
                 flight.setCanAddNewDashPass(checkIfCanAddDashPass(flight));
             });
 

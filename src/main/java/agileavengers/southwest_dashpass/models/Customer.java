@@ -91,7 +91,7 @@ public class Customer {
     }
 
     public Integer getAvailableDashPassCount() {
-        return availableDashPassCount;
+        return availableDashPassCount != null ? availableDashPassCount : 0;
     }
 
     public void setAvailableDashPassCount(Integer availableDashPassCount) {

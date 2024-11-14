@@ -218,7 +218,7 @@
             Search Customer
         </button>
         <button class="button southwest-blue-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/flightsearch\''">
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/searchflight\''">
             Search Flights
         </button>
         <button class="button southwest-blue-bg text-white rounded-button"
