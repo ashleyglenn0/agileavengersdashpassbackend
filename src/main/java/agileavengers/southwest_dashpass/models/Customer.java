@@ -15,17 +15,21 @@ public class Customer {
 
     private static final int MAX_DASHPASSES = 5; // Maximum DashPasses allowed
 
-    @Transient // Calculated field, not persisted
-    private int totalDashPasses;
+    // Persisted fields to store DashPass details directly in the database
+    @Column(name = "total_dash_pass_count")
+    private Integer totalDashPassCount;
 
-    @Transient // Calculated field, not persisted
-    private int dashPassesForPurchase;
+    @Column(name = "available_dash_pass_count")
+    private Integer availableDashPassCount;
 
-    @Transient // Calculated field, not persisted
-    private boolean canPurchaseDashPass;
+    @Column(name = "dash_pass_in_use_count")
+    private Integer dashPassInUseCount;
 
-    private boolean canFly;
-    private boolean canPurchaseFlight;
+    @Column(name = "can_buy_dash_pass")
+    private Boolean canBuyDashPass = true;
+
+    private Boolean canFly = true;
+    private Boolean canPurchaseFlight = true;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<DashPass> dashPasses = new ArrayList<>();
@@ -42,9 +46,14 @@ public class Customer {
 
     public Customer() {
         super();
+        // Initialize default values
+        this.totalDashPassCount = 0;
+        this.availableDashPassCount = MAX_DASHPASSES;
+        this.dashPassInUseCount = 0;
+        this.canBuyDashPass = true;
     }
 
-    // Getters and setters
+    // Getters and Setters
     public User getUser() {
         return user;
     }
@@ -61,44 +70,56 @@ public class Customer {
         this.id = id;
     }
 
-    public int getMaxDashPasses() {
+    public Integer getMaxDashPasses() {
         return MAX_DASHPASSES;
     }
 
-    public void setCanPurchaseDashPass(boolean canPurchaseDashPass) {
-        this.canPurchaseDashPass = canPurchaseDashPass;
+    public Boolean getCanBuyDashPass() {
+        return totalDashPassCount < MAX_DASHPASSES;
     }
 
-    public int getTotalDashPasses() {
-        return dashPasses.size();
+    public void setCanBuyDashPass(Boolean canBuyDashPass) {
+        this.canBuyDashPass = canBuyDashPass;
     }
 
-    public int getDashPassesForPurchase() {
-        return MAX_DASHPASSES - getTotalDashPasses();
+    public Integer getTotalDashPassCount() {
+        return totalDashPassCount;
     }
 
-    public void setDashPassesForPurchase(int dashPassesForPurchase) {
-        this.dashPassesForPurchase = dashPassesForPurchase;
+    public void setTotalDashPassCount(Integer totalDashPassCount) {
+        this.totalDashPassCount = totalDashPassCount;
     }
 
-    public boolean isCanPurchaseDashPass() {
-        return getTotalDashPasses() < MAX_DASHPASSES;
+    public Integer getAvailableDashPassCount() {
+        return availableDashPassCount != null ? availableDashPassCount : 0;
     }
 
-    public boolean isCanFly() {
+    public void setAvailableDashPassCount(Integer availableDashPassCount) {
+        this.availableDashPassCount = availableDashPassCount;
+    }
+
+    public Boolean getCanFly() {
         return canFly;
     }
 
-    public void setCanFly(boolean canFly) {
+    public void setCanFly(Boolean canFly) {
         this.canFly = canFly;
     }
 
-    public boolean isCanPurchaseFlight() {
+    public Boolean getCanPurchaseFlight() {
         return canPurchaseFlight;
     }
 
-    public void setCanPurchaseFlight(boolean canPurchaseFlight) {
+    public void setCanPurchaseFlight(Boolean canPurchaseFlight) {
         this.canPurchaseFlight = canPurchaseFlight;
+    }
+
+    public Integer getDashPassInUseCount() {
+        return dashPassInUseCount;
+    }
+
+    public void setDashPassInUseCount(Integer dashPassInUseCount) {
+        this.dashPassInUseCount = dashPassInUseCount;
     }
 
     public List<DashPass> getDashPasses() {
@@ -117,6 +138,30 @@ public class Customer {
         this.reservations = reservations;
     }
 
+    // Methods to calculate based on DashPass data
+    public void updateDashPassSummary() {
+        // Count unattached DashPasses
+        int unattachedDashPassCount = dashPasses.size();
+
+        // Count DashPasses attached to validated reservations
+        this.dashPassInUseCount = (int) dashPassReservations.stream()
+                .filter(DashPassReservation::getValidated)
+                .count();
+
+        // Total DashPass count includes unattached and validated in-use DashPasses
+        this.totalDashPassCount = unattachedDashPassCount + dashPassInUseCount;
+
+        // Available DashPass count based on maximum limit
+        this.availableDashPassCount = MAX_DASHPASSES - totalDashPassCount;
+
+        // Debug output to check calculations
+        System.out.println("Unattached DashPass Count: " + unattachedDashPassCount);
+        System.out.println("DashPass In Use Count: " + dashPassInUseCount);
+        System.out.println("Total DashPass Count: " + totalDashPassCount);
+        System.out.println("Available DashPass Count: " + availableDashPassCount);
+    }
+
+
     // Method to get list of past DashPass reservations
     public List<DashPassReservation> getPreviousDashPassReservations() {
         LocalDate currentDate = LocalDate.now();
@@ -126,14 +171,26 @@ public class Customer {
     }
 
     public void addDashPass(DashPass dashPass) {
-        dashPasses.add(dashPass);
-        dashPass.setCustomer(this);
+        dashPasses.add(dashPass);       // Add the DashPass to unattached list
+        dashPass.setCustomer(this);      // Link the DashPass to this customer
+        updateDashPassSummary();         // Recalculate DashPass counts
     }
+
 
     public void addDashPassReservation(DashPassReservation dashPassReservation) {
         dashPassReservations.add(dashPassReservation);
         dashPassReservation.setCustomer(this);
+
+        // Only increase in-use count if the reservation is validated
+        if (dashPassReservation.getValidated()) {
+            dashPassInUseCount++;
+        }
+
+        // Update summary based on new counts
+        updateDashPassSummary();
     }
 
-    // Other necessary methods and logic if needed
+    public void incrementDashPassInUseCount() {
+        this.dashPassInUseCount += 1;
+    }
 }

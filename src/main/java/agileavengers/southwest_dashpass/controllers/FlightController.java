@@ -130,7 +130,7 @@ public class FlightController {
                                     flight.canAddExistingDashPass());
 
                     showNewDashPassMap.put(flight.getFlightID(),
-                            customer.getDashPassesForPurchase() > 0 &&
+                            customer.getAvailableDashPassCount() > 0 &&
                                     flight.getNumberOfDashPassesAvailable() > 0 &&
                                     flight.canAddNewDashPass());
 
@@ -154,7 +154,7 @@ public class FlightController {
                                 flight.canAddExistingDashPass());
 
                 showNewDashPassMap.put(flight.getFlightID(),
-                        customer.getDashPassesForPurchase() > 0 &&
+                        customer.getAvailableDashPassCount() > 0 &&
                                 flight.getNumberOfDashPassesAvailable() > 0 &&
                                 flight.canAddNewDashPass());
 
@@ -348,7 +348,7 @@ public class FlightController {
 
             // Process the payment asynchronously
             CompletableFuture<Reservation> futureReservation = bookingService.purchaseFlightAsync(
-                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus
+                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus, null
             );
 
             // Wait for payment completion and handle reservation status
@@ -432,4 +432,3 @@ public class FlightController {
     }
 
 }
-

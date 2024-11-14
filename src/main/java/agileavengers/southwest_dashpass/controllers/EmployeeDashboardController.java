@@ -1,24 +1,23 @@
 package agileavengers.southwest_dashpass.controllers;
 
+import agileavengers.southwest_dashpass.dtos.EmployeeDTO;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.ShiftRepository;
-import agileavengers.southwest_dashpass.services.EmployeeService;
-import agileavengers.southwest_dashpass.services.SupportRequestService;
+import agileavengers.southwest_dashpass.services.*;
 import agileavengers.southwest_dashpass.utils.AnnouncementGenerator;
 import agileavengers.southwest_dashpass.utils.ShiftGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class EmployeeDashboardController {
@@ -30,26 +29,49 @@ public class EmployeeDashboardController {
     private ShiftGenerator shiftGenerator;
     @Autowired
     private SupportRequestService supportRequestService;
+    @Autowired
+    private PendingCustomerService pendingCustomerService;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private ReservationService reservationService;
+    @Autowired
+    private SalesRecordService salesRecordService;
+    @Autowired
+    private ShiftService shiftService;
+
     @GetMapping("/employee/{employeeId}/employeedashboard")
     public String showEmployeeDashboard(@PathVariable Long employeeId, Model model, Principal principal) {
-        // Fetch employee by ID
         Employee employee = employeeService.findEmployeeById(employeeId);
 
-        // If employee is not found, show a custom error page
-        if (employee == null) {
-            model.addAttribute("error", "Employee not found with ID: " + employeeId);
-            return "error/customer-not-found";  // You should have a custom error page
+        if (employee == null || !employee.getUser().getUsername().equals(principal.getName())) {
+            return "error/403"; // Unauthorized
         }
+        // Generate today's shifts for all employees if missing
+        shiftService.generateAndSaveShiftsForAllEmployees();
 
-        // Ensure the employee belongs to the currently logged-in user
-        if (!employee.getUser().getUsername().equals(principal.getName())) {
-            return "error/403";  // Show a 403 error page if access is unauthorized
-        }
+        // Fetch sales data
+        Long teamTotalSales = salesRecordService.calculateTeamTotalSales();
+        Map<String, Object> topPerformerData = salesRecordService.getTopPerformingEmployee();
+        Map<String, Long> salesBreakdown = salesRecordService.getSalesBreakdown();
+        // Calculate individual counts
+        Map<String, Long> individualSalesBreakdown = salesRecordService.getIndividualSalesBreakdown(employeeId);
 
-        // Fetch shifts, announcements, and role
-        List<Shift> shifts = shiftRepository.findByEmployeeId(employeeId);
+        List<Shift> allShifts = shiftRepository.findByEmployeeId(employeeId);
+        List<Shift> uniqueShifts = allShifts.stream()
+                .filter(shift -> shift.getDate().isAfter(LocalDate.now().atStartOfDay()) || shift.getDate().isEqual(LocalDate.now().atStartOfDay()))
+                .filter(new HashSet<>()::add) // Ensures only unique dates are kept
+                .limit(4) // Only take the first 4 unique upcoming shifts
+                .collect(Collectors.toList());
+        model.addAttribute("shifts", uniqueShifts);
+
         List<Announcement> announcements = AnnouncementGenerator.generateRandomAnnouncements(3);
         Role role = employee.getRole();
+        LocalDate date = LocalDate.now();
+
+        // Get scheduled employees for today
+        List<EmployeeDTO> scheduledEmployees = shiftService.getScheduledEmployeesForToday(date);
+
 
         // Fetch only the first 3 or 4 support requests if the employee is SUPPORT or MANAGER
         if (role == Role.SUPPORT || role == Role.MANAGER) {
@@ -57,11 +79,18 @@ public class EmployeeDashboardController {
             model.addAttribute("supportRequests", supportRequests);
         }
 
-        // Add employee data to the model
-        model.addAttribute("employee", employee);
-        model.addAttribute("shifts", shifts);
-        model.addAttribute("announcements", announcements);
+
+        // Add attributes to the model
         model.addAttribute("role", role);
+        model.addAttribute("employee", employee);
+        model.addAttribute("teamTotalSales", teamTotalSales);
+        model.addAttribute("topPerformer", topPerformerData);
+        model.addAttribute("employeeSalesCount", salesBreakdown.get("employeeSales"));
+        model.addAttribute("customerSalesCount", salesBreakdown.get("customerSales"));
+        model.addAttribute("announcements", announcements);
+        model.addAttribute("scheduledEmployees", scheduledEmployees); // Add scheduled employees
+        model.addAttribute("dashPassSalesCount", individualSalesBreakdown.get("dashPassSales"));
+        model.addAttribute("flightSalesCount", individualSalesBreakdown.get("flightSales"));
 
         return "employeedashboard";
     }
@@ -72,7 +101,7 @@ public class EmployeeDashboardController {
     public String requestShiftChange(@PathVariable Long employeeId) {
         Employee employee = employeeService.findEmployeeById(employeeId); // Assuming you have this method
         supportRequestService.createShiftChangeRequest(employee);
-        return "redirect:/employee/{employeeId}/dashboard"; // Redirect to dashboard with a message if needed
+        return "redirect:/employee/{employeeId}/employeedashboard"; // Redirect to dashboard with a message if needed
     }
 
     @GetMapping("/employee/{employeeId}/addcustomer")
@@ -125,8 +154,140 @@ public class EmployeeDashboardController {
 
         return "archived-support-requests";
     }
+    @GetMapping("/employee/{employeeId}/escalatedrequests")
+    public String showEscalatedRequests(@PathVariable Long employeeId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        List<SupportRequest> escalatedRequests = supportRequestService.findEscalatedSupportRequests();
 
+        model.addAttribute("employee", employee);
+        model.addAttribute("escalatedRequests", escalatedRequests);
 
+        return "escalated-support-requests";
+    }
 
+    @PostMapping("/employee/{employeeId}/add-customer")
+    public String addPendingCustomer(@PathVariable Long employeeId, Model model, @ModelAttribute PendingCustomer pendingCustomer) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        if (employee == null) {
+            model.addAttribute("error", "Employee not found.");
+            return "error";  // Return an error view if the employee doesn't exist
+        }
+
+        model.addAttribute("employee", employee);
+        pendingCustomerService.savePendingCustomer(pendingCustomer);
+
+        return "redirect:/employee/" + employeeId + "/employeedashboard";  // Redirect to employee's dashboard
+    }
+
+    @GetMapping("/employee/{employeeId}/viewcustomer/customer/{customerId}/details")
+    public String showCustomerDetails(@PathVariable Long employeeId,
+                                      @PathVariable Long customerId,
+                                      Model model,
+                                      Authentication authentication) {
+        // Retrieve the customer by ID
+        Optional<Customer> customerOpt = customerService.findById(customerId);
+        if (customerOpt.isPresent()) {
+            Customer customer = customerOpt.get();
+            model.addAttribute("customer", customer);
+        } else {
+            model.addAttribute("error", "Customer not found.");
+            return "error";  // Redirect or display an error page if the customer doesn't exist
+        }
+
+        // Retrieve the employee by ID
+        Optional<Employee> employeeOpt = employeeService.findById(employeeId);
+        if (employeeOpt.isPresent()) {
+            Employee employee = employeeOpt.get();
+            model.addAttribute("employee", employee);
+        } else {
+            model.addAttribute("error", "Employee not found.");
+            return "error";  // Redirect or display an error page if the employee doesn't exist
+        }
+
+        // Check if the user has support or manager roles
+        boolean canEditUsernameAndEmail = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPPORT") ||
+                        grantedAuthority.getAuthority().equals("ROLE_MANAGER"));
+        model.addAttribute("canEditUsernameAndEmail", canEditUsernameAndEmail);
+
+        return "customerdetails";
+    }
+
+    @GetMapping("/employee/{employeeId}/search-customer")
+    public String searchCustomer(@PathVariable Long employeeId,
+                                 @RequestParam(value = "name", required = false) String name,
+                                 Model model) {
+        // Retrieve the employee to add to the model
+        Optional<Employee> employeeOpt = employeeService.findById(employeeId);
+        if (employeeOpt.isPresent()) {
+            model.addAttribute("employee", employeeOpt.get());
+        } else {
+            model.addAttribute("error", "Employee not found.");
+            return "error";  // Display an error page if the employee doesn't exist
+        }
+
+        // Check if a search term was provided
+        if (name != null && !name.isEmpty()) {
+            // Perform the search if a name is provided
+            List<Customer> customers = customerService.findCustomersByName(name);
+            model.addAttribute("customers", customers);
+            model.addAttribute("customerName", name);  // Prepopulate the search input with the search term
+        }
+
+        // Return the template for customer search
+        return "searchcustomer";
+    }
+
+    @GetMapping("/employee/{employeeId}/customer/{customerId}/reservations")
+    public String viewCustomerReservations(@PathVariable Long employeeId, @PathVariable Long customerId, Model model) {
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        Customer customer = customerService.findCustomerById(customerId);
+        List<Reservation> reservations = reservationService.getReservationsForCustomer(customerId);
+        Role role = employee.getRole();
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("customer", customer);
+        model.addAttribute("reservations", reservations);
+        model.addAttribute("userRole", role); // Assuming Role has a getName() method
+        System.out.println(role);
+
+        return "reservationList"; // This is the template name for your reservation list view
+    }
+
+    @GetMapping("/employee/{employeeId}/sales")
+    public String viewSalesByType(
+            @PathVariable Long employeeId,
+            @RequestParam(name = "salesType", defaultValue = "all") String salesType,
+            Model model) {
+
+        // Get the employee information
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        if (employee == null) {
+            model.addAttribute("error", "Employee not found.");
+            return "error";
+        }
+
+        // Fetch sales based on the salesType parameter
+        List<SalesRecord> salesRecords;
+        if (salesType.equals("mySales")) {
+            salesRecords = salesRecordService.findSalesByEmployee(employeeId);
+        } else {
+            salesRecords = salesRecordService.findSalesByType(salesType);
+        }
+
+        Map<Long, String> salesDateMap = salesRecords.stream()
+                .collect(Collectors.toMap(
+                        SalesRecord::getId,
+                        record -> record.getSaleDate() != null ? record.getSaleDate().toString() : "N/A"
+                ));
+
+        // Add necessary attributes to the model
+        model.addAttribute("employeeId", employeeId);
+        model.addAttribute("salesType", salesType);
+        model.addAttribute("salesRecords", salesRecords);
+        model.addAttribute("salesDateMap", salesDateMap);
+
+        return "saleslist"; // Return the shared template for displaying sales records
+    }
 
 }

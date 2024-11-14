@@ -77,5 +77,13 @@ public class CustomerService {
         return customerRepository.findCustomersByFirstNameOrLastName(firstName, lastName);
     }
 
+    public void saveCustomer(Customer customer) {
+        customerRepository.save(customer);
+    }
+
+    public Optional<Customer> findById(Long customerId) {
+        return customerRepository.findById(customerId);
+    }
+
 
 }

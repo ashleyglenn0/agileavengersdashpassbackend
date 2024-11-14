@@ -5,6 +5,7 @@ import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.services.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -104,12 +105,17 @@ public class CustomerDashboardController {
 
     @GetMapping("/customer/{customerID}/dashpass-summary")
     public String getDashPassSummary(@PathVariable Long customerID, Model model) {
+        // Retrieve the customer
         Customer customer = customerService.findCustomerById(customerID);
         model.addAttribute("customer", customer);
-        DashPassSummary dashPassSummary = dashPassService.calculateDashPassSummary(customer);
+
+        // Create DashPassSummary directly using the Customer entity
+        DashPassSummary dashPassSummary = new DashPassSummary(customer);
         model.addAttribute("dashPassSummary", dashPassSummary);
-        return "dashpass-summary";  // or wherever you want to display the summary
+
+        return "dashpass-summary";  // View to display the DashPass summary
     }
+
 
     @GetMapping("/customer/{customerID}/send-support-request")
     public String showSendSupportRequestForm(@PathVariable Long customerID, Model model) {
@@ -164,6 +170,25 @@ public class CustomerDashboardController {
         model.addAttribute("customer", customer);
 
         return "customer-support-requests";  // Name of the template
+    }
+
+    @GetMapping("/customer/{customerId}/ticket/{reservationId}")
+    public String viewTicket(@PathVariable Long customerId, @PathVariable Long reservationId, Model model) {
+        Customer customer = customerService.findCustomerById(customerId);
+        model.addAttribute("customer", customer);
+        // Retrieve the reservation from the service
+        Reservation reservation = reservationService.findById(reservationId);
+
+        // Verify that the reservation belongs to the specified customer
+        if (!reservation.getCustomer().getId().equals(customerId)) {
+            throw new AccessDeniedException("This reservation does not belong to the customer.");
+        }
+
+        // Add the reservation and DashPass reservations to the model
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("dashPassReservations", reservation.getDashPassReservations());
+
+        return "ticket"; // Thymeleaf template name
     }
 
 }

@@ -40,7 +40,10 @@
         </form>
     </nav>
 </header>
-<form th:action="@{/customer/{customerID}/purchasedashpass(customerID=${customerID})}" th:object="${dashPass}" method="post">
+<form th:action="${employee != null ?
+                  '/employee/' + employee.id + '/customer/' + customer.id + '/purchasedashpass?customerID=' + customer.id + '&employeeId=' + employee.id :
+                  '/customer/' + customer.id + '/purchasedashpass?customerID=' + customer.id}"
+      th:object="${dashPass}" method="post">
     <div class="container">
         <div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red; font-weight: bold;"></div>
         <h2>Purchase DashPass</h2>
@@ -102,7 +105,11 @@
         </div>
 
         <!-- Submit and Cancel Buttons -->
-        <button type="submit" class="submitButton">Purchase DashPass</button>
+        <a th:href="${employee != null ?
+           '/employee/' + employee.id + '/customer/' + customer.id + '/purchasedashpass' :
+           '/customer/' + customer.id + '/purchasedashpass'}">
+            <button type="submit" class="submitButton">Purchase DashPass</button>
+        </a>
         <button type="button" class="cancelButton" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">
             Cancel
         </button>

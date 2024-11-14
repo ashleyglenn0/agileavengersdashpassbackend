@@ -31,7 +31,7 @@ public class SupportRequest {
 
     // Customer who initiated the request
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = true)
     private Customer customer;
 
     // Employee assigned to handle the request

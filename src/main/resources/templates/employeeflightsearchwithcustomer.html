@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Search Flights for Customer</title>
+  <link rel="stylesheet" href="/styles/searchflights.css" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
+    <form class="navForm" action="/perform_logout" method="post">
+      <button type="submit" class="logout-button">Logout</button>
+    </form>
+  </nav>
+</header>
+
+<div class="card">
+  <h2>Book Flight for <span th:text="${customer.user.firstName}">Customer Name</span></h2>
+  <form th:action="@{/employee/{employeeId}/customer/{customerId}/searchFlightsByDateWithCustomer(employeeId=${employee.id}, customerId=${customer.id})}" method="GET">
+    <!-- Customer-specific form inputs for flight search -->
+    <input type="hidden" name="customerID" th:value="${customerID}" />
+
+    <!-- Trip Type Radio Buttons -->
+    <div class="trip-type-container">
+      <label>Trip Type:</label>
+      <label>
+        <input type="radio" name="tripType" value="ONE_WAY" onclick="toggleReturnDate(false)" required> One Way
+      </label>
+      <label>
+        <input type="radio" name="tripType" value="ROUND_TRIP" onclick="toggleReturnDate(true)"> Round Trip
+      </label>
+    </div>
+
+    <!-- Dates in a row -->
+    <div class="form-row">
+      <label for="departureDate">Departure Date:</label>
+      <input type="date" id="departureDate" name="departureDate" th:value="${departureDate}" required />
+
+      <label for="returnDate" id="returnDateLabel" style="display: none;">Return Date:</label>
+      <input type="date" name="returnDate" id="returnDate" style="display: none;">
+    </div>
+
+    <!-- Airport Dropdowns in a row -->
+    <div class="form-row">
+      <label for="departureAirportCode">Departure Airport:</label>
+      <select id="departureAirportCode" name="departureAirportCode" th:value="${departureAirport}" required>
+        <option th:each="airport : ${airports}"
+                th:value="${airport.airportCode}"
+                th:text="${airport.airportCode}">Select Departure Airport</option>
+      </select>
+
+      <label for="arrivalAirportCode">Arrival Airport:</label>
+      <select id="arrivalAirportCode" name="arrivalAirportCode" th:value="${arrivalAirport}" required>
+        <option th:each="airport : ${airports}"
+                th:value="${airport.airportCode}"
+                th:text="${airport.airportCode}">Select Arrival Airport</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-row">
+      <button type="button" class="back-button" onclick="window.history.back();">Cancel</button>
+      <button type="submit" class="find-flight-button">Find Flight for Customer</button>
+    </div>
+  </form>
+</div>
+
+<footer>For educational purposes only. All Trademarks are the property of their respective owners.</footer>
+</body>
+</html>

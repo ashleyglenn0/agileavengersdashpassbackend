@@ -87,4 +87,8 @@ public class SupportRequestService {
         return supportRequestRepository.findByStatus(SupportRequest.Status.CLOSED);
     }
 
+    public List<SupportRequest> findEscalatedSupportRequests() {
+        return supportRequestRepository.findByStatus(SupportRequest.Status.ESCALATED);
+    }
+
 }

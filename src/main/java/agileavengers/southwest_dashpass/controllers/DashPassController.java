@@ -82,7 +82,7 @@ public class DashPassController {
         }
 
         // Check if the customer has reached the maximum number of DashPasses
-        if (customer.getTotalDashPasses() >= customer.getMaxDashPasses()) {
+        if (customer.getTotalDashPassCount() >= customer.getMaxDashPasses()) {
             model.addAttribute("errorMessage", "You have reached the maximum number of DashPasses allowed.");
             model.addAttribute("customer", customer);  // Add customer info to show on the purchase page if needed
             // Re-display the purchase form with the error message
@@ -214,7 +214,7 @@ public class DashPassController {
             if (paymentStatus == PaymentStatus.PAID) {
                 Reservation reservation = reservationId != null ? reservationService.findById(reservationId) : null;
 
-                String confirmationNumber = dashPassService.purchaseDashPass(customer, reservation, dashPassQuantity, paymentStatus);
+                String confirmationNumber = dashPassService.purchaseDashPass(customer, reservation, dashPassQuantity, paymentStatus, null);
 
                 // Redirect to confirmation page with required parameters
                 return "redirect:/customer/" + customerID + "/dashpasspurchasecomplete?confirmationNumber=" + confirmationNumber +
@@ -317,7 +317,7 @@ public class DashPassController {
             DashPass dashPass = dashPassService.findDashPassById(dashPassId);
 
             // Redeem the DashPass
-            dashPassReservationService.redeemDashPass(customer, reservation, dashPass);
+            dashPassReservationService.redeemDashPass(customer, reservation, dashPass, null);
 
             // Set success alert in model
             model.addAttribute("dashPassAdded", true);

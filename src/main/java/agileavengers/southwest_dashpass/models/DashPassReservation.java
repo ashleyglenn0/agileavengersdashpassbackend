@@ -33,6 +33,9 @@ public class DashPassReservation {
     @Column(name= "isActive", nullable = false)
     private boolean isActive;
 
+    @Column(name = "isValidated")
+    private Boolean isValidated;
+
 
 
 
@@ -110,6 +113,14 @@ public class DashPassReservation {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Boolean getValidated() {
+        return isValidated;
+    }
+
+    public void setValidated(Boolean validated) {
+        isValidated = validated;
     }
 }
 

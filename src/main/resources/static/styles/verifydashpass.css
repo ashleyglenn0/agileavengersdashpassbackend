@@ -150,6 +150,22 @@ header h1 {
     font-weight: bold;
 }
 
+.validate-button {
+    background-color: #28a745; /* Green color for validation */
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.validate-button:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+
 
 /* Responsive Design */
 @media (max-width: 600px) {

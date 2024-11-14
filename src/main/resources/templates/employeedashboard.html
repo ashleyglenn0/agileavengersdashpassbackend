@@ -25,8 +25,110 @@
 <div class="container white-bg rounded-container">
     <h1 style="color:#00338D">Welcome, <span th:text="${employee.user.firstName}"></span>!</h1>
 
+    <!-- Sales Goals Section -->
+    <section th:if="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER || role == T(agileavengers.southwest_dashpass.models.Role).SALES}"
+             class="sales-section card-section white-bg rounded-container">
+        <h3 th:text="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER ? 'Team Sales Performance' : 'My Sales Performance'}"></h3>
+
+        <!-- Conditionally render sales data for managers -->
+        <div th:if="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER}">
+            <div class="team-sales-overview">
+                <div class="sales-metric">
+                    <h4>Team Total Sales: <span th:text="${teamTotalSales}"></span></h4>
+                </div>
+                <div class="sales-metric">
+                    <h4>Employee Sales: <span th:text="${employeeSalesCount}"></span></h4>
+                </div>
+                <div class="sales-metric">
+                    <h4>Customer Sales: <span th:text="${customerSalesCount}"></span></h4>
+                </div>
+
+                <div class="sales-metric top-performer" th:if="${topPerformer != null}">
+                    <h4>Top Sales Employee</h4>
+                    <p><strong>Employee:</strong>
+                        <span th:text="${topPerformer['employee'].user.firstName} + ' ' + ${topPerformer['employee'].user.lastName}"></span>
+                    </p>
+                    <p><strong>Total Sales:</strong> <span th:text="${topPerformer['totalSales']}"></span></p>
+                </div>
+            </div>
+
+            <!-- Manager-specific buttons for viewing sales data -->
+            <div class="manager-buttons">
+                <button class="button southwest-yellow-bg text-white rounded-button"
+                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=flight\''">
+                    View All Flight Sales
+                </button>
+                <button class="button southwest-yellow-bg text-white rounded-button"
+                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=dashpass\''">
+                    View All DashPass Sales
+                </button>
+                <button class="button southwest-yellow-bg text-white rounded-button"
+                        th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=all\''">
+                    View All Sales
+                </button>
+            </div>
+        </div>
+
+        <!-- Conditionally render personal sales data for sales associates -->
+        <div th:if="${role == T(agileavengers.southwest_dashpass.models.Role).SALES}" class="sales-buttons">
+            <div class="sales-data">
+                <h4 th:text="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER ? 'All Sales Records' : 'My Sales Records'}"></h4>
+
+                <!-- Check if salesRecords is not empty -->
+                <div class="sales-summary">
+                    <h4>Summary</h4>
+                    <p><strong>Dash Pass Sales:</strong> <span th:text="${dashPassSalesCount}">0</span></p>
+                    <p><strong>Flight Sales:</strong> <span th:text="${flightSalesCount}">0</span></p>
+                    <hr />
+                </div>
+            </div>
+
+            <button class="button southwest-yellow-bg text-white rounded-button"
+                    th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/sales?salesType=mySales\''">
+                Track My Sales
+            </button>
+        </div>
+    </section>
+    <!-- At A Glance Section -->
+    <section th:if="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+             class="at-a-glance-section card-section white-bg rounded-container">
+        <h3>At A Glance</h3>
+
+        <!-- Scheduled Employees for Today -->
+        <ul th:if="${scheduledEmployees != null}">
+            <li th:each="employee, iterStat : ${scheduledEmployees}" th:if="${iterStat.index < 3}">
+                <p><strong>Name:</strong> <span th:text="${employee.firstName} + ' ' + ${employee.lastName}"></span></p>
+                <p><strong>Role:</strong> <span th:text="${employee.role}"></span></p>
+                <p><strong>Shift:</strong>
+                    <span th:text="${employee.shiftStartTime}"></span> -
+                    <span th:text="${employee.shiftEndTime}"></span>
+                </p>
+                <hr />
+            </li>
+        </ul>
+
+        <!-- Manager Action Buttons -->
+        <div class="manager-buttons">
+            <button class="button southwest-yellow-bg text-white rounded-button"
+                    onclick="refreshScheduledEmployees()">
+                Assign Shift
+            </button>
+            <button class="button southwest-blue-bg text-white rounded-button"
+                    th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/timeoffrequests\''">
+                View Time Off Requests
+            </button>
+            <button class="button southwest-yellow-bg text-white rounded-button"
+                    th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/audit\''">
+                Audit
+            </button>
+        </div>
+    </section>
+
     <!-- Upcoming Shifts Section -->
-    <section class="upcoming-shifts card-section white-bg rounded-container">
+    <section th:if="${role == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or role ==
+    T(agileavengers.southwest_dashpass.models.Role).SALES or role ==
+    T(agileavengers.southwest_dashpass.models.Role).BAGGAGE_CLAIM}"
+             class="upcoming-shifts card-section white-bg rounded-container">
         <div class="shifts-section">
             <h3>Upcoming Shifts</h3>
             <div th:if="${shifts.isEmpty()}">
@@ -34,9 +136,9 @@
             </div>
             <ul th:each="shift : ${shifts}">
                 <li>
-                    Date: <span th:text="${shift.date}"></span> |
-                    Start: <span th:text="${shift.startTime}"></span> |
-                    End: <span th:text="${shift.endTime}"></span>
+                    Date: <span th:text="${#temporals.format(shift.date, 'MM/dd/yyyy')}"></span> |
+                    Start: <span th:text="${#temporals.format(shift.startTime, 'HH:mm')}"></span> |
+                    End: <span th:text="${#temporals.format(shift.endTime, 'HH:mm')}"></span>
                     <!-- Request Shift Change Button -->
                     <form th:action="@{/employee/{employeeId}/requestShiftChange(employeeId=${employee.id})}" method="post" style="display:inline;">
                         <input type="hidden" th:name="shiftId" th:value="${shift.id}">
@@ -65,6 +167,12 @@
                 th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/archivedrequests\''">
             View Archived Requests
         </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:if="${role == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/escalatedrequests\''">
+            View Escalated Requests
+        </button>
+
 
     </section>
     <!-- Upcoming Holidays & Busy Days Section -->
@@ -95,7 +203,10 @@
         </a>
 
         <a th:href="@{/employee/{employeeId}/verifydashpass(employeeId=${employee.id})}">
-            <button class="button southwest-blue-bg text-white rounded-button">Validate DashPass</button>
+            <button class="button southwest-blue-bg text-white rounded-button">Verify DashPass</button>
+        </a>
+        <a th:href="@{/employee/{employeeId}/customer/{customerId}/trackbag(employeeId=${employee.id})}">
+            <button class="button southwest-blue-bg text-white rounded-button">Track A Bag</button>
         </a>
     </section>
 
@@ -103,12 +214,17 @@
     <section class="additional-actions card-section white-bg rounded-container">
         <h3>Additional Tools</h3>
         <button class="button southwest-blue-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/customersearch\''">
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/search-customer\''">
             Search Customer
         </button>
         <button class="button southwest-blue-bg text-white rounded-button"
-                th:onclick="'window.location.href=\'/employee/flightsearch\''">
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/searchflight\''">
             Search Flights
+        </button>
+        <button class="button southwest-blue-bg text-white rounded-button"
+                th:onclick="'window.location.href=\'/employee/flightsearch\''"
+                th:if="${role == T(agileavengers.southwest_dashpass.models.Role).BAGGAGE_CLAIM}">
+            Update Bag Status
         </button>
     </section>
 </div>
@@ -116,6 +232,27 @@
 <footer class="southwest-yellow-bg text-dark rounded-container">
     For educational purposes only. All Trademarks are the property of their respective owners.
 </footer>
+<script>
+    function refreshScheduledEmployees() {
+        fetch('/manager/refreshScheduledEmployees')
+            .then(response => response.json())
+            .then(data => {
+                let employeeList = document.querySelector('.at-a-glance-section ul');
+                employeeList.innerHTML = ''; // Clear the existing list
+                data.forEach(employee => {
+                    employeeList.innerHTML += `
+                        <li>
+                            <p><strong>Name:</strong> ${employee.name}</p>
+                            <p><strong>Role:</strong> ${employee.role}</p>
+                            <p><strong>Shift:</strong> ${employee.shiftStart} - ${employee.shiftEnd}</p>
+                            <hr />
+                        </li>`;
+                });
+            })
+            .catch(error => console.error('Error refreshing scheduled employees:', error));
+    }
+</script>
+
 
 </body>
 </html>

@@ -61,9 +61,25 @@
       </td>
 
       <td>
-        <a th:href="@{/customer/{customerId}/reservation/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
-          <button class="button">View</button>
-        </a>
+        <div class="actions">
+          <a th:href="@{/customer/{customerId}/reservation/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
+            <button class="button">Reservation</button>
+          </a>
+          <a th:if="${userRole == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or
+                userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or
+                userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+             th:href="@{/employee/{employeeId}/validateReservation/customer/{customerId}/reservations/{reservationId}(employeeId=${employee.id}, customerId=${customer.id}, reservationId=${reservation.reservationId})}">
+            <button type="button" class="button">View Ticket (Employee)</button>
+          </a>
+
+          <!-- Default link for other roles (e.g., customers) -->
+          <a th:unless="${userRole == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or
+                   userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or
+                   userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+             th:href="@{/customer/{customerId}/ticket/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
+            <button type="button" class="button">View Ticket</button>
+          </a>
+        </div>
       </td>
     </tr>
     </tbody>

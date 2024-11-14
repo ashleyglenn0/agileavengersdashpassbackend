@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Customer Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/styles/customerdetails.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<!-- Navigation Bar -->
+<nav class="navbar southwest-yellow-bg">
+    <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-brand text-dark">Home</a>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="card container">
+        <h2 class="center-text">Customer Details</h2>
+
+        <!-- Customer Details Display (Centered Text) -->
+        <div id="customerDetailsView" class="customer-details">
+            <p><strong>First Name:</strong> <span th:text="${customer.user.firstName}">John</span></p>
+            <p><strong>Last Name:</strong> <span th:text="${customer.user.lastName}">Doe</span></p>
+            <p><strong>Email:</strong> <span th:text="${customer.user.email}">john.doe@example.com</span></p>
+            <p><strong>Username:</strong> <span th:text="${customer.user.username}">johndoe</span></p>
+        </div>
+
+        <!-- Customer Details Form (Hidden Initially) -->
+        <form id="customerDetailsForm" th:action="@{/customer/update}" method="post" style="display: none;">
+            <div class="customer-details">
+                <p><strong>First Name:</strong>
+                    <input type="text" name="firstName" th:value="${customer.user.firstName}" readonly>
+                </p>
+                <p><strong>Last Name:</strong>
+                    <input type="text" name="lastName" th:value="${customer.user.lastName}" readonly>
+                </p>
+                <p><strong>Email:</strong>
+                    <input type="text" name="email" th:value="${customer.user.email}" th:readonly="${!canEditUsernameAndEmail}">
+                </p>
+                <p><strong>Username:</strong>
+                    <input type="text" name="username" th:value="${customer.user.username}" th:readonly="${!canEditUsernameAndEmail}">
+                </p>
+            </div>
+            <button type="submit" id="saveButton" class="button southwest-yellow-bg text-dark" style="display: none;">Save</button>
+        </form>
+
+        <!-- All Buttons in a Row at the Bottom -->
+        <div class="bottom-buttons">
+            <button class="button southwest-yellow-bg text-dark">Go Back</button>
+            <button id="editButton" class="button southwest-yellow-bg text-dark" onclick="toggleEditMode()">Edit</button>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/purchaseDashPass(employeeId=${employee.id}, customerId=${customer.id})}">
+                <button class="button southwest-yellow-bg text-dark">Add DashPass</button>
+            </a>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/searchflight(employeeId=${employee.id}, customerId=${customer.id})}">
+                <button class="button southwest-yellow-bg text-dark">Add Flight</button>
+            </a>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/reservations(employeeId=${employee.id}, customerId=${customer.id})}"
+               class="button southwest-yellow-bg text-dark">
+                Search Reservations
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    Educational purposes only. All trademarks are the property of their respective owners.
+</footer>
+
+<!-- JavaScript to Toggle Edit Mode -->
+<script>
+  function toggleEditMode() {
+    const editButton = document.getElementById("editButton");
+    const saveButton = document.getElementById("saveButton");
+    const customerDetailsView = document.getElementById("customerDetailsView");
+    const customerDetailsForm = document.getElementById("customerDetailsForm");
+
+    // Toggle visibility of form and view-only mode
+    customerDetailsView.style.display = customerDetailsView.style.display === "none" ? "block" : "none";
+    customerDetailsForm.style.display = customerDetailsForm.style.display === "none" ? "block" : "none";
+
+    // Toggle Edit and Save buttons
+    editButton.style.display = editButton.style.display === "none" ? "inline-block" : "none";
+    saveButton.style.display = saveButton.style.display === "none" ? "inline-block" : "none";
+  }
+</script>
+
+</body>
+</html>

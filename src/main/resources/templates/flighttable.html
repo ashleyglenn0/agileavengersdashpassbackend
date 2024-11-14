@@ -44,14 +44,19 @@
                     <!-- DashPass Option (Only for Outbound Flights) -->
                     <div>
                         <p><strong>DashPass Option:</strong></p>
-                        <div th:if="${showExistingDashPassMap[flight.flightID]}">
-                            <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
+                        <div th:if="${flight.numberOfDashPassesAvailable > 0}">
+                            <div th:if="${showExistingDashPassMap[flight.flightID]}">
+                                <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
+                            </div>
+                            <div th:if="${showNewDashPassMap[flight.flightID]}">
+                                <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
+                            </div>
+                            <div>
+                                <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                            </div>
                         </div>
-                        <div th:if="${showNewDashPassMap[flight.flightID]}">
-                            <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
-                        </div>
-                        <div>
-                            <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                        <div th:if="${flight.numberOfDashPassesAvailable == 0}">
+                            <p class="no-dashpass-message">No DashPasses available for this flight.</p>
                         </div>
                     </div>
 
@@ -69,7 +74,7 @@
             <div th:each="roundTrip : ${roundTripFlights}">
                 <h4 class="section-header" th:text="'Trip ID: ' + ${roundTrip.tripId}">Trip ID</h4>
 
-                <!-- Outbound Flight for Round Trip -->
+                <!-- Outbound Flights for Round Trip -->
                 <div class="flight-card">
                     <h5 class="section-title">Outbound Flight</h5>
                     <div class="flight-details" th:each="outbound : ${roundTrip.outboundFlights}">
@@ -87,14 +92,19 @@
                         <!-- DashPass Option (Only for Outbound Flights in Round Trip) -->
                         <div>
                             <p><strong>DashPass Option:</strong></p>
-                            <div th:if="${showExistingDashPassMap[outbound.flightID]}">
-                                <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
+                            <div th:if="${outbound.numberOfDashPassesAvailable > 0}">
+                                <div th:if="${showExistingDashPassMap[outbound.flightID]}">
+                                    <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
+                                </div>
+                                <div th:if="${showNewDashPassMap[outbound.flightID]}">
+                                    <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
+                                </div>
+                                <div>
+                                    <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                                </div>
                             </div>
-                            <div th:if="${showNewDashPassMap[outbound.flightID]}">
-                                <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
-                            </div>
-                            <div>
-                                <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                            <div th:if="${outbound.numberOfDashPassesAvailable == 0}">
+                                <p class="no-dashpass-message">No DashPasses available for this flight.</p>
                             </div>
                         </div>
 
@@ -105,9 +115,9 @@
                     </div>
                 </div>
 
-                <!-- Return Flight for Round Trip (No DashPass Option) -->
+                <!-- Return Flights for Round Trip -->
                 <div class="flight-card">
-                    <h5 class="section-title">Return Flight</h5>
+                    <h5 class="section-title">Return Flights</h5>
                     <div class="flight-details" th:each="returnFlight : ${roundTrip.returnFlights}">
                         <p><strong>Flight Number:</strong> <span th:text="${returnFlight.flightNumber}">FL0000</span></p>
                         <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
@@ -120,7 +130,7 @@
                             <p class="seat-warning">Only <span th:text="${returnFlight.numberOfSeatsAvailable}"></span> seats left! Book soon!</p>
                         </div>
 
-                        <!-- Select Return Flight (No DashPass Option) -->
+                        <!-- Select Return Flight -->
                         <div>
                             <input type="radio" name="returnFlightId" th:value="${returnFlight.flightID}" required> Select this Return Flight
                         </div>

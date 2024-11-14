@@ -51,38 +51,6 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
 //                             @Param("endDate") LocalDate endDate);
 
 
-    // For one-way flights
-//    @Query("SELECT f FROM Flight f WHERE f.departureAirportCode = :departureCode " +
-//            "AND f.arrivalAirportCode = :arrivalCode " +
-//            "AND f.departureDate BETWEEN :startDate AND :endDate " +
-//            "AND f.direction = 'OUTBOUND'")
-//    List<Flight> findOneWayFlights(
-//            @Param("departureCode") String departureCode,
-//            @Param("arrivalCode") String arrivalCode,
-//            @Param("startDate") LocalDate startDate,
-//            @Param("endDate") LocalDate endDate);
-
-    // For round-trip flights (outbound and matching return flights)
-//    @Query("SELECT new agileavengers.southwest_dashpass.dtos.RoundTripFlightDTO(" +
-//            "outbound.flightID, outbound.flightNumber, outbound.departureAirportCode, outbound.arrivalAirportCode, " +
-//            "outbound.departureDate, outbound.departureTime, outbound.arrivalTime, outbound.price, " +
-//            "returnFlight.flightID, returnFlight.flightNumber, returnFlight.departureAirportCode, returnFlight.arrivalAirportCode, " +
-//            "returnFlight.departureDate, returnFlight.departureTime, returnFlight.arrivalTime, returnFlight.price) " +
-//            "FROM Flight outbound JOIN Flight returnFlight ON outbound.tripId = returnFlight.tripId " +
-//            "WHERE outbound.direction = 'OUTBOUND' AND returnFlight.direction = 'RETURN' " +
-//            "AND outbound.departureAirportCode = :departureCode " +
-//            "AND outbound.arrivalAirportCode = :arrivalCode " +
-//            "AND outbound.departureDate BETWEEN :startDate AND :endDate " +
-//            "AND returnFlight.departureDate BETWEEN :returnStartDate AND :returnEndDate")
-//    List<RoundTripFlightDTO> findRoundTripFlights(
-//            @Param("departureCode") String departureCode,
-//            @Param("arrivalCode") String arrivalCode,
-//            @Param("startDate") LocalDate startDate,
-//            @Param("endDate") LocalDate endDate,
-//            @Param("returnStartDate") LocalDate returnStartDate,
-//            @Param("returnEndDate") LocalDate returnEndDate);
-
-
     @Query("SELECT f FROM Flight f WHERE f.departureAirportCode = :departureAirportCode " +
             "AND f.arrivalAirportCode = :arrivalAirportCode " +
             "AND f.departureDate BETWEEN :startDate AND :endDate " +

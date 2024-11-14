@@ -47,10 +47,30 @@
                 <p><strong>Using Existing DashPass:</strong></p>
                 <p>DashPass ID: <span th:text="${dashPass.dashpassId}">[DashPass ID]</span></p>
                 <p>Expiration Date: <span th:text="${#temporals.format(dashPass.expirationDate, 'MM-dd-yyyy')}">[Expiration Date]</span></p>
+                <div class="dashpass-terms">
+                    <h4>DashPass Terms and Conditions</h4>
+                    <ul>
+                        <strong><li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li></strong>
+                        <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+                        <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+                        <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+                        <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+                    </ul>
+                </div>
             </div>
             <div th:if="${dashPassOption == 'new'}">
                 <p><strong>Purchasing New DashPass:</strong></p>
                 <p><strong>DashPass Price:</strong> $<span>50.00</span></p>
+                <div class="dashpass-terms">
+                    <h4>DashPass Terms and Conditions</h4>
+                    <ul>
+                        <strong><li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li></strong>
+                        <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+                        <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+                        <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+                        <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+                    </ul>
+                </div>
             </div>
             <div th:if="${dashPassOption == 'none'}">
                 <p><strong>No DashPass will be used for this trip.</strong></p>

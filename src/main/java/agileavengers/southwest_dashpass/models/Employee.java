@@ -2,6 +2,8 @@ package agileavengers.southwest_dashpass.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="EMPLOYEE")
 public class Employee {
@@ -27,7 +29,25 @@ public class Employee {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true) // This defines the foreign key in the 'customer' table that references 'users'
     private User user;
 
-    // Constructor with fields
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Shift> shifts;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TimeOffRequest> timeOffRequests;  // Link to employee's time-off requests
+
+    // Other fields, constructors, getters, and setters
+
+    public List<TimeOffRequest> getTimeOffRequests() {
+        return timeOffRequests;
+    }
+
+    public void setTimeOffRequests(List<TimeOffRequest> timeOffRequests) {
+        this.timeOffRequests = timeOffRequests;
+    }
+
+
+
+// Constructor with fields
 
     // Default constructor
     public Employee() {
@@ -129,5 +149,13 @@ public class Employee {
 
     public void setCanRedeemDashPass(boolean canRedeemDashPass) {
         this.canRedeemDashPass = canRedeemDashPass;
+    }
+
+    public List<Shift> getShifts() {
+        return shifts;
+    }
+
+    public void setShifts(List<Shift> shifts) {
+        this.shifts = shifts;
     }
 }

@@ -26,24 +26,31 @@ public class BookingService {
     private final DashPassReservationService dashPassReservationService;
     private final MockPaymentProcessor mockPaymentProcessor;
     private final ReservationRepository reservationRepository;
+    private final EmployeeService employeeService;
+    private final AuditTrailService auditTrailService;
+    private final SalesRecordService salesRecordService;
 
     @Autowired
     public BookingService(FlightService flightService, DashPassService dashPassService, ReservationService reservationService,
                           DashPassReservationService dashPassReservationService, MockPaymentProcessor mockPaymentProcessor,
-                          ReservationRepository reservationRepository) {
+                          ReservationRepository reservationRepository, SalesRecordService salesRecordService,
+                          AuditTrailService auditTrailService, EmployeeService employeeService) {
         this.flightService = flightService;
         this.dashPassService = dashPassService;
         this.reservationService = reservationService;
         this.dashPassReservationService = dashPassReservationService;
         this.mockPaymentProcessor = mockPaymentProcessor;
         this.reservationRepository = reservationRepository;
+        this.salesRecordService = salesRecordService;
+        this.employeeService = employeeService;
+        this.auditTrailService = auditTrailService;
     }
 
 
     @Async
     public CompletableFuture<Reservation> purchaseFlightAsync(Customer currentCustomer, Long outboundFlightId, Long returnFlightId,
                                                               String dashPassOption, String tripType, double totalCost,
-                                                              PaymentDetailsDTO paymentDetails, String userSelectedStatus)
+                                                              PaymentDetailsDTO paymentDetails, String userSelectedStatus, Long employeeId) // Optional employeeId)
             throws InterruptedException {
         if (currentCustomer == null) {
             throw new IllegalArgumentException("Customer cannot be null");
@@ -60,6 +67,7 @@ public class BookingService {
                 reservation.setTripType(TripType.valueOf(tripType));
                 reservation.setPaymentStatus(PaymentStatus.PAID);
                 reservation.setStatus(ReservationStatus.VALID);
+                reservation.setValidated(false);
 
                 // Populate reservation with flight details
                 Flight outboundFlight = flightService.findFlightById(outboundFlightId);
@@ -110,6 +118,14 @@ public class BookingService {
                 reservationService.save(reservation);
                 System.out.println("Reservation saved successfully for Customer ID " + currentCustomer.getId());
 
+                if (employeeId != null) {
+                    Employee employee = employeeService.findEmployeeById(employeeId);
+                    salesRecordService.logFlightSaleByEmployee(outboundFlight, currentCustomer, employee);
+                } else {
+                    salesRecordService.logCustomerFlightSale(outboundFlight, currentCustomer);
+                }
+                auditTrailService.logAction("Flight linked to reservation.", outboundFlight.getFlightID(), currentCustomer.getId(), employeeId);
+
                 // Process DashPass based on selection
                 if (isNewPurchase) {
                     DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(
@@ -117,12 +133,28 @@ public class BookingService {
                     );
                     reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
                     System.out.println("New DashPass created and linked to reservation.");
+                    if (employeeId != null) {
+                        Employee employee = employeeService.findEmployeeById(employeeId);
+                        salesRecordService.logDashPassSaleByEmployee(dashPassReservation.getDashPass(), currentCustomer, employee);
+                    } else {
+                        salesRecordService.logCustomerDashPassSale(dashPassReservation.getDashPass(), currentCustomer);
+                    }
+                    auditTrailService.logAction("New DashPass linked to reservation.", dashPassReservation.getId(), currentCustomer.getId(), employeeId);
+
                 } else if ("existing".equals(dashPassOption)) {
                     DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(
                             currentCustomer, reservation, outboundFlight
                     );
                     reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
                     System.out.println("Existing DashPass linked to reservation.");
+
+                    if (employeeId != null) {
+                        Employee employee = employeeService.findEmployeeById(employeeId);
+                        salesRecordService.logDashPassSaleByEmployee(dashPassReservation.getDashPass(), currentCustomer, employee);
+                    } else {
+                        salesRecordService.logCustomerDashPassSale(dashPassReservation.getDashPass(), currentCustomer);
+                    }
+                    auditTrailService.logAction("Existing DashPass linked to reservation.", dashPassReservation.getId(), currentCustomer.getId(), employeeId);
                 }
 
                 return reservation;
@@ -145,4 +177,3 @@ public class BookingService {
     }
 
 }
-
