@@ -96,6 +96,24 @@ button[type="submit"]:hover {
     margin-bottom: 8px;
 }
 
+/* Section Headers */
+.section h3 {
+    color: #004687; /* Southwest blue */
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Bag Section Styling */
+.section p {
+    font-size: 1rem;
+    color: #333333; /* Neutral text color */
+}
+
+.section span {
+    font-weight: bold;
+    color: #004687; /* Southwest blue */
+}
+
 
 /* Mobile Responsiveness */
 @media (max-width: 600px) {

@@ -50,7 +50,8 @@ public class BookingService {
     @Async
     public CompletableFuture<Reservation> purchaseFlightAsync(Customer currentCustomer, Long outboundFlightId, Long returnFlightId,
                                                               String dashPassOption, String tripType, double totalCost,
-                                                              PaymentDetailsDTO paymentDetails, String userSelectedStatus, Long employeeId) // Optional employeeId)
+                                                              PaymentDetailsDTO paymentDetails, String userSelectedStatus,
+                                                              Long employeeId, int bagQuantity)
             throws InterruptedException {
         if (currentCustomer == null) {
             throw new IllegalArgumentException("Customer cannot be null");
@@ -82,42 +83,63 @@ public class BookingService {
                     throw new IllegalStateException("No available seats for outbound flight");
                 }
 
-                double finalPrice = outboundFlight.getPrice();
-
                 if ("ROUND_TRIP".equals(tripType) && returnFlightId != null) {
                     Flight returnFlight = flightService.findFlightById(returnFlightId);
                     returnFlight.setReservation(reservation);
                     reservation.getFlights().add(returnFlight);
-                    finalPrice += returnFlight.getPrice();
 
                     if (returnFlight.getAvailableSeats() > 0) {
-                        returnFlight.setAvailableSeats(outboundFlight.getSeatsRemaining() - 1);
+                        returnFlight.setAvailableSeats(returnFlight.getSeatsRemaining() - 1);
                         returnFlight.setSeatsSold(returnFlight.getSeatsSold() + 1);
                     } else {
-                        throw new IllegalStateException("No available seats for outbound flight");
+                        throw new IllegalStateException("No available seats for return flight");
                     }
                 }
-                System.out.println("Final price for reservation: $" + finalPrice);
+
+                // Assign terminal and gate information
                 Random random = new Random();
                 for (Flight flight : reservation.getFlights()) {
-                    // Generate terminal and gate information
                     String terminal = generateTerminal(flight.getDepartureAirportCode());
                     String gate = "Gate " + (random.nextInt(20) + 1);
 
-                    System.out.println("Assigned Terminal for Flight " + flight.getFlightID() + ": " + terminal);
-                    System.out.println("Assigned Gate for Flight " + flight.getFlightID() + ": " + gate);
-
-                    // Set terminal and gate for the flight
                     reservation.setFlightTerminal(flight.getFlightID(), terminal);
                     reservation.setFlightGate(flight.getFlightID(), gate);
                 }
 
-                boolean isNewPurchase = "new".equals(dashPassOption);
-                reservation.setTotalPrice(isNewPurchase ? finalPrice + 50.0 : finalPrice);
+                // Add bags to reservation, customer, and flights
+                List<Bag> bags = new ArrayList<>();
+                for (int i = 0; i < bagQuantity; i++) {
+                    Bag bag = new Bag();
+                    bag.setStatus(BagStatus.PRE_CHECK_IN); // Default status
+                    bag.setReservation(reservation);
+                    bag.setCustomer(currentCustomer);
+                    bag.setFlight(outboundFlight); // Explicitly set the flight
+                    bags.add(bag);
+                }
+                currentCustomer.getBags().addAll(bags); // Associate bags with the customer
+                outboundFlight.getBags().addAll(bags); // Associate bags with outbound flight
+                if ("ROUND_TRIP".equals(tripType) && returnFlightId != null) {
+                    Flight returnFlight = flightService.findFlightById(returnFlightId);
+
+                    // For round trips, split bags between outbound and return flights if necessary
+                    for (Bag bag : bags) {
+                        Bag returnBag = new Bag();
+                        returnBag.setStatus(BagStatus.PRE_CHECK_IN);
+                        returnBag.setReservation(reservation);
+                        returnBag.setCustomer(currentCustomer);
+                        returnBag.setFlight(returnFlight); // Assign to the return flight
+                        currentCustomer.getBags().add(returnBag);
+                        returnFlight.getBags().add(returnBag);
+                    }
+                }
+
+                // Use pre-calculated total price from controller
+                reservation.setTotalPrice(totalCost);
 
                 reservationService.save(reservation);
                 System.out.println("Reservation saved successfully for Customer ID " + currentCustomer.getId());
 
+                // Log flight sales
                 if (employeeId != null) {
                     Employee employee = employeeService.findEmployeeById(employeeId);
                     salesRecordService.logFlightSaleByEmployee(outboundFlight, currentCustomer, employee);
@@ -127,11 +149,12 @@ public class BookingService {
                 auditTrailService.logAction("Flight linked to reservation.", outboundFlight.getFlightID(), currentCustomer.getId(), employeeId);
 
                 // Process DashPass based on selection
+                boolean isNewPurchase = "new".equals(dashPassOption);
                 if (isNewPurchase) {
                     DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassAndSaveNewDashPassReservation(
-                            currentCustomer, reservation, outboundFlight // Link the DashPassReservation to the entire reservation, not just the flight
+                            currentCustomer, reservation, outboundFlight
                     );
-                    reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
+                    reservation.getDashPassReservations().add(dashPassReservation);
                     System.out.println("New DashPass created and linked to reservation.");
                     if (employeeId != null) {
                         Employee employee = employeeService.findEmployeeById(employeeId);
@@ -140,14 +163,12 @@ public class BookingService {
                         salesRecordService.logCustomerDashPassSale(dashPassReservation.getDashPass(), currentCustomer);
                     }
                     auditTrailService.logAction("New DashPass linked to reservation.", dashPassReservation.getId(), currentCustomer.getId(), employeeId);
-
                 } else if ("existing".equals(dashPassOption)) {
                     DashPassReservation dashPassReservation = dashPassReservationService.createNewDashPassReservationAndAssignExistingDashPass(
                             currentCustomer, reservation, outboundFlight
                     );
-                    reservation.getDashPassReservations().add(dashPassReservation); // Link to reservation
+                    reservation.getDashPassReservations().add(dashPassReservation);
                     System.out.println("Existing DashPass linked to reservation.");
-
                     if (employeeId != null) {
                         Employee employee = employeeService.findEmployeeById(employeeId);
                         salesRecordService.logDashPassSaleByEmployee(dashPassReservation.getDashPass(), currentCustomer, employee);
@@ -156,6 +177,10 @@ public class BookingService {
                     }
                     auditTrailService.logAction("Existing DashPass linked to reservation.", dashPassReservation.getId(), currentCustomer.getId(), employeeId);
                 }
+                System.out.println("PurchaseFlightAsync - Total Price: " + totalCost);
+                System.out.println("Bag Quantity: " + bagQuantity + ", Bags Added: " + currentCustomer.getBags().size());
+                System.out.println("Payment Status: " + paymentStatus);
+
 
                 return reservation;
             } else {

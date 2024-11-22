@@ -21,7 +21,7 @@
         <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Back</button>
     </div>
 
-    <form th:action="@{/customer/{customerID}/revieworder(customerID=${customer.id})}" method="get">
+    <form th:action="@{/customer/{customerID}/addBags(customerID=${customer.id})}" method="get">
         <input type="hidden" name="customerID" th:value="${customerID}" />
         <input type="hidden" name="tripType" th:value="${tripType}" />
 
@@ -105,6 +105,9 @@
                             </div>
                             <div th:if="${outbound.numberOfDashPassesAvailable == 0}">
                                 <p class="no-dashpass-message">No DashPasses available for this flight.</p>
+                                <div>
+                                    <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                                </div>
                             </div>
                         </div>
 
@@ -142,7 +145,7 @@
         <!-- Submit Button for both One-Way and Round-Trip -->
         <div class="button-group">
             <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Cancel</button>
-            <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Confirm Booking</button>
+            <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Proceed To Add Bags</button>
         </div>
     </form>
 </div>

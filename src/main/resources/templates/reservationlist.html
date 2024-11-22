@@ -79,6 +79,11 @@
              th:href="@{/customer/{customerId}/ticket/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
             <button type="button" class="button">View Ticket</button>
           </a>
+          <!-- Track Bags Button -->
+          <a th:if="${reservation.bags != null and !#lists.isEmpty(reservation.bags)}"
+             th:href="@{/customer/{customerId}/trackbag(reservationId=${reservation.reservationId}, customerId=${customer.id})}">
+            <button class="button">Track Bags</button>
+          </a>
         </div>
       </td>
     </tr>

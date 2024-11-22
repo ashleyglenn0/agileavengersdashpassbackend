@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Random;
 
 @Controller
 public class CustomerDashboardController {
@@ -22,18 +23,20 @@ public class CustomerDashboardController {
     private final SupportRequestService supportRequestService;
     private final EmployeeService employeeService;
     private final DashPassService dashPassService;
+    private final BagService bagService;
 
     // Constructor Injection
     @Autowired
     public CustomerDashboardController(CustomerService customerService, ReservationService reservationService,
                                        DashPassReservationService dashPassReservationService, SupportRequestService supportRequestService,
-                                       EmployeeService employeeService, DashPassService dashPassService) {
+                                       EmployeeService employeeService, DashPassService dashPassService, BagService bagService) {
         this.customerService = customerService;
         this.reservationService = reservationService;
         this.dashPassReservationService = dashPassReservationService;
         this.supportRequestService = supportRequestService;
         this.employeeService = employeeService;
         this.dashPassService = dashPassService;
+        this.bagService = bagService;
     }
 
     @GetMapping("/customer/{customerID}/customerdashboard")
@@ -189,6 +192,44 @@ public class CustomerDashboardController {
         model.addAttribute("dashPassReservations", reservation.getDashPassReservations());
 
         return "ticket"; // Thymeleaf template name
+    }
+
+    @GetMapping("/customer/{customerID}/trackbag")
+    public String trackBags(
+            @PathVariable Long customerID,
+            @RequestParam(value = "reservationId", required = false) Long reservationId,
+            Model model) {
+
+        Customer customer = customerService.findCustomerById(customerID);
+
+        List<Bag> bags;
+        Reservation reservation = null;
+
+        if (reservationId != null) {
+            bags = bagService.findBagsByReservationId(reservationId);
+            reservation = reservationService.findById(reservationId); // Fetch reservation
+        } else {
+            bags = bagService.findBagsByCustomerId(customerID);
+        }
+
+        // Get the bag status (use the first bag's status for simplicity)
+        String bagStatusDisplayName = bags.isEmpty() ? null : bags.get(0).getStatus().getDisplayName();
+
+        // Generate randomized time between 5 and 25 minutes
+        int randomizedTimeToNextStep = new Random().nextInt(21) + 5;
+
+        // Debugging
+        System.out.println("Bag Status Display Name: " + bagStatusDisplayName);
+        System.out.println("Randomized Time to Next Step: " + randomizedTimeToNextStep);
+        System.out.println("Flight: " + (reservation != null && !reservation.getFlights().isEmpty() ? reservation.getFlights().get(0) : "No flight found"));
+
+        model.addAttribute("randomizedTimeToNextStep", randomizedTimeToNextStep);
+        model.addAttribute("customer", customer);
+        model.addAttribute("bags", bags);
+        model.addAttribute("bagStatus", bagStatusDisplayName); // Use display name
+        model.addAttribute("flight", reservation != null && !reservation.getFlights().isEmpty() ? reservation.getFlights().get(0) : null);
+
+        return "trackbag";
     }
 
 }

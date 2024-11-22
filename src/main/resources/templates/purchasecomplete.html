@@ -59,6 +59,20 @@
       </ul>
     </div>
 
+    <!-- Bag Information -->
+    <h2>Bags</h2>
+    <div th:if="${bags != null}">
+      <ul>
+        <li th:each="bag : ${bags}">
+          Bag ID: <span th:text="${bag.id}"></span><br/>
+          Status: <span th:text="${bag.status}"></span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${bags == null || bags.isEmpty()}">
+      <p>No bags added to this reservation.</p>
+    </div>
+
     <!-- Total Price -->
     <h2>Total Price</h2>
     <p>$<span th:text="${#numbers.formatDecimal(reservation.totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
