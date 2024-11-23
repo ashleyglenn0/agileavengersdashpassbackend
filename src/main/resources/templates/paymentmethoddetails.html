@@ -68,6 +68,7 @@
         <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
         <input type="hidden" name="tripType" th:value="${tripType}" />
         <input type="hidden" name="bagQuantity" th:value="${bagQuantity}" />
+        <input type="hidden" name="bags" th:value="${bags}" />
 
         <!-- Section for Saved Payment Methods -->
         <div th:if="${!#lists.isEmpty(paymentMethods)}">

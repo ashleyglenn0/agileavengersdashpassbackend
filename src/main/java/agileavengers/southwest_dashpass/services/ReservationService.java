@@ -54,7 +54,7 @@ public class ReservationService {
     }
 
     public Reservation findLatestPaidReservationForCustomer(Customer customer) {
-        return reservationRepository.findTopByCustomerAndPaymentStatusOrderByDateBookedDesc(customer, PaymentStatus.PAID);
+        return reservationRepository.findTopByCustomerAndPaymentStatusWithBagsOrderByDateBookedDesc(customer, PaymentStatus.PAID);
     }
 
     public List<Reservation> getValidReservationsForCustomer(Long customerId) {

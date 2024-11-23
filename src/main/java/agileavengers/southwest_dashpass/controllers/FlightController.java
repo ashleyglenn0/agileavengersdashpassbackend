@@ -434,6 +434,7 @@ public class FlightController {
             Reservation reservation = futureReservation.get();
             if (reservation.getPaymentStatus() == PaymentStatus.PAID) {
                 List<Bag> bags = reservation.getBags(); // Fetch associated bags
+
                 model.addAttribute("bags", bags); // Add bags to the model
                 model.addAttribute("reservation", reservation);
                 model.addAttribute("outboundFlight", reservation.getFlights().get(0));
@@ -505,10 +506,12 @@ public class FlightController {
             }
 
             // Add bag details to the model
-            int bagQuantity = reservation.getBagQuantity(); // Ensure bagQuantity is set in the Reservation class
-            double bagCost = (bagQuantity > 1) ? (bagQuantity - 1) * 35 : 0; // Inline calculation for bag cost
-            model.addAttribute("bagQuantity", bagQuantity);
-            model.addAttribute("bagCost", bagCost);
+            List<Bag> bags = reservation.getBags();
+            if (bags != null && !bags.isEmpty()) {
+                model.addAttribute("bags", bags);
+            } else {
+                model.addAttribute("bags", Collections.emptyList()); // Pass an empty list to avoid errors in the view
+            }
         } else {
             // Handle case where no paid reservation is found
             model.addAttribute("errorMessage", "No valid reservation found.");
@@ -517,6 +520,5 @@ public class FlightController {
         // Return the purchase complete view
         return "purchasecomplete";
     }
-
 
 }

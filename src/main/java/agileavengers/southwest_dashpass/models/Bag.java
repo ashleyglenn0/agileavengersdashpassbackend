@@ -9,7 +9,8 @@ public class Bag {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private BagStatus status; // Enum for bag status
+    @Column(name = "status", nullable = false, length = 20)
+    private BagStatus status;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)

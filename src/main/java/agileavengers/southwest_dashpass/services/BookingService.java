@@ -107,6 +107,7 @@ public class BookingService {
                 }
 
                 // Add bags to reservation, customer, and flights
+                double bagCost = 0.0;
                 List<Bag> bags = new ArrayList<>();
                 for (int i = 0; i < bagQuantity; i++) {
                     Bag bag = new Bag();
@@ -115,7 +116,19 @@ public class BookingService {
                     bag.setCustomer(currentCustomer);
                     bag.setFlight(outboundFlight); // Explicitly set the flight
                     bags.add(bag);
+
+                    // Add cost for each additional bag after the first one
+                    if (i >= 1) { // Bag cost applies starting from the second bag
+                        bagCost += 35.0; // Assume $35 per additional bag
+                    }
                 }
+                // Set bags to the reservation
+                reservation.setBags(bags);
+
+                // Set bag-related fields on reservation
+                reservation.setBagQuantity(bagQuantity);
+                reservation.setBagCost(bagCost);
+
                 currentCustomer.getBags().addAll(bags); // Associate bags with the customer
                 outboundFlight.getBags().addAll(bags); // Associate bags with outbound flight
                 if ("ROUND_TRIP".equals(tripType) && returnFlightId != null) {
@@ -133,11 +146,16 @@ public class BookingService {
                     }
                 }
 
+                // Set bags to the reservation
+                reservation.setBags(bags);
+
                 // Use pre-calculated total price from controller
                 reservation.setTotalPrice(totalCost);
 
                 reservationService.save(reservation);
                 System.out.println("Reservation saved successfully for Customer ID " + currentCustomer.getId());
+                System.out.println("Reservation saved. Bag count: " + reservation.getBags().size());
+
 
                 // Log flight sales
                 if (employeeId != null) {

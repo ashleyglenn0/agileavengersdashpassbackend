@@ -61,15 +61,18 @@
 
     <!-- Bag Information -->
     <h2>Bags</h2>
-    <div th:if="${bags != null}">
+    <div th:if="${bags != null and !bags.isEmpty()}">
       <ul>
-        <li th:each="bag : ${bags}">
-          Bag ID: <span th:text="${bag.id}"></span><br/>
-          Status: <span th:text="${bag.status}"></span>
+        <li th:each="bag, iterStat : ${bags}">
+          <strong>Bag ID:</strong> <span th:text="${bag.id}">N/A</span><br/>
+          <strong>Associated Flight ID:</strong> <span th:text="${bag.flight.flightID}">N/A</span><br/>
+          <strong>Status:</strong> <span th:text="${bag.status.displayName}">N/A</span><br/>
+          <strong>Bag Cost:</strong>
+          <span th:text="${iterStat.index == 0 ? 0.00 : 35.00}">0.00</span>
         </li>
       </ul>
     </div>
-    <div th:if="${bags == null || bags.isEmpty()}">
+    <div th:if="${bags == null or bags.isEmpty()}">
       <p>No bags added to this reservation.</p>
     </div>
 
