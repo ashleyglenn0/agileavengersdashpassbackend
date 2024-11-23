@@ -1,5 +1,6 @@
 package agileavengers.southwest_dashpass.controllers;
 
+import agileavengers.southwest_dashpass.dtos.CustomerUpdateDTO;
 import agileavengers.southwest_dashpass.dtos.EmployeeDTO;
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.ShiftRepository;
@@ -184,34 +185,37 @@ public class EmployeeDashboardController {
                                       @PathVariable Long customerId,
                                       Model model,
                                       Authentication authentication) {
-        // Retrieve the customer by ID
         Optional<Customer> customerOpt = customerService.findById(customerId);
-        if (customerOpt.isPresent()) {
-            Customer customer = customerOpt.get();
-            model.addAttribute("customer", customer);
-        } else {
+        if (customerOpt.isEmpty()) {
             model.addAttribute("error", "Customer not found.");
-            return "error";  // Redirect or display an error page if the customer doesn't exist
+            return "error";
+        }
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        // Populate the CustomerUpdateDTO
+        CustomerUpdateDTO customerUpdateDTO = new CustomerUpdateDTO();
+        Customer customer = customerOpt.get();
+        if (customer.getUser() != null) {
+            customerUpdateDTO.setFirstName(customer.getUser().getFirstName());
+            customerUpdateDTO.setLastName(customer.getUser().getLastName());
+            customerUpdateDTO.setEmail(customer.getUser().getEmail());
+            customerUpdateDTO.setUsername(customer.getUser().getUsername());
         }
 
-        // Retrieve the employee by ID
-        Optional<Employee> employeeOpt = employeeService.findById(employeeId);
-        if (employeeOpt.isPresent()) {
-            Employee employee = employeeOpt.get();
-            model.addAttribute("employee", employee);
-        } else {
-            model.addAttribute("error", "Employee not found.");
-            return "error";  // Redirect or display an error page if the employee doesn't exist
-        }
+        model.addAttribute("customerUpdateDTO", customerUpdateDTO);
 
-        // Check if the user has support or manager roles
-        boolean canEditUsernameAndEmail = authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPPORT") ||
-                        grantedAuthority.getAuthority().equals("ROLE_MANAGER"));
+        // Set canEdit and canEditUsernameAndEmail based on role
+        boolean canEdit = true; // Assuming all roles can edit first name and last name
+        boolean canEditUsernameAndEmail = employee.getRole() == Role.SUPPORT || employee.getRole() == Role.MANAGER;
+
+        model.addAttribute("canEdit", canEdit);
         model.addAttribute("canEditUsernameAndEmail", canEditUsernameAndEmail);
+        model.addAttribute("employee", employee);
+        model.addAttribute("customer", customer);
 
         return "customerdetails";
     }
+
+
 
     @GetMapping("/employee/{employeeId}/search-customer")
     public String searchCustomer(@PathVariable Long employeeId,
@@ -288,6 +292,24 @@ public class EmployeeDashboardController {
         model.addAttribute("salesDateMap", salesDateMap);
 
         return "saleslist"; // Return the shared template for displaying sales records
+    }
+
+    @PostMapping("/employee/{employeeId}/customer/{customerId}/update")
+    public String updateCustomerDetails(
+            @PathVariable Long employeeId,
+            @PathVariable Long customerId,
+            @ModelAttribute("customerUpdateDTO") CustomerUpdateDTO customerDto,
+            Model model) {
+
+        Employee employee = employeeService.findById(employeeId)
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+
+        Role employeeRole = employee.getRole();
+        customerDto.setCustomerId(customerId); // Ensure the DTO has the correct customer ID
+
+        employeeService.editCustomerDetails(customerDto, employeeRole);
+
+        return "redirect:/employee/" + employeeId + "/employeedashboard";
     }
 
 }

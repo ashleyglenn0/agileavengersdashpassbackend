@@ -55,6 +55,12 @@ public class Reservation {
     @Column(name = "isValidated")
     private Boolean isValidated;
 
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bag> bags = new ArrayList<>();
+
+    private int bagQuantity; // Total number of bags
+    private double bagCost;  // Total cost for the bags
+
 
     public Reservation(Customer customer, LocalDate bookingDate){
         this.customer = customer;
@@ -191,6 +197,30 @@ public class Reservation {
 
     public void setValidated(Boolean validated) {
         isValidated = validated;
+    }
+
+    public List<Bag> getBags() {
+        return bags;
+    }
+
+    public void setBags(List<Bag> bags) {
+        this.bags = bags;
+    }
+
+    public int getBagQuantity() {
+        return bagQuantity;
+    }
+
+    public void setBagQuantity(int bagQuantity) {
+        this.bagQuantity = bagQuantity;
+    }
+
+    public double getBagCost() {
+        return bagCost;
+    }
+
+    public void setBagCost(double bagCost) {
+        this.bagCost = bagCost;
     }
 }
 

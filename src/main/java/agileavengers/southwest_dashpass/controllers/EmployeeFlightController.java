@@ -337,6 +337,7 @@ public class EmployeeFlightController {
                                    @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
                                    @RequestParam("dashPassOption") String dashPassOption,
                                    @RequestParam("tripType") String tripType,
+                                   @RequestParam("bagQuantity") int bagQuantity,
                                    @RequestParam("totalPrice") double totalPrice,
                                    @RequestParam("userSelectedStatus") String userSelectedStatus,
                                    @RequestParam(value = "selectedPaymentMethodId", required = false) String selectedPaymentMethodId,
@@ -390,7 +391,7 @@ public class EmployeeFlightController {
 
             // Process the payment asynchronously
             CompletableFuture<Reservation> futureReservation = bookingService.purchaseFlightAsync(
-                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus, employeeId
+                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus, employeeId, bagQuantity
             );
 
             // Wait for payment completion and handle reservation status

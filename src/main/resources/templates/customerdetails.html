@@ -21,29 +21,32 @@
 
         <!-- Customer Details Display (Centered Text) -->
         <div id="customerDetailsView" class="customer-details">
-            <p><strong>First Name:</strong> <span th:text="${customer.user.firstName}">John</span></p>
-            <p><strong>Last Name:</strong> <span th:text="${customer.user.lastName}">Doe</span></p>
-            <p><strong>Email:</strong> <span th:text="${customer.user.email}">john.doe@example.com</span></p>
-            <p><strong>Username:</strong> <span th:text="${customer.user.username}">johndoe</span></p>
+            <p><strong>First Name:</strong> <span th:text="${customerUpdateDTO.firstName}">John</span></p>
+            <p><strong>Last Name:</strong> <span th:text="${customerUpdateDTO.lastName}">Doe</span></p>
+            <p><strong>Email:</strong> <span th:text="${customerUpdateDTO.email}">john.doe@example.com</span></p>
+            <p><strong>Username:</strong> <span th:text="${customerUpdateDTO.username}">johndoe</span></p>
         </div>
 
         <!-- Customer Details Form (Hidden Initially) -->
-        <form id="customerDetailsForm" th:action="@{/customer/update}" method="post" style="display: none;">
+        <form id="customerDetailsForm" th:action="@{/employee/{employeeId}/customer/{customerId}/update(employeeId=${employee.id}, customerId=${customer.id})}"
+              th:object="${customerUpdateDTO}" method="post" style="display: none;">
             <div class="customer-details">
                 <p><strong>First Name:</strong>
-                    <input type="text" name="firstName" th:value="${customer.user.firstName}" readonly>
+                    <input type="text" th:field="*{firstName}" th:readonly="${!canEdit}">
                 </p>
                 <p><strong>Last Name:</strong>
-                    <input type="text" name="lastName" th:value="${customer.user.lastName}" readonly>
+                    <input type="text" th:field="*{lastName}" th:readonly="${!canEdit}">
                 </p>
-                <p><strong>Email:</strong>
-                    <input type="text" name="email" th:value="${customer.user.email}" th:readonly="${!canEditUsernameAndEmail}">
+                <p th:if="${canEditUsernameAndEmail}">
+                    <strong>Email:</strong>
+                    <input type="text" th:field="*{email}" th:readonly="${!canEditUsernameAndEmail}">
                 </p>
-                <p><strong>Username:</strong>
-                    <input type="text" name="username" th:value="${customer.user.username}" th:readonly="${!canEditUsernameAndEmail}">
+                <p th:if="${canEditUsernameAndEmail}">
+                    <strong>Username:</strong>
+                    <input type="text" th:field="*{username}" th:readonly="${!canEditUsernameAndEmail}">
                 </p>
             </div>
-            <button type="submit" id="saveButton" class="button southwest-yellow-bg text-dark" style="display: none;">Save</button>
+            <button type="submit" class="button southwest-yellow-bg text-dark">Save</button>
         </form>
 
         <!-- All Buttons in a Row at the Bottom -->
@@ -85,7 +88,28 @@
     // Toggle Edit and Save buttons
     editButton.style.display = editButton.style.display === "none" ? "inline-block" : "none";
     saveButton.style.display = saveButton.style.display === "none" ? "inline-block" : "none";
-  }
+
+    // Use backend-defined permissions to enable fields
+    const canEdit = /*[[${canEdit}]]*/ true;
+    const canEditUsernameAndEmail = /*[[${canEditUsernameAndEmail}]]*/ true;
+
+    // Enable input fields based on permissions
+    if (customerDetailsForm.style.display === "block") {
+        customerDetailsForm.querySelectorAll("input").forEach(input => {
+            if (input.name === "firstName" || input.name === "lastName") {
+                input.removeAttribute("readonly");
+            } else if ((input.name === "email" || input.name === "username") && canEditUsernameAndEmail) {
+                input.removeAttribute("readonly");
+            }
+        });
+    } else {
+        // Disable editing when exiting edit mode
+        customerDetailsForm.querySelectorAll("input").forEach(input => {
+            input.setAttribute("readonly", "readonly");
+        });
+    }
+}
+
 </script>
 
 </body>

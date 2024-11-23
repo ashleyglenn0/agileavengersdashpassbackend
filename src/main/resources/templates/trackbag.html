@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bag Tracking</title>
+  <link rel="stylesheet" href="/styles/bagTracking.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-brand">Southwest Airlines</div>
+  <ul class="navbar-links">
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/flights">Flights</a></li>
+    <li><a href="/support">Support</a></li>
+  </ul>
+</nav>
+
+<!-- Bag Tracking Information -->
+<div class="bag-tracking-container">
+  <h1>Bag Tracking</h1>
+
+  <!-- Conditional Display if No Bags -->
+  <div th:if="${bags == null || bags.isEmpty()}">
+    <p>No bags have been checked for this flight. If you only have carry-on luggage, enjoy your trip!</p>
+    <p>If you have checked a bag and don't see it here, please see Customer Service Immediately!</p>
+  </div>
+
+  <!-- Bag Tracking Details -->
+  <div th:if="${bags != null && !bags.isEmpty()}">
+    <p th:if="${flight != null}">
+      <strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">FL123</span>
+    </p>
+    <p th:if="${flight == null}">
+      No flight information available.
+    </p>
+    <p><strong>Number of Bags Checked:</strong> <span th:text="${bags.size()}">2</span></p>
+
+    <!-- Status Indicator Bar -->
+    <div class="status-bar">
+      <div class="status-step completed">
+        <span>Pre Check In</span>
+      </div>
+      <div class="status-step" th:classappend="${bagStatus == 'AT_THE_COUNTER'} ? 'completed'">
+        <span>At The Counter</span>
+      </div>
+      <div class="status-step" th:classappend="${bagStatus == 'LOADING'} ? 'completed'">
+        <span>Loading</span>
+      </div>
+      <div class="status-step" th:classappend="${bagStatus == 'IN_TRANSIT'} ? 'completed delayed'">
+        <span>In Transit</span>
+      </div>
+      <div class="status-step" th:classappend="${bagStatus == 'UNLOADING'} ? 'completed'">
+        <span>Unloading</span>
+      </div>
+      <div class="status-step" th:classappend="${bagStatus == 'AT_CAROUSEL'} ? 'completed'">
+        <span>At Carousel</span>
+      </div>
+      <div class="status-step" th:classappend="${bagStatus == 'PICKED_UP'} ? 'completed'">
+        <span>Picked Up</span>
+      </div>
+    </div>
+
+    <div class="status-info">
+      <p><strong>Current Status:</strong>
+        <span th:text="${bagStatus != null ? bagStatus : 'No Status Available'}">No Status Available</span>
+      </p>
+
+      <!-- Time until next step based on bagStatus -->
+      <p class="eta" th:if="${bagStatus == 'Pre Check In'}">
+        <strong>Time Until Check In At Counter:</strong>
+        <span th:text="${randomizedTimeToNextStep != null ? randomizedTimeToNextStep : 'N/A'}">10</span> minutes
+      </p>
+      <p class="eta" th:if="${bagStatus == 'At the Counter'}">
+        <strong>Time Until Loaded on Plane:</strong>
+        <span th:text="${randomizedTimeToNextStep != null ? randomizedTimeToNextStep : 'N/A'}">10</span> minutes
+      </p>
+      <p class="eta" th:if="${bagStatus == 'Loading'}">
+        <strong>Time Until In Transit:</strong>
+        <span th:text="${randomizedTimeToNextStep != null ? randomizedTimeToNextStep : 'N/A'}">15</span> minutes
+      </p>
+      <p class="eta" th:if="${bagStatus == 'In Transit'}">
+        <strong>Time Until Unloading:</strong>
+        <span th:text="${randomizedTimeToNextStep != null ? randomizedTimeToNextStep : 'N/A'}">20</span> minutes
+      </p>
+      <p class="eta" th:if="${bagStatus == 'Unloading'}">
+        <strong>Time Until At Carousel:</strong>
+        <span th:text="${randomizedTimeToNextStep != null ? randomizedTimeToNextStep : 'N/A'}">25</span> minutes
+      </p>
+      <p class="eta" th:if="${bagStatus == 'At the Carousel'}">
+        <strong>Time Until Picked Up:</strong>
+        <span th:text="${randomizedTimeToNextStep != null ? randomizedTimeToNextStep : 'N/A'}">5</span> minutes
+      </p>
+      <p class="eta" th:if="${bagStatus == 'Picked Up'}">
+        <strong>Bag Status:</strong> Your bag has been picked up.
+      </p>
+      <p class="eta" th:if="${bagStatus == null}">
+        <strong>Bag Status:</strong> No status available.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2024 Southwest Airlines. For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

@@ -19,7 +19,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByCustomer_Id(Long customerId);
 
-    Reservation findTopByCustomerAndPaymentStatusOrderByDateBookedDesc(Customer customer, PaymentStatus paymentStatus);
+    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.bags WHERE r.customer = :customer AND r.paymentStatus = :paymentStatus ORDER BY r.dateBooked DESC")
+    Reservation findTopByCustomerAndPaymentStatusWithBagsOrderByDateBookedDesc(
+            @Param("customer") Customer customer,
+            @Param("paymentStatus") PaymentStatus paymentStatus);
 
     // Query to fetch only valid reservations
     List<Reservation> findByCustomerIdAndStatus(Long customerId, ReservationStatus status);

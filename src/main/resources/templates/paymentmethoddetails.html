@@ -44,6 +44,18 @@
           <p><strong>DashPass:</strong> Purchased (Additional $50.00)</p>
         </div>
 
+        <!-- Bag Information -->
+        <div th:if="${bagQuantity > 0}">
+          <p><strong>Bags:</strong>
+            <span th:text="${bagQuantity}"></span>
+            <span th:if="${bagQuantity > 1}">
+            (Additional
+            <span th:text="${(bagQuantity - 1) * 35}"></span> <!-- Inline calculation -->
+            USD)
+        </span>
+          </p>
+        </div>
+
         <!-- Total Cost -->
         <p><strong>Total Cost:</strong> $<span th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
       </div>
@@ -55,6 +67,8 @@
         <input type="hidden" name="dashPassOption" th:value="${dashPassOption}" />
         <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
         <input type="hidden" name="tripType" th:value="${tripType}" />
+        <input type="hidden" name="bagQuantity" th:value="${bagQuantity}" />
+        <input type="hidden" name="bags" th:value="${bags}" />
 
         <!-- Section for Saved Payment Methods -->
         <div th:if="${!#lists.isEmpty(paymentMethods)}">

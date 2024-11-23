@@ -40,7 +40,10 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<DashPassReservation> dashPassReservations = new ArrayList<>();
 
-    @OneToOne
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bag> bags = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
@@ -192,5 +195,13 @@ public class Customer {
 
     public void incrementDashPassInUseCount() {
         this.dashPassInUseCount += 1;
+    }
+
+    public List<Bag> getBags() {
+        return bags;
+    }
+
+    public void setBags(List<Bag> bags) {
+        this.bags = bags;
     }
 }

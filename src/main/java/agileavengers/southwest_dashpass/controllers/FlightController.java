@@ -176,45 +176,114 @@ public class FlightController {
         return "flighttable";
     }
 
+    @GetMapping("/customer/{customerID}/addBags")
+    public String displayAddBagsPage(
+            @PathVariable Long customerID,
+            @RequestParam("tripType") String tripType,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            Model model) {
 
-
-    // GET mapping to show the review order page
-    @GetMapping("/customer/{customerID}/revieworder")
-    public String getReviewOrderPage(@PathVariable Long customerID,
-                                     @RequestParam("outboundFlightId") Long outboundFlightId,
-                                     @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
-                                     @RequestParam("dashPassOption") String dashPassOption,
-                                     @RequestParam("tripType") String tripType,
-                                     Model model) {
+        // Retrieve customer and flight details
         Customer customer = customerService.findCustomerById(customerID);
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
         Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
 
+        // Calculate base total price (without bagCost)
         double totalPrice = outboundFlight.getPrice();
         if (returnFlight != null) {
             totalPrice += returnFlight.getPrice();
         }
 
-        if ("new".equals(dashPassOption)) {
-            totalPrice += 50.0;
+        if ("new".equalsIgnoreCase(dashPassOption)) {
+            totalPrice += 50.0; // Add DashPass cost if "new" is selected
         }
 
-        // Retrieve the first available DashPass if an existing DashPass is selected
-        DashPass dashPass = null;
-        if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
-            dashPass = customer.getDashPasses().get(0); // Get the first DashPass in the list
+        // Add data to the model
+        model.addAttribute("customer", customer);
+        model.addAttribute("customerID", customerID);
+        model.addAttribute("tripType", tripType);
+        model.addAttribute("outboundFlightId", outboundFlightId);
+        model.addAttribute("returnFlightId", returnFlightId);
+        model.addAttribute("dashPassOption", dashPassOption);
+        model.addAttribute("outboundFlight", outboundFlight);
+        model.addAttribute("returnFlight", returnFlight);
+        model.addAttribute("totalPrice", totalPrice); // Pass base totalPrice
+
+        return "addBag"; // Returns the Add Bag template
+    }
+
+
+    @PostMapping("/customer/{customerID}/addBags")
+    public String processAddBags(
+            @PathVariable Long customerID,
+            @RequestParam("tripType") String tripType,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
+            @RequestParam("bagCost") double bagCost,
+            @RequestParam("totalPrice") double totalPrice,
+            Model model) {
+
+        // Calculate bag cost
+        bagCost = 0;
+        if (bagQuantity > 1) {
+            bagCost = (bagQuantity - 1) * 35; // First bag is free
         }
 
+        totalPrice += bagCost; // Add bag cost to total price
+
+        // Redirect to the review order page with all required parameters
+        return "redirect:/customer/" + customerID + "/revieworder"
+                + "?outboundFlightId=" + outboundFlightId
+                + (returnFlightId != null ? "&returnFlightId=" + returnFlightId : "")
+                + "&dashPassOption=" + dashPassOption
+                + "&tripType=" + tripType
+                + "&bagQuantity=" + bagQuantity
+                + "&bagCost=" + bagCost
+                + "&totalPrice=" + totalPrice;
+    }
+
+
+
+
+    // GET mapping to show the review order page
+    @GetMapping("/customer/{customerID}/revieworder")
+    public String getReviewOrderPage(
+            @PathVariable Long customerID,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            @RequestParam("tripType") String tripType,
+            @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
+            @RequestParam("bagCost") double bagCost,
+            @RequestParam("totalPrice") double totalPrice,
+            Model model) {
+
+        // Retrieve customer and flights for display
+        Customer customer = customerService.findCustomerById(customerID);
+        Flight outboundFlight = flightService.findFlightById(outboundFlightId);
+        Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
+
+        System.out.println("Bag Quantity: " + bagQuantity + ", Bag Cost: " + bagCost);
+        System.out.println("Total Price in Review Order: " + totalPrice);
+
+
+        // Add attributes to the model
         model.addAttribute("customer", customer);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
-        model.addAttribute("dashPass", dashPass); // Add the dashPass to the model
         model.addAttribute("dashPassOption", dashPassOption);
         model.addAttribute("tripType", tripType);
+        model.addAttribute("bagQuantity", bagQuantity);
+        model.addAttribute("bagCost", bagCost);
         model.addAttribute("totalPrice", totalPrice);
 
         return "revieworder";
     }
+
 
     @PostMapping("/customer/{customerID}/revieworder")
     public String confirmFlight(
@@ -223,43 +292,47 @@ public class FlightController {
             @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
             @RequestParam("dashPassOption") String dashPassOption,
             @RequestParam("tripType") String tripType,
+            @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
+            @RequestParam("bagCost") double bagCost,
+            @RequestParam("totalPrice") double totalPrice,
             Model model) {
 
+        // Retrieve customer and flights for validation or display
         Customer customer = customerService.findCustomerById(customerID);
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
-        Flight returnFlight = null;
+        Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
+
+        // Retrieve the first available DashPass if an existing DashPass is selected
         DashPass dashPass = null;
-
-        if (returnFlightId != null) {
-            returnFlight = flightService.findFlightById(returnFlightId);
+        if ("existing".equalsIgnoreCase(dashPassOption) && !customer.getDashPasses().isEmpty()) {
+            dashPass = customer.getDashPasses().get(0); // Use the first available DashPass
         }
 
-        double totalPrice = outboundFlight.getPrice();
-        if (returnFlight != null) {
-            totalPrice += returnFlight.getPrice();
-        }
+        // Add bag cost to the total price
+        totalPrice += bagCost;
 
-        // Check DashPass options and calculate total price accordingly
-        if ("new".equals(dashPassOption)) {
-            totalPrice += 50.0;
-        } else if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
-            dashPass = customer.getDashPasses().get(0); // Retrieve the first available DashPass
-        }
+        System.out.println("Bag Quantity: " + bagQuantity + ", Bag Cost: " + bagCost);
+        System.out.println("Total Price in Review Order POST: " + totalPrice);
 
-        // Redirect to the payment method details page with the updated URL parameters
+
+        // Redirect to the payment method details page with all relevant parameters
         return "redirect:/customer/" + customerID + "/paymentmethoddetails"
                 + "?outboundFlightId=" + outboundFlightId
                 + (returnFlightId != null ? "&returnFlightId=" + returnFlightId : "")
                 + "&dashPassOption=" + dashPassOption
                 + "&tripType=" + tripType
+                + "&bagQuantity=" + bagQuantity
+                + "&bagCost=" + bagCost
                 + "&totalPrice=" + totalPrice
                 + (dashPass != null ? "&dashPassId=" + dashPass.getDashpassId() : "");
     }
 
 
+
     @GetMapping("/customer/{customerID}/paymentmethoddetails")
     public String showPaymentMethodPage(@PathVariable Long customerID,
                                         @RequestParam("outboundFlightId") Long outboundFlightId,
+                                        @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
                                         @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
                                         @RequestParam("dashPassOption") String dashPassOption,
                                         @RequestParam("tripType") String tripType,
@@ -278,6 +351,7 @@ public class FlightController {
 
 
         model.addAttribute("paymentDetailsDTO", new PaymentDetailsDTO());
+        model.addAttribute("bagQuantity", bagQuantity);
         model.addAttribute("customer", customer);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
@@ -298,6 +372,7 @@ public class FlightController {
                                    @RequestParam("dashPassOption") String dashPassOption,
                                    @RequestParam("tripType") String tripType,
                                    @RequestParam("totalPrice") double totalPrice,
+                                   @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
                                    @RequestParam("userSelectedStatus") String userSelectedStatus,
                                    @RequestParam(value = "selectedPaymentMethodId", required = false) String selectedPaymentMethodId,
                                    @RequestParam(value = "savePaymentDetails", required = false, defaultValue = "false") boolean savePaymentDetails,
@@ -348,12 +423,19 @@ public class FlightController {
 
             // Process the payment asynchronously
             CompletableFuture<Reservation> futureReservation = bookingService.purchaseFlightAsync(
-                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus, null
+                    customer, outboundFlightId, returnFlightId, dashPassOption, tripType, totalPrice, paymentDetailsToUse, userSelectedStatus, null, bagQuantity
             );
+
+            System.out.println("Complete Purchase - Total Price: " + totalPrice);
+            System.out.println("User Selected Status: " + userSelectedStatus);
+
 
             // Wait for payment completion and handle reservation status
             Reservation reservation = futureReservation.get();
             if (reservation.getPaymentStatus() == PaymentStatus.PAID) {
+                List<Bag> bags = reservation.getBags(); // Fetch associated bags
+
+                model.addAttribute("bags", bags); // Add bags to the model
                 model.addAttribute("reservation", reservation);
                 model.addAttribute("outboundFlight", reservation.getFlights().get(0));
 
@@ -421,6 +503,14 @@ public class FlightController {
             List<DashPassReservation> dashPassReservations = reservation.getDashPassReservations();
             if (dashPassReservations != null && !dashPassReservations.isEmpty()) {
                 model.addAttribute("dashPassReservations", dashPassReservations);
+            }
+
+            // Add bag details to the model
+            List<Bag> bags = reservation.getBags();
+            if (bags != null && !bags.isEmpty()) {
+                model.addAttribute("bags", bags);
+            } else {
+                model.addAttribute("bags", Collections.emptyList()); // Pass an empty list to avoid errors in the view
             }
         } else {
             // Handle case where no paid reservation is found

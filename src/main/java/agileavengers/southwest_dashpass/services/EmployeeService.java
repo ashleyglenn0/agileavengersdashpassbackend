@@ -1,7 +1,9 @@
 package agileavengers.southwest_dashpass.services;
 
+import agileavengers.southwest_dashpass.dtos.CustomerUpdateDTO;
 import agileavengers.southwest_dashpass.dtos.EmployeeDTO;
 import agileavengers.southwest_dashpass.models.*;
+import agileavengers.southwest_dashpass.repository.CustomerRepository;
 import agileavengers.southwest_dashpass.repository.EmployeeRepository;
 import agileavengers.southwest_dashpass.repository.TimeOffRequestRepository;
 import agileavengers.southwest_dashpass.repository.UserRepository;
@@ -27,6 +29,8 @@ public class EmployeeService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private TimeOffRequestRepository timeOffRequestRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Transactional
     public void registerEmployee(Employee employee, User user) {
@@ -78,5 +82,28 @@ public class EmployeeService {
     public List<TimeOffRequest> getAllTimeOffRequests() {
         return timeOffRequestRepository.findAll();
     }
+
+    @Transactional
+    public Customer editCustomerDetails(CustomerUpdateDTO customerDto, Role role) {
+        Customer existingCustomer = customerRepository.findById(customerDto.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+        User user = existingCustomer.getUser();
+        if (user == null) {
+            throw new IllegalStateException("The customer does not have an associated user.");
+        }
+
+        // Update fields
+        user.setFirstName(customerDto.getFirstName());
+        user.setLastName(customerDto.getLastName());
+
+        if (role == Role.SUPPORT || role == Role.MANAGER) {
+            user.setEmail(customerDto.getEmail());
+            user.setUsername(customerDto.getUsername());
+        }
+
+        return customerRepository.save(existingCustomer);
+    }
+
 
 }
