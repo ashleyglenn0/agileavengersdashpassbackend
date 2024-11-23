@@ -39,29 +39,32 @@
     <p><strong>Number of Bags Checked:</strong> <span th:text="${bags.size()}">2</span></p>
 
     <!-- Status Indicator Bar -->
+    <p>Debugging: bagStatus is "<span th:text="${bagStatus}">Unknown</span>"</p>
+
     <div class="status-bar">
-      <div class="status-step completed">
+      <div class="status-step" th:classappend="${bagStatus == 'Pre Check In' ? 'completed' : ''}">
         <span>Pre Check In</span>
       </div>
-      <div class="status-step" th:classappend="${bagStatus == 'AT_THE_COUNTER'} ? 'completed'">
+      <div class="status-step" th:classappend="${bagStatus == 'At the Counter' ? 'completed' : ''}">
         <span>At The Counter</span>
       </div>
-      <div class="status-step" th:classappend="${bagStatus == 'LOADING'} ? 'completed'">
+      <div class="status-step" th:classappend="${bagStatus == 'Loading' ? 'completed' : ''}">
         <span>Loading</span>
       </div>
-      <div class="status-step" th:classappend="${bagStatus == 'IN_TRANSIT'} ? 'completed delayed'">
+      <div class="status-step" th:classappend="${bagStatus == 'In Transit' ? 'completed' : ''}">
         <span>In Transit</span>
       </div>
-      <div class="status-step" th:classappend="${bagStatus == 'UNLOADING'} ? 'completed'">
+      <div class="status-step" th:classappend="${bagStatus == 'Unloading' ? 'completed' : ''}">
         <span>Unloading</span>
       </div>
-      <div class="status-step" th:classappend="${bagStatus == 'AT_CAROUSEL'} ? 'completed'">
+      <div class="status-step" th:classappend="${bagStatus == 'At Carousel' ? 'completed' : ''}">
         <span>At Carousel</span>
       </div>
-      <div class="status-step" th:classappend="${bagStatus == 'PICKED_UP'} ? 'completed'">
+      <div class="status-step" th:classappend="${bagStatus == 'Picked Up' ? 'completed' : ''}">
         <span>Picked Up</span>
       </div>
     </div>
+
 
     <div class="status-info">
       <p><strong>Current Status:</strong>
@@ -99,6 +102,24 @@
       <p class="eta" th:if="${bagStatus == null}">
         <strong>Bag Status:</strong> No status available.
       </p>
+    </div>
+
+    <!-- Update Bag Status Form (Only for Managers and Baggage Claim roles) -->
+    <div th:if="${userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER or
+                 userRole == T(agileavengers.southwest_dashpass.models.Role).BAGGAGE_CLAIM}">
+      <form th:action="@{/employee/{employeeId}/updateBagStatus/customer/{customerId}/reservation/{reservationId}
+      (employeeId=${employee.id}, customerId=${customer.id}, reservationId=${reservation.reservationId})}" method="post">
+        <label for="nextStatus">Update Bag Status:</label>
+        <select id="nextStatus" name="nextStatus">
+          <option value="AT_THE_COUNTER">At the Counter</option>
+          <option value="LOADING">Loading</option>
+          <option value="IN_TRANSIT">In Transit</option>
+          <option value="UNLOADING">Unloading</option>
+          <option value="AT_CAROUSEL">At Carousel</option>
+          <option value="PICKED_UP">Picked Up</option>
+        </select>
+        <button type="submit" class="button">Update Status</button>
+      </form>
     </div>
   </div>
 </div>

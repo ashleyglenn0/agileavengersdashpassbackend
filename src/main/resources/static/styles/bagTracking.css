@@ -77,8 +77,9 @@ body {
 }
 
 .status-step.completed {
-  background-color: #ffc72c; /* Southwest yellow for completed steps */
-  color: #ffffff; /* White text for contrast */
+  background-color: #FFD700; /* Example: Gold */
+  color: #ffffff; /* Example: Black text */
+  border: 2px solid #000; /* Example: Black border */
 }
 
 .status-step.delayed {
