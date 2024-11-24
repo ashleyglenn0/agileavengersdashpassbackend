@@ -8,13 +8,24 @@
 <body>
 
 <!-- Navbar -->
-<header class="navbar">
-    <div>
-        <a href="/customer/{customerId}/customerdashboard" class="button confirm-button">Home</a>
-        <form action="/perform_logout" method="post" style="display:inline;">
-            <button style="background-color: #00338D; color: white;" type="submit" class="button cancel-button">Logout</button>
-        </form>
-    </div>
+<header>
+    <nav class="navbar">
+        <!-- Left: Logo -->
+        <div class="navbar-left">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+            </a>
+        </div>
+
+        <!-- Right: Links and Logout Button -->
+        <div class="navbar-right">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+            </form>
+        </div>
+    </nav>
 </header>
 
 <!-- Review Order Card -->

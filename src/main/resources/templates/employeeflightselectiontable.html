@@ -5,11 +5,21 @@
   <link rel="stylesheet" href="/styles/flights.css" />
 </head>
 <body>
-<header class="navbar southwest-yellow-bg">
-  <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
-  <form action="/perform_logout" method="post">
-    <button type="submit" class="logout-button southwest-blue-bg text-white rounded-button">Logout</button>
-  </form>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
 </header>
 
 <div class="container southwest-blue-bg">
@@ -21,7 +31,7 @@
     <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Back</button>
   </div>
 
-  <form th:action="@{/employee/{employeeId}/customer/{customerID}/employeerevieworder(customerID=${customer.id}, employeeId=${employee.id})}" method="get">
+  <form th:action="@{/employee/{employeeId}/customer/{customerID}/employeeaddbags(customerID=${customer.id}, employeeId=${employee.id})}" method="get">
     <input type="hidden" name="customerID" th:value="${customerID}" />
     <input type="hidden" name="tripType" th:value="${tripType}" />
 
@@ -142,7 +152,7 @@
     <!-- Submit Button for both One-Way and Round-Trip -->
     <div class="button-group">
       <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Cancel</button>
-      <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Confirm Booking</button>
+      <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Next</button>
     </div>
   </form>
 </div>

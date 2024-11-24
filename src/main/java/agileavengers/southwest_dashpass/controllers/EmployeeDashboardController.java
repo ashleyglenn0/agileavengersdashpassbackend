@@ -111,7 +111,9 @@ public class EmployeeDashboardController {
     @GetMapping("/employee/{employeeId}/addcustomer")
     public String showAddCustomerForm(@PathVariable Long employeeId, Model model) {
         // Add any model attributes if needed, such as employee information for context
+        Employee employee = employeeService.findEmployeeById(employeeId);
         model.addAttribute("employeeId", employeeId); // Optional: pass employeeId for tracking
+        model.addAttribute("employee", employee);
         return "addcustomer"; // This is the name of your Thymeleaf template for the Add Customer form
     }
 
@@ -289,6 +291,7 @@ public class EmployeeDashboardController {
                 ));
 
         // Add necessary attributes to the model
+        model.addAttribute("employee", employee);
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("salesType", salesType);
         model.addAttribute("salesRecords", salesRecords);

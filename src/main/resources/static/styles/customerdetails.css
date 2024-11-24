@@ -12,19 +12,64 @@
     color: #00338D;
 }
 
-/* Navigation Bar */
+/* Navbar Styling */
 .navbar {
-    height: 70px;
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    border-radius: 5px;
 }
 
-.navbar-brand {
-    font-size: 20px;
-    font-weight: bold;
-    text-decoration: none;
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
 }
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
 
 /* Main Content */
 .main-content {

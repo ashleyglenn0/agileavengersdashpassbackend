@@ -228,7 +228,7 @@ public class FlightController {
             Model model) {
 
         // Calculate bag cost
-        bagCost = 0;
+//        bagCost = 0;
         if (bagQuantity > 1) {
             bagCost = (bagQuantity - 1) * 35; // First bag is free
         }
@@ -245,8 +245,6 @@ public class FlightController {
                 + "&bagCost=" + bagCost
                 + "&totalPrice=" + totalPrice;
     }
-
-
 
 
     // GET mapping to show the review order page
@@ -270,12 +268,18 @@ public class FlightController {
         System.out.println("Bag Quantity: " + bagQuantity + ", Bag Cost: " + bagCost);
         System.out.println("Total Price in Review Order: " + totalPrice);
 
+        DashPass dashPass = null;
+        if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
+            dashPass = customer.getDashPasses().get(0); // Get the first DashPass in the list
+        }
+
 
         // Add attributes to the model
         model.addAttribute("customer", customer);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
         model.addAttribute("dashPassOption", dashPassOption);
+        model.addAttribute("dashPass", dashPass);
         model.addAttribute("tripType", tripType);
         model.addAttribute("bagQuantity", bagQuantity);
         model.addAttribute("bagCost", bagCost);
