@@ -10,13 +10,17 @@
 </head>
 <body class="southwest-blue-bg">
 <header>
-    <nav class="navbar southwest-yellow-bg rounded-container">
+    <nav class="navbar">
         <div class="navbar-left">
-            <a href="/employee/dashboard" class="navbar-brand text-dark">Home</a>
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
         </div>
         <div class="navbar-right">
-            <form action="/perform_logout" method="post">
-                <button style="background-color: #00338D; color: white;" type="submit" class="button southwest-blue-bg text-white rounded-button">Logout</button>
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
             </form>
         </div>
     </nav>
@@ -204,9 +208,6 @@
 
         <a th:href="@{/employee/{employeeId}/verifydashpass(employeeId=${employee.id})}">
             <button class="button southwest-blue-bg text-white rounded-button">Verify DashPass</button>
-        </a>
-        <a th:href="@{/employee/{employeeId}/customer/{customerId}/trackbag(employeeId=${employee.id})}">
-            <button class="button southwest-blue-bg text-white rounded-button">Track A Bag</button>
         </a>
     </section>
 

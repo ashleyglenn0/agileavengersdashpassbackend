@@ -6,6 +6,22 @@
   <link rel="stylesheet" href="/styles/purchasecomplete.css" />
 </head>
 <body>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
 
 <!-- Confirmation Container -->
 <div class="confirmation-container">
@@ -57,6 +73,23 @@
           Flight ID: <span th:text="${dashPassReservation.flight.flightID}"></span>
         </li>
       </ul>
+    </div>
+
+    <!-- Bag Information -->
+    <h2>Bags</h2>
+    <div th:if="${bags != null and !bags.isEmpty()}">
+      <ul>
+        <li th:each="bag, iterStat : ${bags}">
+          <strong>Bag ID:</strong> <span th:text="${bag.id}">N/A</span><br/>
+          <strong>Associated Flight ID:</strong> <span th:text="${bag.flight.flightID}">N/A</span><br/>
+          <strong>Status:</strong> <span th:text="${bag.status.displayName}">N/A</span><br/>
+          <strong>Bag Cost:</strong>
+          <span th:text="${iterStat.index == 0 ? 0.00 : 35.00}">0.00</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${bags == null or bags.isEmpty()}">
+      <p>No bags added to this reservation.</p>
     </div>
 
     <!-- Total Price -->

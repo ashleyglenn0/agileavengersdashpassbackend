@@ -10,9 +10,22 @@
 <body class="southwest-blue-bg">
 
 <!-- Navigation Bar -->
-<nav class="navbar southwest-yellow-bg">
-    <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-brand text-dark">Home</a>
-</nav>
+<header>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
 
 <!-- Main Content -->
 <div class="main-content">
@@ -51,7 +64,7 @@
 
         <!-- All Buttons in a Row at the Bottom -->
         <div class="bottom-buttons">
-            <button class="button southwest-yellow-bg text-dark">Go Back</button>
+            <button class="button southwest-yellow-bg text-dark" onclick="window.history.back();">Go Back</button>
             <button id="editButton" class="button southwest-yellow-bg text-dark" onclick="toggleEditMode()">Edit</button>
             <a th:href="@{/employee/{employeeId}/customer/{customerId}/purchaseDashPass(employeeId=${employee.id}, customerId=${customer.id})}">
                 <button class="button southwest-yellow-bg text-dark">Add DashPass</button>

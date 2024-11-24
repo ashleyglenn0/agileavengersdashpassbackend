@@ -7,13 +7,26 @@
   <link rel="stylesheet" href="/styles/verifydashpass.css">
 </head>
 <body>
-
 <header>
-  <h1>DashPass Verification</h1>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
 </header>
 
 <div class="container">
   <!-- Search Section with Separate Forms for Customer and DashPass Search -->
+  <h1>DashPass Verification</h1>
   <section class="search-section">
 
     <!-- Form to Search by Customer Name -->
@@ -31,7 +44,7 @@
   </section>
 
   <!-- Back to Dashboard Button -->
-  <button type="button" class="back-button" onclick="window.history.back();">Back to Dashboard</button>
+  <button type="button" class="back-button" th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/employeedashboard\''">Back to Dashboard</button>
 
   <!-- Thymeleaf Conditional Rendering -->
   <section class="results-section">

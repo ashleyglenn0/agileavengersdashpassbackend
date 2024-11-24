@@ -9,11 +9,21 @@
 <body>
 
 <!-- Navbar Header -->
-<header class="navbar">
-  <div class="navbar-logo">
-    <a href="/"><img src="/images/logo.png" alt="Southwest Airlines Logo"></a>
-  </div>
-  <div class="navbar-title">Reservation Validation</div>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
 </header>
 
 <!-- Reservation Content Container -->

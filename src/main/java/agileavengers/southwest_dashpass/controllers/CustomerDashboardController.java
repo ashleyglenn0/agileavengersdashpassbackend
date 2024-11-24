@@ -144,6 +144,7 @@ public class CustomerDashboardController {
 
         // Find the customer by ID
         Customer customer = customerService.findCustomerById(customerID);
+        model.addAttribute("customer", customer);
         if (customer == null) {
             model.addAttribute("errorMessage", "Customer not found.");
             return "send-support-request";
@@ -214,6 +215,7 @@ public class CustomerDashboardController {
 
         // Get the bag status (use the first bag's status for simplicity)
         String bagStatusDisplayName = bags.isEmpty() ? null : bags.get(0).getStatus().getDisplayName();
+        System.out.println("Bag Status: " + bagStatusDisplayName);
 
         // Generate randomized time between 5 and 25 minutes
         int randomizedTimeToNextStep = new Random().nextInt(21) + 5;

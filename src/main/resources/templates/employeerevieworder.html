@@ -5,6 +5,22 @@
   <link rel="stylesheet" href="/styles/confirmpurchase.css" />
 </head>
 <body>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
 
 <!-- Confirmation Card -->
 <div class="container">
@@ -16,6 +32,8 @@
     <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}">
     <input type="hidden" name="returnFlightId" th:value="${returnFlight != null} ? ${returnFlight.flightID} : ''" />
     <input type="hidden" name="dashPassOption" th:value="${dashPassOption}">
+    <input type="hidden" name="bagQuantity" th:value="${bagQuantity}">
+    <input type="hidden" name="bagCost" th:value="${bagCost}">
     <input type="hidden" name="totalPrice" th:value="${totalPrice}">
 
     <!-- Outbound Flight Details -->
@@ -75,6 +93,13 @@
       <div th:if="${dashPassOption == 'none'}">
         <p><strong>No DashPass will be used for this trip.</strong></p>
       </div>
+    </div>
+
+    <!-- Bag Section -->
+    <div class="section">
+      <h3>Bags</h3>
+      <p><strong>Number of Bags:</strong> <span th:text="${bagQuantity}">[Bag Quantity]</span></p>
+      <p><strong>Bag Cost:</strong> $<span th:text="${bagCost != null ? #numbers.formatDecimal(bagCost, 1, 'COMMA', 2, 'POINT') : '0.00'}">[Bag Cost]</span></p>
     </div>
 
     <!-- Total Price -->

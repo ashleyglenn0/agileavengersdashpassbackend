@@ -57,6 +57,25 @@ body {
             color: #ffffff;
         }
 
+        .navbar-link {
+            text-decoration: none;
+            color: #00338D;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .navbar-link:hover {
+            text-decoration: underline;
+        }
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Space between links and Logout button */
+        }
+
+        .navbar-left img {
+            height: 40px;
+        }
+
 /* Media query for smaller screens */
 @media (max-width: 600px) {
   .button {

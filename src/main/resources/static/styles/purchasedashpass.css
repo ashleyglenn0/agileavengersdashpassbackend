@@ -3,37 +3,54 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: rgb(0, 51, 153);
+    background-color: #00338D; /* Southwest Blue */
     color: white;
 }
 
-/* Navbar styling */
+/* Navbar Styling */
 .navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background-color: rgb(255, 204, 0);
+    border-radius: 5px;
 }
 
-.logo {
-    width: 150px;
+.navbar-left img {
+    height: 40px;
 }
 
-.navbar .button {
-    background-color: rgb(0, 51, 153);
-    color: white;
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
     border: none;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-.navbar .button:hover {
-    background-color: #ff9900;
-    color: white;
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
 }
 
 /* Center the form inside a card */
@@ -51,19 +68,7 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
-    text-align: center;
-}
-
-h2 {
-    margin-bottom: 20px;
-    color: #00338D;
-}
-
-/* Form group styling */
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-    padding: 40px;
+    color: #00338D; /* Text inside the card stays Southwest Blue */
 }
 
 /* Form input styling */
@@ -76,62 +81,91 @@ input.form-control {
     font-size: 16px;
 }
 
-/* Styling for the table inside the card */
-.table {
-    width: 100%;
-    margin-bottom: 20px;
-    border-collapse: collapse;
-}
-
-.table th, .table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
 /* Total price styling */
 #totalPrice {
     font-size: 18px;
     font-weight: bold;
     text-align: center;
+    color: #00338D;
 }
 
 /* Button styling */
 .submitButton, .cancelButton {
-    border-radius: 25px;
-    padding: 10px 20px;
-    font-size: 14px;
+    border-radius: 5px; /* Squared buttons */
+    padding: 10px 20px; /* Consistent padding for buttons */
+    font-size: 16px;
     cursor: pointer;
-    margin-right: 10px;
+    margin-top: 20px; /* Add space between buttons and other elements */
     transition: all 0.3s;
 }
 
 /* Submit button style */
 .submitButton {
-    background-color: rgb(255, 204, 0);
-    color: rgb(0, 51, 153);
-    border: none;
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue */
+    border: 2px solid #FFC72C; /* Same color border for consistency */
+    font-weight: bold;
 }
 
 .submitButton:hover {
-    background-color: rgb(255, 204, 0);
+    background-color: #FFD56E; /* Lighter yellow for hover effect */
 }
 
 /* Cancel button style (blue outline) */
 .cancelButton {
-    background-color: transparent;
-    color: white;
-    border: 2px solid rgb(255, 204, 0);
+    background-color: transparent; /* Transparent background */
+    color: #00338D; /* Southwest Blue for text */
+    border: 2px solid #00338D; /* Blue outline */
+    font-weight: bold;
 }
 
 .cancelButton:hover {
-    background-color: #007bff;
-    color: white;
+    background-color: #00338D; /* Blue background on hover */
+    color: white; /* White text on hover */
 }
+
+/* Add spacing around buttons */
+.button-container {
+    display: flex;
+    justify-content: center; /* Center-align buttons */
+    gap: 20px; /* Add space between buttons */
+    margin-top: 20px; /* Add space above buttons */
+}
+
+/* Table Styling */
+.table {
+    width: 100%; /* Full width of the card */
+    margin-top: 20px; /* Add spacing above the table */
+    margin-bottom: 20px; /* Add spacing below the table */
+    border-collapse: collapse; /* Avoid double borders */
+    text-align: left; /* Align content to the left */
+    font-size: 16px; /* Make text size consistent */
+}
+
+.table th {
+    background-color: #00338D; /* Blue background for header */
+    color: white; /* White text for header */
+    padding: 10px; /* Add padding to header cells */
+    text-align: center; /* Center-align header content */
+}
+
+.table td {
+    padding: 10px; /* Add padding to table cells */
+    border-bottom: 1px solid #ddd; /* Light border below rows */
+    text-align: center; /* Center-align content */
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1; /* Highlight row on hover */
+}
+
+/* Add spacing around the table */
+.table-container {
+    margin: 20px 0; /* Space above and below the table */
+    padding: 10px; /* Add padding around the table for better readability */
+}
+
+
 
 /* Footer styling */
 footer {

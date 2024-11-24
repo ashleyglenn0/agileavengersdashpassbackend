@@ -9,8 +9,19 @@
 <body class="southwest-blue-bg">
 
 <header>
-  <nav class="navbar southwest-yellow-bg">
-    <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-brand text-dark">Dashboard</a>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
   </nav>
 </header>
 

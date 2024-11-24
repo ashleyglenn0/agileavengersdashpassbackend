@@ -2,18 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Available Flights (Employee View)</title>
-  <link rel="stylesheet" href="/styles/flights.css" />
+  <link rel="stylesheet" href="/styles/employeeflightinfo.css" />
 </head>
 <body>
-<header class="navbar southwest-yellow-bg">
-  <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
-  <form action="/perform_logout" method="post">
-    <button type="submit" class="logout-button southwest-blue-bg text-white rounded-button">Logout</button>
-  </form>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
 </header>
 
 <div class="container southwest-blue-bg">
-  <h3 class="section-title southwest-yellow-text">Available Flights (Employee View)</h3>
+  <h3 class="section-title southwest-yellow-text">Available Flights (For Internal Personnel Only)</h3>
 
   <!-- Message if no flights are found -->
   <div th:if="${#lists.isEmpty(outboundFlights) && #lists.isEmpty(roundTripFlights)}" class="no-flights-message">

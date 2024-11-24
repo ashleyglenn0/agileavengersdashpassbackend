@@ -9,28 +9,28 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar">
-    <!-- Left: Logo -->
-    <div class="navbar-left">
-        <a href="/customer/{customerId}/customerdashboard">
-            <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
-        </a>
-    </div>
-
-    <!-- Right: Links and Logout Button -->
-    <div class="navbar-right">
-        <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
-        <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
-        <form action="/perform_logout" method="post" style="display: inline;">
-            <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
-        </form>
-    </div>
-</nav>
+<header>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
 
 <!-- Add Bags Form -->
 <div class="add-bag-container">
     <h1>Add Bags</h1>
-    <form id="addBagForm" th:action="@{/customer/{customerID}/addBags(customerID=${customerID})}" method="POST">
+    <form id="addBagForm" th:action="@{/employee/{employeeId}/customer/{customerID}/employeeaddbags(customerID=${customerID}, employeeId=${employee.id})}" method="POST">
+        <input type="hidden" name="employeeId" th:value="${employeeId}" />
         <input type="hidden" name="customerID" th:value="${customerID}" />
         <input type="hidden" name="tripType" th:value="${tripType}" />
         <input type="hidden" name="outboundFlightId" th:value="${outboundFlightId}" />

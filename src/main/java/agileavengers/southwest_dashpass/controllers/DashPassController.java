@@ -313,6 +313,7 @@ public class DashPassController {
         try {
             // Find the customer, reservation, and dashpass
             Customer customer = customerService.findCustomerById(customerId);
+            model.addAttribute("customer", customer);
             Reservation reservation = reservationService.findById(reservationId);
             DashPass dashPass = dashPassService.findDashPassById(dashPassId);
 

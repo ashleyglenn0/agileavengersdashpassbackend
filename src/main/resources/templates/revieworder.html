@@ -5,6 +5,25 @@
     <link rel="stylesheet" href="/styles/confirmpurchase.css" />
 </head>
 <body>
+<header>
+    <nav class="navbar">
+        <!-- Left: Logo -->
+        <div class="navbar-left">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+            </a>
+        </div>
+
+        <!-- Right: Links and Logout Button -->
+        <div class="navbar-right">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
 
 <!-- Confirmation Card -->
 <div class="container">

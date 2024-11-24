@@ -6,14 +6,22 @@
 </head>
 <body>
 <!-- Navbar -->
-<nav class="navbar">
-    <ul>
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/flights">Flights</a></li>
-        <li><a href="/dashpass">DashPass</a></li>
-        <li><a href="/support">Support</a></li>
-    </ul>
-</nav>
+<header>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
 
 <div class="container">
     <!-- Page Title -->

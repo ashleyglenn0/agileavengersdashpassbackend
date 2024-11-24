@@ -1,6 +1,7 @@
 package agileavengers.southwest_dashpass.services;
 
 import agileavengers.southwest_dashpass.models.*;
+import agileavengers.southwest_dashpass.repository.BagRepository;
 import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
 import agileavengers.southwest_dashpass.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
@@ -18,13 +19,15 @@ public class ReservationService {
     private DashPassReservationRepository dashPassReservationRepository;
 
     private CustomerService customerService;
+    private BagRepository bagRepository;
 
     @Autowired
     public ReservationService(ReservationRepository reservationRepository, DashPassReservationRepository dashPassReservationRepository,
-                              CustomerService customerService) {
+                              CustomerService customerService, BagRepository bagRepository) {
         this.reservationRepository = reservationRepository;
         this.dashPassReservationRepository = dashPassReservationRepository;
         this.customerService = customerService;
+        this.bagRepository = bagRepository;
     }
 
     public List<Reservation> getReservationsForCustomer(Long customerId) {
@@ -131,6 +134,16 @@ public class ReservationService {
             }
         }
 
+        // Update the status of all bags associated with this reservation
+        if (reservation.getBags() != null && !reservation.getBags().isEmpty()) {
+            for (Bag bag : reservation.getBags()) {
+                bag.setStatus(BagStatus.AT_THE_COUNTER); // Set bag status to "AT_THE_COUNTER"
+            }
+        }
+
+        // Save the updated bags
+        bagRepository.saveAll(reservation.getBags());
+
         // Mark the reservation as validated
         reservation.setValidated(true);
 
@@ -141,11 +154,5 @@ public class ReservationService {
         customer.updateDashPassSummary();
         customerService.save(customer); // Persist the updated counts in the database
     }
-
-
-
-
-
-
 
 }

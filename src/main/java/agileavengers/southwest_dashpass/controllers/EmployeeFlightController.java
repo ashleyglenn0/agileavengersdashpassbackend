@@ -209,41 +209,120 @@ public class EmployeeFlightController {
         return "employeeflightselectiontable";
     }
 
-    @GetMapping("/employee/{employeeId}/customer/{customerID}/employeerevieworder")
-    public String getReviewOrderPage(@PathVariable Long customerID,
-                                     @PathVariable Long employeeId,
-                                     @RequestParam("outboundFlightId") Long outboundFlightId,
-                                     @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
-                                     @RequestParam("dashPassOption") String dashPassOption,
-                                     @RequestParam("tripType") String tripType,
-                                     Model model) {
-        Customer customer = customerService.findCustomerById(customerID);
+    @GetMapping("/employee/{employeeId}/customer/{customerID}/employeeaddbags")
+    public String displayAddBagsPage(
+            @PathVariable Long employeeId,
+            @PathVariable Long customerID,
+            @RequestParam("tripType") String tripType,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            Model model) {
+
+        // Retrieve customer and flight details
         Employee employee = employeeService.findEmployeeById(employeeId);
+        Customer customer = customerService.findCustomerById(customerID);
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
         Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
 
+        // Calculate base total price (without bagCost)
         double totalPrice = outboundFlight.getPrice();
         if (returnFlight != null) {
             totalPrice += returnFlight.getPrice();
         }
 
-        if ("new".equals(dashPassOption)) {
-            totalPrice += 50.0;
+        if ("new".equalsIgnoreCase(dashPassOption)) {
+            totalPrice += 50.0; // Add DashPass cost if "new" is selected
         }
 
-        // Retrieve the first available DashPass if an existing DashPass is selected
+        // Add data to the model
+        model.addAttribute("customer", customer);
+        model.addAttribute("employee", employee);
+        model.addAttribute("customerID", customerID);
+        model.addAttribute("tripType", tripType);
+        model.addAttribute("outboundFlightId", outboundFlightId);
+        model.addAttribute("returnFlightId", returnFlightId);
+        model.addAttribute("dashPassOption", dashPassOption);
+        model.addAttribute("outboundFlight", outboundFlight);
+        model.addAttribute("returnFlight", returnFlight);
+        model.addAttribute("totalPrice", totalPrice); // Pass base totalPrice
+
+        return "employeeaddbag"; // Returns the Add Bag template
+    }
+
+
+    @PostMapping("/employee/{employeeId}/customer/{customerID}/employeeaddbags")
+    public String processAddBags(
+            @PathVariable Long employeeId,
+            @PathVariable Long customerID,
+            @RequestParam("tripType") String tripType,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
+            @RequestParam("bagCost") double bagCost,
+            @RequestParam("totalPrice") double totalPrice,
+            Model model) {
+
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        model.addAttribute("employee", employee);
+
+        // Calculate bag cost
+        if (bagQuantity > 1) {
+            bagCost = (bagQuantity - 1) * 35; // First bag is free
+        }
+
+        totalPrice += bagCost; // Add bag cost to total price
+
+        // Redirect to the review order page with all required parameters
+        return "redirect:/employee/" + employeeId + "/customer/" + customerID + "/employeerevieworder"
+                + "?outboundFlightId=" + outboundFlightId
+                + (returnFlightId != null ? "&returnFlightId=" + returnFlightId : "")
+                + "&dashPassOption=" + dashPassOption
+                + "&tripType=" + tripType
+                + "&bagQuantity=" + bagQuantity
+                + "&bagCost=" + bagCost
+                + "&totalPrice=" + totalPrice;
+    }
+
+    @GetMapping("/employee/{employeeId}/customer/{customerID}/employeerevieworder")
+    public String getReviewOrderPage(
+            @PathVariable Long customerID,
+            @PathVariable Long employeeId,
+            @RequestParam("outboundFlightId") Long outboundFlightId,
+            @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
+            @RequestParam("dashPassOption") String dashPassOption,
+            @RequestParam("tripType") String tripType,
+            @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
+            @RequestParam("bagCost") double bagCost,
+            @RequestParam("totalPrice") double totalPrice,
+            Model model) {
+
+        // Retrieve customer and flights for display
+        Employee employee = employeeService.findEmployeeById(employeeId);
+        model.addAttribute("employee", employee);
+        Customer customer = customerService.findCustomerById(customerID);
+        Flight outboundFlight = flightService.findFlightById(outboundFlightId);
+        Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
+
         DashPass dashPass = null;
         if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
             dashPass = customer.getDashPasses().get(0); // Get the first DashPass in the list
         }
 
+        System.out.println("Bag Quantity: " + bagQuantity + ", Bag Cost: " + bagCost);
+        System.out.println("Total Price in Review Order: " + totalPrice);
+
+
+        // Add attributes to the model
         model.addAttribute("customer", customer);
-        model.addAttribute("employee", employee);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
-        model.addAttribute("dashPass", dashPass); // Add the dashPass to the model
         model.addAttribute("dashPassOption", dashPassOption);
+        model.addAttribute("dashPass", dashPass);
         model.addAttribute("tripType", tripType);
+        model.addAttribute("bagQuantity", bagQuantity);
+        model.addAttribute("bagCost", bagCost);
         model.addAttribute("totalPrice", totalPrice);
 
         return "employeerevieworder";
@@ -257,37 +336,38 @@ public class EmployeeFlightController {
             @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
             @RequestParam("dashPassOption") String dashPassOption,
             @RequestParam("tripType") String tripType,
+            @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
+            @RequestParam("bagCost") double bagCost,
+            @RequestParam("totalPrice") double totalPrice,
             Model model) {
 
+        // Retrieve customer and flights for validation or display
         Customer customer = customerService.findCustomerById(customerID);
-        Employee employee = employeeService.findEmployeeById(employeeId);
-        model.addAttribute("employee", employee);
+        Employee employee  = employeeService.findEmployeeById(employeeId);
         Flight outboundFlight = flightService.findFlightById(outboundFlightId);
-        Flight returnFlight = null;
+        Flight returnFlight = returnFlightId != null ? flightService.findFlightById(returnFlightId) : null;
+
+        // Retrieve the first available DashPass if an existing DashPass is selected
         DashPass dashPass = null;
-
-        if (returnFlightId != null) {
-            returnFlight = flightService.findFlightById(returnFlightId);
+        if ("existing".equalsIgnoreCase(dashPassOption) && !customer.getDashPasses().isEmpty()) {
+            dashPass = customer.getDashPasses().get(0); // Use the first available DashPass
         }
 
-        double totalPrice = outboundFlight.getPrice();
-        if (returnFlight != null) {
-            totalPrice += returnFlight.getPrice();
-        }
+        // Add bag cost to the total price
+        totalPrice += bagCost;
 
-        // Check DashPass options and calculate total price accordingly
-        if ("new".equals(dashPassOption)) {
-            totalPrice += 50.0;
-        } else if ("existing".equals(dashPassOption) && !customer.getDashPasses().isEmpty()) {
-            dashPass = customer.getDashPasses().get(0); // Retrieve the first available DashPass
-        }
+        System.out.println("Bag Quantity: " + bagQuantity + ", Bag Cost: " + bagCost);
+        System.out.println("Total Price in Review Order POST: " + totalPrice);
 
-        // Redirect to the payment method details page with the updated URL parameters
-        return "redirect:employee/" + employeeId + "/customer/" + customerID + "/employeeflightpaymentdetails"
+
+        // Redirect to the payment method details page with all relevant parameters
+        return "redirect:/customer/" + customerID + "/employeeflightpaymentdetails"
                 + "?outboundFlightId=" + outboundFlightId
                 + (returnFlightId != null ? "&returnFlightId=" + returnFlightId : "")
                 + "&dashPassOption=" + dashPassOption
                 + "&tripType=" + tripType
+                + "&bagQuantity=" + bagQuantity
+                + "&bagCost=" + bagCost
                 + "&totalPrice=" + totalPrice
                 + (dashPass != null ? "&dashPassId=" + dashPass.getDashpassId() : "");
     }
@@ -296,6 +376,7 @@ public class EmployeeFlightController {
     public String showPaymentMethodPage(@PathVariable Long customerID,
                                         @PathVariable Long employeeId,
                                         @RequestParam("outboundFlightId") Long outboundFlightId,
+                                        @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
                                         @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
                                         @RequestParam("dashPassOption") String dashPassOption,
                                         @RequestParam("tripType") String tripType,
@@ -318,6 +399,7 @@ public class EmployeeFlightController {
         model.addAttribute("paymentDetailsDTO", new PaymentDetailsDTO());
         model.addAttribute("customer", customer);
         model.addAttribute("employee", employee);
+        model.addAttribute("bagQuantity", bagQuantity);
         model.addAttribute("outboundFlight", outboundFlight);
         model.addAttribute("returnFlight", returnFlight);
         model.addAttribute("dashPassOption", dashPassOption);
@@ -337,7 +419,7 @@ public class EmployeeFlightController {
                                    @RequestParam(value = "returnFlightId", required = false) Long returnFlightId,
                                    @RequestParam("dashPassOption") String dashPassOption,
                                    @RequestParam("tripType") String tripType,
-                                   @RequestParam("bagQuantity") int bagQuantity,
+                                   @RequestParam(value = "bagQuantity", defaultValue = "1") int bagQuantity,
                                    @RequestParam("totalPrice") double totalPrice,
                                    @RequestParam("userSelectedStatus") String userSelectedStatus,
                                    @RequestParam(value = "selectedPaymentMethodId", required = false) String selectedPaymentMethodId,
@@ -350,7 +432,7 @@ public class EmployeeFlightController {
 
         // Validate payment details if using a new payment method
         if ("new".equals(selectedPaymentMethodId) && bindingResult.hasErrors()) {
-            handlePaymentError(model, outboundFlightId, returnFlightId, customerID, tripType, dashPassOption, totalPrice, userSelectedStatus);
+            handlePaymentError(model, outboundFlightId, returnFlightId, employeeId, customerID, tripType, dashPassOption, bagQuantity, totalPrice, userSelectedStatus);
             return "employeeflightpaymentdetails";
         }
 
@@ -397,6 +479,9 @@ public class EmployeeFlightController {
             // Wait for payment completion and handle reservation status
             Reservation reservation = futureReservation.get();
             if (reservation.getPaymentStatus() == PaymentStatus.PAID) {
+                List<Bag> bags = reservation.getBags(); // Fetch associated bags
+
+                model.addAttribute("bags", bags); // Add bags to the model
                 model.addAttribute("reservation", reservation);
                 model.addAttribute("outboundFlight", reservation.getFlights().get(0));
 
@@ -413,13 +498,13 @@ public class EmployeeFlightController {
                 return "employeepurchasecomplete";
             } else {
                 // Handle payment failure
-                handlePaymentError(model, outboundFlightId, returnFlightId, customerID, tripType, dashPassOption, totalPrice, userSelectedStatus);
+                handlePaymentError(model, outboundFlightId, returnFlightId, employeeId, customerID, tripType, dashPassOption, bagQuantity, totalPrice, userSelectedStatus);
                 model.addAttribute("errorMessage", "Payment failed. Please try again.");
                 return "employeeflightpaymentdetails";
             }
         } catch (Exception e) {
             System.out.println("Unexpected exception: " + e.getMessage());
-            handlePaymentError(model, outboundFlightId, returnFlightId, customerID, tripType, dashPassOption, totalPrice, userSelectedStatus);
+            handlePaymentError(model, outboundFlightId, returnFlightId, employeeId, customerID, tripType, dashPassOption, bagQuantity, totalPrice, userSelectedStatus);
             model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
             return "employeeflightpaymentdetails";
         }
@@ -427,15 +512,17 @@ public class EmployeeFlightController {
 
 
     // Helper method to handle errors and return the model with necessary attributes
-    private void handlePaymentError(Model model, Long outboundFlightId, Long returnFlightId, Long customerID,
-                                    String tripType, String dashPassOption, double totalPrice, String userSelectedStatus) {
+    private void handlePaymentError(Model model, Long outboundFlightId, Long returnFlightId, Long employeeId, Long customerID,
+                                    String tripType, String dashPassOption, int bagQuantity, double totalPrice, String userSelectedStatus) {
         model.addAttribute("outboundFlight", flightService.findFlightById(outboundFlightId));
         if (returnFlightId != null) {
             model.addAttribute("returnFlight", flightService.findFlightById(returnFlightId));
         }
         model.addAttribute("customer", customerService.findCustomerById(customerID));
+        model.addAttribute("employee", employeeService.findEmployeeById(employeeId));
         model.addAttribute("tripType", tripType);
         model.addAttribute("dashPassOption", dashPassOption);
+        model.addAttribute("bagQuantity", bagQuantity);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("userSelectedStatus", userSelectedStatus);
     }
@@ -466,6 +553,13 @@ public class EmployeeFlightController {
             List<DashPassReservation> dashPassReservations = reservation.getDashPassReservations();
             if (dashPassReservations != null && !dashPassReservations.isEmpty()) {
                 model.addAttribute("dashPassReservations", dashPassReservations);
+            }
+            // Add bag details to the model
+            List<Bag> bags = reservation.getBags();
+            if (bags != null && !bags.isEmpty()) {
+                model.addAttribute("bags", bags);
+            } else {
+                model.addAttribute("bags", Collections.emptyList()); // Pass an empty list to avoid errors in the view
             }
         } else {
             // Handle case where no paid reservation is found

@@ -5,11 +5,24 @@
     <link rel="stylesheet" href="/styles/flights.css" />
 </head>
 <body>
-<header class="navbar southwest-yellow-bg">
-    <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Airlines Logo">
-    <form action="/perform_logout" method="post">
-        <button type="submit" class="logout-button southwest-blue-bg text-white rounded-button">Logout</button>
-    </form>
+<header>
+    <nav class="navbar">
+        <!-- Left: Logo -->
+        <div class="navbar-left">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+            </a>
+        </div>
+
+        <!-- Right: Links and Logout Button -->
+        <div class="navbar-right">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+            </form>
+        </div>
+    </nav>
 </header>
 
 <div class="container southwest-blue-bg">
@@ -69,15 +82,14 @@
         </div>
 
         <!-- Round-Trip Flights Section -->
+        <!-- Outbound Flights Section -->
         <div th:if="${!#lists.isEmpty(roundTripFlights)}" class="card-container">
-            <h3 class="section-title southwest-yellow-text">Available Round Trip Flights</h3>
+            <h3 class="section-title southwest-yellow-text">Available Outbound Flights</h3>
             <div th:each="roundTrip : ${roundTripFlights}">
-                <h4 class="section-header" th:text="'Trip ID: ' + ${roundTrip.tripId}">Trip ID</h4>
-
-                <!-- Outbound Flights for Round Trip -->
-                <div class="flight-card">
+                <!-- Loop through Outbound Flights for each Round Trip -->
+                <div th:each="outbound : ${roundTrip.outboundFlights}" class="flight-card">
                     <h5 class="section-title">Outbound Flight</h5>
-                    <div class="flight-details" th:each="outbound : ${roundTrip.outboundFlights}">
+                    <div class="flight-details">
                         <p><strong>Flight Number:</strong> <span th:text="${outbound.flightNumber}">FL0000</span></p>
                         <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(outbound.departureDate, 'MM-dd-yyyy')}">Date</span></p>
                         <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outbound.departureTime, 'hh:mm a')}">Time</span></p>
@@ -89,39 +101,41 @@
                             <p class="seat-warning">Only <span th:text="${outbound.numberOfSeatsAvailable}"></span> seats left! Book soon!</p>
                         </div>
 
-                        <!-- DashPass Option (Only for Outbound Flights in Round Trip) -->
+                        <!-- DashPass Option -->
                         <div>
                             <p><strong>DashPass Option:</strong></p>
                             <div th:if="${outbound.numberOfDashPassesAvailable > 0}">
                                 <div th:if="${showExistingDashPassMap[outbound.flightID]}">
-                                    <input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass<br>
+                                    <label><input type="radio" name="dashPassOption" value="existing" required> Use Existing DashPass</label><br>
                                 </div>
                                 <div th:if="${showNewDashPassMap[outbound.flightID]}">
-                                    <input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)<br>
+                                    <label><input type="radio" name="dashPassOption" value="new"> Purchase New DashPass ($50.00)</label><br>
                                 </div>
-                                <div>
-                                    <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
-                                </div>
+                                <label><input type="radio" name="dashPassOption" value="none"> Do not use DashPass</label>
                             </div>
                             <div th:if="${outbound.numberOfDashPassesAvailable == 0}">
                                 <p class="no-dashpass-message">No DashPasses available for this flight.</p>
-                                <div>
-                                    <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
-                                </div>
+                                <label><input type="radio" name="dashPassOption" value="none"> Do not use DashPass</label>
                             </div>
                         </div>
 
                         <!-- Select Outbound Flight -->
                         <div>
-                            <input type="radio" name="outboundFlightId" th:value="${outbound.flightID}" required> Select this Outbound Flight
+                            <label><input type="radio" name="outboundFlightId" th:value="${outbound.flightID}" required> Select this Outbound Flight</label>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Return Flights for Round Trip -->
-                <div class="flight-card">
-                    <h5 class="section-title">Return Flights</h5>
-                    <div class="flight-details" th:each="returnFlight : ${roundTrip.returnFlights}">
+
+        <!-- Return Flights Section -->
+        <div th:if="${!#lists.isEmpty(roundTripFlights)}" class="card-container">
+            <h3 class="section-title southwest-yellow-text">Available Return Flights</h3>
+            <div th:each="roundTrip : ${roundTripFlights}">
+                <div th:each="returnFlight : ${roundTrip.returnFlights}" class="flight-card">
+                    <h4 class="section-title">Return Flight</h4>
+                    <div class="flight-details">
                         <p><strong>Flight Number:</strong> <span th:text="${returnFlight.flightNumber}">FL0000</span></p>
                         <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
                         <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
@@ -135,17 +149,18 @@
 
                         <!-- Select Return Flight -->
                         <div>
-                            <input type="radio" name="returnFlightId" th:value="${returnFlight.flightID}" required> Select this Return Flight
+                            <label><input type="radio" name="returnFlightId" th:value="${returnFlight.flightID}" required> Select this Return Flight</label>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+
         <!-- Submit Button for both One-Way and Round-Trip -->
         <div class="button-group">
             <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Cancel</button>
-            <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Proceed To Add Bags</button>
+            <button class="confirm-button southwest-yellow-bg rounded-button" type="submit">Continue</button>
         </div>
     </form>
 </div>

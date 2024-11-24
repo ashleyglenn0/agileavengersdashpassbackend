@@ -5,6 +5,25 @@
   <link rel="stylesheet" th:href="@{/styles/reservations.css}" />
 </head>
 <body>
+<header>
+  <nav class="navbar">
+    <!-- Left: Logo -->
+    <div class="navbar-left">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+      </a>
+    </div>
+
+    <!-- Right: Links and Logout Button -->
+    <div class="navbar-right">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
 <div class="container">
   <h2>All Reservations</h2>
   <!-- Check if there are any reservations -->
@@ -65,24 +84,37 @@
           <a th:href="@{/customer/{customerId}/reservation/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
             <button class="button">Reservation</button>
           </a>
-          <a th:if="${userRole == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or
-                userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or
-                userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+          <!-- View Ticket for Employees -->
+          <a th:if="${employee != null and
+          (userRole == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or
+           userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or
+           userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER)}"
              th:href="@{/employee/{employeeId}/validateReservation/customer/{customerId}/reservations/{reservationId}(employeeId=${employee.id}, customerId=${customer.id}, reservationId=${reservation.reservationId})}">
             <button type="button" class="button">View Ticket (Employee)</button>
           </a>
 
-          <!-- Default link for other roles (e.g., customers) -->
+          <!-- View Ticket for Customers -->
           <a th:unless="${userRole == T(agileavengers.southwest_dashpass.models.Role).SUPPORT or
-                   userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or
-                   userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
+               userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or
+               userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER}"
              th:href="@{/customer/{customerId}/ticket/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}">
             <button type="button" class="button">View Ticket</button>
           </a>
-          <!-- Track Bags Button -->
-          <a th:if="${reservation.bags != null and !#lists.isEmpty(reservation.bags)}"
+
+          <!-- Track Bags Button for Employees -->
+          <a th:if="${employee != null
+            and reservation.bags != null
+            and !#lists.isEmpty(reservation.bags)
+            and (userRole == T(agileavengers.southwest_dashpass.models.Role).BAGGAGE_CLAIM
+                 or userRole == T(agileavengers.southwest_dashpass.models.Role).SALES or userRole == T(agileavengers.southwest_dashpass.models.Role).MANAGER)}"
+             th:href="@{/employee/{employeeId}/trackbag/customer/{customerId}/reservation/{reservationId}(employeeId=${employee.id}, customerId=${customer.id}, reservationId=${reservation.reservationId})}">
+            <button class="button">Track Bags (Employee)</button>
+          </a>
+
+          <!-- Track Bags Button for Customers -->
+          <a th:if="${employee == null}"
              th:href="@{/customer/{customerId}/trackbag(reservationId=${reservation.reservationId}, customerId=${customer.id})}">
-            <button class="button">Track Bags</button>
+            <button type="button" class="button">Track Bags</button>
           </a>
         </div>
       </td>

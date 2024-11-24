@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -40,6 +41,8 @@ public class EmployeeDashboardController {
     private SalesRecordService salesRecordService;
     @Autowired
     private ShiftService shiftService;
+    @Autowired
+    private BagService bagService;
 
     @GetMapping("/employee/{employeeId}/employeedashboard")
     public String showEmployeeDashboard(@PathVariable Long employeeId, Model model, Principal principal) {
@@ -108,7 +111,9 @@ public class EmployeeDashboardController {
     @GetMapping("/employee/{employeeId}/addcustomer")
     public String showAddCustomerForm(@PathVariable Long employeeId, Model model) {
         // Add any model attributes if needed, such as employee information for context
+        Employee employee = employeeService.findEmployeeById(employeeId);
         model.addAttribute("employeeId", employeeId); // Optional: pass employeeId for tracking
+        model.addAttribute("employee", employee);
         return "addcustomer"; // This is the name of your Thymeleaf template for the Add Customer form
     }
 
@@ -286,6 +291,7 @@ public class EmployeeDashboardController {
                 ));
 
         // Add necessary attributes to the model
+        model.addAttribute("employee", employee);
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("salesType", salesType);
         model.addAttribute("salesRecords", salesRecords);
@@ -310,6 +316,78 @@ public class EmployeeDashboardController {
         employeeService.editCustomerDetails(customerDto, employeeRole);
 
         return "redirect:/employee/" + employeeId + "/employeedashboard";
+    }
+
+    @GetMapping("/employee/{employeeId}/trackbag/customer/{customerId}/reservation/{reservationId}")
+    public String viewTrackBags(
+            @PathVariable Long employeeId,
+            @PathVariable Long customerId,
+            @PathVariable Long reservationId,
+            Model model) {
+        Customer customer = customerService.findCustomerById(customerId);
+        Employee employee = employeeService.findEmployeeById(employeeId);
+
+        List<Bag> bags;
+        Reservation reservation = null;
+
+        if (reservationId != null) {
+            bags = bagService.findBagsByReservationId(reservationId);
+            reservation = reservationService.findById(reservationId); // Fetch reservation
+        } else {
+            bags = bagService.findBagsByCustomerId(customerId);
+        }
+
+        // Get the bag status (use the first bag's status for simplicity)
+        String bagStatusDisplayName = bags.isEmpty() ? null : bags.get(0).getStatus().getDisplayName().trim();
+
+        // Generate randomized time between 5 and 25 minutes
+        int randomizedTimeToNextStep = new Random().nextInt(21) + 5;
+
+        Role userRole = employee.getRole();
+
+
+        // Debugging
+        System.out.println("Bag Status Display Name: " + bagStatusDisplayName);
+        System.out.println("Randomized Time to Next Step: " + randomizedTimeToNextStep);
+        System.out.println("Flight: " + (reservation != null && !reservation.getFlights().isEmpty() ? reservation.getFlights().get(0) : "No flight found"));
+
+        model.addAttribute("randomizedTimeToNextStep", randomizedTimeToNextStep);
+        model.addAttribute("customer", customer);
+        model.addAttribute("employee", employee);
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("userRole", userRole);
+        model.addAttribute("bags", bags);
+        model.addAttribute("bagStatus", bagStatusDisplayName); // Use display name
+        model.addAttribute("flight", reservation != null && !reservation.getFlights().isEmpty() ? reservation.getFlights().get(0) : null);
+
+        return "trackbag";
+    }
+
+
+    @PostMapping("/employee/{employeeId}/updateBagStatus/customer/{customerId}/reservation/{reservationId}")
+    public String updateBagStatus(
+            @PathVariable Long employeeId,
+            @PathVariable Long customerId,
+            @PathVariable Long reservationId,
+            @RequestParam String nextStatus,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // Update bag status
+            bagService.updateBagStatus(reservationId, nextStatus);
+
+            // Add a success message
+            redirectAttributes.addFlashAttribute("successMessage", "Bag status updated successfully.");
+        } catch (IllegalArgumentException e) {
+            // Add an error message for invalid status
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid bag status: " + nextStatus);
+        } catch (Exception e) {
+            // Add a generic error message for any other issue
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update bag status. Please try again.");
+        }
+
+        // Redirect back to the track bag page for the reservation
+        return "redirect:/customer/" + customerId + "/trackbag?reservationId=" + reservationId;
     }
 
 }
