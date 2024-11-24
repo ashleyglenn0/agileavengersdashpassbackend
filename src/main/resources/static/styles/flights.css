@@ -1,53 +1,43 @@
-/* General Styling */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #00338D; /* Southwest Blue */
-    color: #ffffff;
-}
-
-/* Header Styling */
-/* Navbar Styling */
+/* Navbar */
 .navbar {
     background-color: #FFC72C; /* Southwest Yellow */
-    color: #00338D; /* Southwest Blue for text */
-    padding: 10px;
-    margin-bottom: 20px;
+    color: #00338D; /* Southwest Blue */
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-radius: 5px;
-}
-
-/* Navbar Left (Logo) */
-.navbar-left img {
-    height: 40px; /* Size of the Southwest logo */
-}
-
-/* Navbar Right (Links and Logout Button) */
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Space between links and button */
+    position: fixed; /* Ensure navbar is fixed */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    z-index: 1000; /* Ensure navbar stays on top */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Navbar Links */
 .navbar-link {
-    text-decoration: none;
-    color: #00338D; /* Southwest Blue */
+    font-size: 1.0rem; /* Match size in the first picture */
     font-weight: bold;
-    margin-right: 15px; /* Add space to the right of each link */
+    color: #00338D; /* Southwest Blue */
+    text-decoration: none;
 }
 
 .navbar-link:hover {
-    text-decoration: underline; /* Hover effect for links */
+    text-decoration: underline; /* Add hover effect */
+}
+
+/* Optional: Adjust spacing if needed */
+.navbar-link {
+    margin-right: 20px; /* Space between links */
 }
 
 /* Logout Button */
 .button {
     background-color: #00338D; /* Southwest Blue */
-    color: #ffffff; /* White text */
+    color: #FFFFFF; /* White text */
+    font-size: 1.0rem; /* Match size of navbar text */
+    font-weight: bold;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -55,168 +45,141 @@ body {
 }
 
 .button:hover {
-    background-color: #00255A; /* Darker blue for hover */
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-    .navbar-right {
-        flex-direction: column; /* Stack links and button vertically */
-        gap: 10px; /* Space between stacked elements */
-    }
+    background-color: #00255A; /* Slightly darker blue on hover */
 }
 
 
-/* Main Container */
+/* Add spacing to account for fixed navbar */
+body {
+    padding-top: 80px; /* Adjust for navbar height */
+    background-color: #00338D; /* Southwest Blue */
+    font-family: Arial, sans-serif;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+/* Main Content Container */
 .container {
     max-width: 800px;
-    margin: 20px auto;
+    margin: 0 auto; /* Center align content */
     padding: 20px;
-    background-color: #004287; /* Southwest Blue */
-    color: #ffffff;
-    text-align: center;
+    background-color: #00338D; /* Southwest Blue */
     border-radius: 8px;
 }
 
-/* Section Title */
+/* Section Titles */
 .section-title {
-    font-size: 24px;
-    color: #ffbf27; /* Southwest Yellow */
-    margin-bottom: 20px;
-}
-
-/* Message for No Flights */
-.no-flights-message {
-    font-size: 18px;
-    color: #ffffff;
-    margin: 20px 0;
-}
-
-/* Card Container */
-.card-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* Individual Flight Card Styling */
-.flight-card {
-    background-color: #f0f4fa; /* Light background for contrast */
-    color: #004287; /* Southwest Blue text */
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e0e0e0;
-    margin-bottom: 20px;
+    color: #FFC72C; /* Southwest Yellow */
+    font-size: 1.8rem;
+    margin-bottom: 15px;
     text-align: left;
 }
 
-.flight-card h5.section-title {
-    color: #ffb400; /* Southwest Yellow */
-    margin-bottom: 10px;
-}
-
-.flight-card p {
-    margin: 5px 0;
-}
-
-/* Seat Availability Warning */
-.seat-warning {
-    color: red;
-    font-style: italic;
-    font-size: 0.9em;
-}
-
-/* Button Group */
-.button-group {
+/* Flight Card Container */
+.card-container {
+    margin: 20px 0; /* Add spacing above and below */
     display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* Buttons */
-.back-button,
-.confirm-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    background-color: #ffb400; /* Southwest Yellow */
-    color: #004287;
-    font-weight: bold;
-}
-
-.back-button:hover, .confirm-button:hover {
-    background-color: #e0a500; /* Darken on hover */
-}
-
-/* Footer Styling */
-.footer {
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 14px;
-    color: #004287;
-    background-color: #ffbf27; /* Southwest Yellow */
-}
-
-/* Flight Section Styling */
-.flight-section {
-    background-color: #ffffff;
+/* Flight Card Styling */
+.flight-card {
+    background-color: #FFFFFF;
+    color: #00338D; /* Southwest Blue */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 15px;
-    color: #333333; /* Dark text for contrast */
+    margin-bottom: 20px; /* Add spacing between cards */
+    border: 1px solid #E5E7EB;
+    text-align: left;
 }
 
-/* Flight Details Container */
+/* Flight Details */
 .flight-details {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    color: #333333;
+    gap: 10px; /* Add spacing between details */
 }
 
-/* Divider Line Between Flight Cards */
-.card-container .flight-section {
-    border-bottom: 1px solid #cccccc;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+.flight-details p {
+    margin: 5px 0;
+    font-size: 1rem;
 }
 
-.card-container .flight-section:last-child {
-    border-bottom: none; /* Remove divider after the last flight */
+/* Section Titles */
+.section-title {
+    color: #FFC72C; /* Southwest Yellow */
+    font-size: 1.5rem;
+    margin-bottom: 10px;
 }
 
+/* DashPass Messages */
 .no-dashpass-message {
     color: red;
     font-style: italic;
     margin-top: 5px;
 }
 
-.dashpass-terms {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+/* Seat Warning */
+.seat-warning {
+    color: red;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Buttons for Selection */
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+.button-group button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue */
+}
+
+.button-group button:hover {
+    background-color: #FFD56E; /* Slightly lighter yellow */
+}
+
+/* Return Flights Section */
+.return-flights {
+    margin-top: 30px; /* Space above return flights */
+}
+
+.return-flights .flight-card {
     padding: 15px;
-    margin-top: 20px;
-    color: #333333;
+    margin-bottom: 20px; /* Space between return flight cards */
+    background-color: #F9FAFB; /* Light background for contrast */
+    border: 1px solid #E5E7EB;
 }
 
-.dashpass-terms h4 {
-    color: #00338D; /* Southwest blue */
-    margin-bottom: 10px;
+/* Footer */
+.footer {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: #FFC72C; /* Southwest Yellow */
+    text-align: center;
+    color: #00338D;
+    font-size: 0.9rem;
 }
 
-.dashpass-terms ul {
-    padding-left: 20px;
-    list-style-type: disc;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .flight-card {
+        padding: 15px;
+    }
 }
-
-.dashpass-terms li {
-    margin-bottom: 8px;
-}
-
-
-

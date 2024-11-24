@@ -101,7 +101,7 @@
   </form>
 
   <!-- Return to Dashboard Button -->
-  <button class="button" onclick="window.history.back();">Return to Dashboard</button>
+  <button class="button" th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/customerdashboard\''">Return to Dashboard</button>
 </div>
 
 </body>

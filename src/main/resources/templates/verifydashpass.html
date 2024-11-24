@@ -24,12 +24,9 @@
   </nav>
 </header>
 
-<header>
-  <h1>DashPass Verification</h1>
-</header>
-
 <div class="container">
   <!-- Search Section with Separate Forms for Customer and DashPass Search -->
+  <h1>DashPass Verification</h1>
   <section class="search-section">
 
     <!-- Form to Search by Customer Name -->
@@ -47,7 +44,7 @@
   </section>
 
   <!-- Back to Dashboard Button -->
-  <button type="button" class="back-button" onclick="window.history.back();">Back to Dashboard</button>
+  <button type="button" class="back-button" th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/employeedashboard\''">Back to Dashboard</button>
 
   <!-- Thymeleaf Conditional Rendering -->
   <section class="results-section">

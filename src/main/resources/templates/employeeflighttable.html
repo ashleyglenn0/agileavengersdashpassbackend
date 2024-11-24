@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Available Flights (Employee View)</title>
-  <link rel="stylesheet" href="/styles/flights.css" />
+  <link rel="stylesheet" href="/styles/employeeflightinfo.css" />
 </head>
 <body>
 <header>
@@ -23,7 +23,7 @@
 </header>
 
 <div class="container southwest-blue-bg">
-  <h3 class="section-title southwest-yellow-text">Available Flights (Employee View)</h3>
+  <h3 class="section-title southwest-yellow-text">Available Flights (For Internal Personnel Only)</h3>
 
   <!-- Message if no flights are found -->
   <div th:if="${#lists.isEmpty(outboundFlights) && #lists.isEmpty(roundTripFlights)}" class="no-flights-message">

@@ -64,7 +64,7 @@
 
         <!-- All Buttons in a Row at the Bottom -->
         <div class="bottom-buttons">
-            <button class="button southwest-yellow-bg text-dark">Go Back</button>
+            <button class="button southwest-yellow-bg text-dark" onclick="window.history.back();">Go Back</button>
             <button id="editButton" class="button southwest-yellow-bg text-dark" onclick="toggleEditMode()">Edit</button>
             <a th:href="@{/employee/{employeeId}/customer/{customerId}/purchaseDashPass(employeeId=${employee.id}, customerId=${customer.id})}">
                 <button class="button southwest-yellow-bg text-dark">Add DashPass</button>

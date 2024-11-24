@@ -23,7 +23,7 @@ body {
 .navbar {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Ensure items are spread evenly */
     align-items: center;
     padding: 10px 20px;
     background-color: var(--southwest-yellow);
@@ -35,15 +35,20 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Adjust logo styling */
 .navbar .logo {
     height: 50px;
+    display: block;
 }
 
+/* Align Home link better */
 .nav-links {
     list-style: none;
     display: flex;
     gap: 15px;
     margin: 0;
+    padding: 0;
+    align-items: center; /* Vertical alignment */
 }
 
 .nav-links li {
@@ -54,14 +59,16 @@ body {
     text-decoration: none;
     color: var(--southwest-blue);
     font-weight: bold;
+    font-size: 1rem;
+    padding: 5px 10px; /* Add padding for better click area */
 }
 
-/* Login Container */
+/* Ensure proper spacing between navbar and page content */
 .content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 80px;  /* Offset for fixed navbar */
+    margin-top: 100px; /* Increase margin to adjust for fixed navbar height */
     width: 90%;
     max-width: 400px;
 }
@@ -143,4 +150,18 @@ body {
     .navbar, .login-container {
         width: 90%;
     }
+    .navbar {
+            flex-direction: row; /* Maintain horizontal layout */
+            padding: 10px;
+        }
+
+        .nav-links {
+            flex-wrap: wrap; /* Allow wrapping of links if needed */
+            justify-content: center;
+            gap: 10px; /* Adjust spacing for smaller screens */
+        }
+
+        .content {
+            margin-top: 120px; /* Adjust margin to compensate for navbar wrapping */
+        }
 }

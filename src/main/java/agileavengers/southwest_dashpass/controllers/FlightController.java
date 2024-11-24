@@ -394,6 +394,7 @@ public class FlightController {
 
         try {
             Customer customer = customerService.findCustomerById(customerID);
+            model.addAttribute("customer", customer);
             if (customer == null) {
                 throw new IllegalStateException("Customer not found for ID: " + customerID);
             }

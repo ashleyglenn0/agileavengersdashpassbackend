@@ -144,6 +144,7 @@ public class CustomerDashboardController {
 
         // Find the customer by ID
         Customer customer = customerService.findCustomerById(customerID);
+        model.addAttribute("customer", customer);
         if (customer == null) {
             model.addAttribute("errorMessage", "Customer not found.");
             return "send-support-request";
