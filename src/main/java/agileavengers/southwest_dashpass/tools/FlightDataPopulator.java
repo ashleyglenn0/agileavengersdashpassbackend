@@ -97,7 +97,7 @@ public class FlightDataPopulator {
             int maxSeats = 100 + random.nextInt(101); // Random seat capacity between 100-200
             int seatsSold = random.nextInt(maxSeats); // Random seats sold (can reach maxSeats)
             int dashPassesAvailable = random.nextInt(16); // Random DashPass availability (0–15)
-            double price = 100 + (random.nextInt(401) + random.nextDouble()); // Random price between $100–$300
+            double price = 100 + (random.nextInt(402) + random.nextDouble()); // Random price between $100–$300
 
             Flight outboundFlight = new Flight();
             outboundFlight.setFlightNumber(flightNumber);
