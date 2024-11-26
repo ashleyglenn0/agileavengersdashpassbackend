@@ -48,109 +48,89 @@ public class FlightDataPopulator {
     }
 
     public void populateFlights(int count) {
-        Random random = new Random();
-
-        // Fetch existing flight numbers once and store them in a Set for fast lookup
-        Set<String> existingFlightNumbers = new HashSet<>(flightRepository.findAllFlightNumbers());
+        // Example hardcoded values for testing
+        String[] departureCodes = {"LAX", "JFK", "ORD", "ATL", "SFO"};
+        String[] arrivalCodes = {"MIA", "DFW", "SEA", "PHL", "MSY"};
+        TripType[] tripTypes = {TripType.ONE_WAY, TripType.ROUND_TRIP};
 
         for (int i = 0; i < count; i++) {
             String tripId = UUID.randomUUID().toString();
-            String departureCode = getRandomAirportCode(random);
-            String arrivalCode = getRandomAirportCode(random);
+            String departureCode = departureCodes[i % departureCodes.length];
+            String arrivalCode = arrivalCodes[i % arrivalCodes.length];
+            TripType tripType = tripTypes[i % tripTypes.length];
 
-            while (departureCode.equals(arrivalCode)) {
-                arrivalCode = getRandomAirportCode(random);
-            }
+            // Debugging: Log hardcoded data
+            System.out.println("Trip ID: " + tripId);
+            System.out.println("Departure Code: " + departureCode);
+            System.out.println("Arrival Code: " + arrivalCode);
+            System.out.println("Trip Type: " + tripType);
 
-            // Fetch or create departure and arrival airports
-            Airport departureAirport = createOrFetchAirport(departureCode);
-            Airport arrivalAirport = createOrFetchAirport(arrivalCode);
+            // Outbound flight
+            String flightNumber = "FL" + (i + 1000); // Unique flight number
+            LocalDate departureDate = LocalDate.now().plusDays(i);
+            LocalDateTime departureTime = departureDate.atTime(8 + (i % 10), 30); // Fixed morning times
+            LocalDateTime arrivalTime = departureTime.plusHours(3); // Fixed duration
+            int maxSeats = 150; // Fixed seat capacity
+            int seatsSold = 50; // Fixed seats sold
+            int dashPassesAvailable = 10; // Fixed DashPass availability
 
-            boolean isRoundTrip = random.nextBoolean();
-            TripType tripType = isRoundTrip ? TripType.ROUND_TRIP : TripType.ONE_WAY;
+            Flight outboundFlight = new Flight();
+            outboundFlight.setFlightNumber(flightNumber);
+            outboundFlight.setDepartureAirportCode(departureCode);
+            outboundFlight.setArrivalAirportCode(arrivalCode);
+            outboundFlight.setDepartureDate(departureDate);
+            outboundFlight.setArrivalDate(arrivalTime.toLocalDate());
+            outboundFlight.setDepartureTime(departureTime.toLocalTime());
+            outboundFlight.setArrivalTime(arrivalTime.toLocalTime());
+            outboundFlight.setDirection("OUTBOUND");
+            outboundFlight.setTripId(tripId);
+            outboundFlight.setTripType(tripType);
+            outboundFlight.setPrice(299.99); // Fixed price
+            outboundFlight.setAvailableSeats(maxSeats);
+            outboundFlight.setSeatsSold(seatsSold);
+            outboundFlight.setNumberOfSeatsAvailable(maxSeats - seatsSold);
+            outboundFlight.setMaxNumberOfDashPassesForFlight(15);
+            outboundFlight.setNumberOfDashPassesAvailable(dashPassesAvailable);
+            outboundFlight.setCanAddNewDashPass(true);
+            outboundFlight.setCanUseExistingDashPass(true);
 
-            LocalDate outboundDate = LocalDate.now().plusDays(random.nextInt(30));
-            int outboundFlightsOnSameDay = random.nextInt(4) + 2;
+            // Save outbound flight
+            flightRepository.save(outboundFlight);
+            System.out.println("Saved Outbound Flight: " + outboundFlight.getFlightNumber());
 
-            for (int j = 0; j < outboundFlightsOnSameDay; j++) {
-                String flightNumber = generateUniqueFlightNumber(existingFlightNumbers, random);
-                LocalDateTime departureTime = outboundDate.atStartOfDay()
-                        .plusHours(random.nextInt(12) + 6)
-                        .plusMinutes(random.nextInt(60));
-                int durationMinutes = 60 + random.nextInt(240);
-                LocalDateTime arrivalTime = departureTime.plusMinutes(durationMinutes);
+            // Return flight for round trips
+            if (tripType == TripType.ROUND_TRIP) {
+                LocalDate returnDate = departureDate.plusDays(3); // Return 3 days later
+                LocalDateTime returnDepartureTime = returnDate.atTime(10 + (i % 5), 0); // Fixed times
+                LocalDateTime returnArrivalTime = returnDepartureTime.plusHours(3); // Fixed duration
 
-                int maxSeats = 50 + random.nextInt(151); // Random seats between 50 and 200
-                int seatsSold = random.nextInt(maxSeats);
-                int dashPassesAvailable = random.nextInt(16); // DashPass availability between 0 and 15
-                boolean dashPassAvailable = dashPassesAvailable > 0;
+                Flight returnFlight = new Flight();
+                returnFlight.setFlightNumber(flightNumber + "R");
+                returnFlight.setDepartureAirportCode(arrivalCode);
+                returnFlight.setArrivalAirportCode(departureCode);
+                returnFlight.setDepartureDate(returnDepartureTime.toLocalDate());
+                returnFlight.setArrivalDate(returnArrivalTime.toLocalDate());
+                returnFlight.setDepartureTime(returnDepartureTime.toLocalTime());
+                returnFlight.setArrivalTime(returnArrivalTime.toLocalTime());
+                returnFlight.setDirection("RETURN");
+                returnFlight.setTripId(tripId);
+                returnFlight.setTripType(TripType.ROUND_TRIP);
+                returnFlight.setPrice(299.99);
+                returnFlight.setAvailableSeats(maxSeats);
+                returnFlight.setSeatsSold(seatsSold);
+                returnFlight.setNumberOfSeatsAvailable(maxSeats - seatsSold);
+                returnFlight.setMaxNumberOfDashPassesForFlight(15);
+                returnFlight.setNumberOfDashPassesAvailable(dashPassesAvailable);
+                returnFlight.setCanAddNewDashPass(true);
+                returnFlight.setCanUseExistingDashPass(true);
 
-                // Create Outbound Flight
-                Flight outboundFlight = new Flight();
-                outboundFlight.setFlightNumber(flightNumber);
-                outboundFlight.setDepartureAirportCode(departureAirport.getAirportCode());
-                outboundFlight.setArrivalAirportCode(arrivalAirport.getAirportCode());
-                outboundFlight.setDepartureDate(departureTime.toLocalDate());
-                outboundFlight.setArrivalDate(arrivalTime.toLocalDate());
-                outboundFlight.setDepartureTime(departureTime.toLocalTime());
-                outboundFlight.setArrivalTime(arrivalTime.toLocalTime());
-                outboundFlight.setDirection("OUTBOUND");
-                outboundFlight.setTripId(tripId);
-                outboundFlight.setTripType(tripType);
-                outboundFlight.setPrice(100 + (random.nextDouble() * (500 - 100)));
-                outboundFlight.setAvailableSeats(maxSeats);
-                outboundFlight.setSeatsSold(seatsSold);
-                outboundFlight.setNumberOfSeatsAvailable(maxSeats - seatsSold);
-                outboundFlight.setMaxNumberOfDashPassesForFlight(15);
-                outboundFlight.setNumberOfDashPassesAvailable(dashPassesAvailable);
-                outboundFlight.setCanAddNewDashPass(dashPassAvailable);
-                outboundFlight.setCanUseExistingDashPass(dashPassAvailable);
-
-                flightRepository.save(outboundFlight);
-
-                if (isRoundTrip) {
-                    LocalDate returnDate = outboundDate.plusDays(1 + random.nextInt(7));
-                    int returnFlightsOnSameDay = random.nextInt(4) + 2;
-
-                    for (int k = 0; k < returnFlightsOnSameDay; k++) {
-                        LocalDateTime returnDepartureTime = returnDate.atStartOfDay()
-                                .plusHours(random.nextInt(12) + 6)
-                                .plusMinutes(random.nextInt(60));
-                        LocalDateTime returnArrivalTime = returnDepartureTime.plusMinutes(60 + random.nextInt(240));
-
-                        maxSeats = 50 + random.nextInt(151); // New random seats for return flight
-                        seatsSold = random.nextInt(maxSeats);
-                        dashPassesAvailable = random.nextInt(16);
-                        dashPassAvailable = dashPassesAvailable > 0;
-
-                        // Create Return Flight
-                        Flight returnFlight = new Flight();
-                        returnFlight.setFlightNumber(generateUniqueFlightNumber(existingFlightNumbers, random));
-                        returnFlight.setDepartureAirportCode(arrivalAirport.getAirportCode());
-                        returnFlight.setArrivalAirportCode(departureAirport.getAirportCode());
-                        returnFlight.setDepartureDate(returnDepartureTime.toLocalDate());
-                        returnFlight.setArrivalDate(returnArrivalTime.toLocalDate());
-                        returnFlight.setDepartureTime(returnDepartureTime.toLocalTime());
-                        returnFlight.setArrivalTime(returnArrivalTime.toLocalTime());
-                        returnFlight.setDirection("RETURN");
-                        returnFlight.setTripId(tripId);
-                        returnFlight.setTripType(TripType.ROUND_TRIP);
-                        returnFlight.setReturnDate(returnDate);
-                        returnFlight.setPrice(100 + (random.nextDouble() * (500 - 100)));
-                        returnFlight.setAvailableSeats(maxSeats);
-                        returnFlight.setSeatsSold(seatsSold);
-                        returnFlight.setNumberOfSeatsAvailable(maxSeats - seatsSold);
-                        returnFlight.setMaxNumberOfDashPassesForFlight(15);
-                        returnFlight.setNumberOfDashPassesAvailable(dashPassesAvailable);
-                        returnFlight.setCanAddNewDashPass(dashPassAvailable);
-                        returnFlight.setCanUseExistingDashPass(dashPassAvailable);
-
-                        flightRepository.save(returnFlight);
-                    }
-                }
+                // Save return flight
+                flightRepository.save(returnFlight);
+                System.out.println("Saved Return Flight: " + returnFlight.getFlightNumber());
             }
         }
     }
+
 
 
     private String getRandomAirportCode(Random random) {

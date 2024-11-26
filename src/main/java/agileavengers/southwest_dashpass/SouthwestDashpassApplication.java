@@ -44,7 +44,7 @@ public class SouthwestDashpassApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// Call the flight data generator here
-		flightDataPopulator.populateFlightsIfEmpty(); // Generate 100 random flights
+		flightDataPopulator.populateFlights(15); // Generate 100 random flights
 		System.out.println("Flights generated successfully.");
 	}
 
