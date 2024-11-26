@@ -17,16 +17,16 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long flightID;
 
-    @Column(name="flightNumber")
+    @Column(name="flight_number")
     private String flightNumber;
 
-    @Column(name="departureDate")
+    @Column(name="departure_date")
     private LocalDate departureDate;
-    @Column(name="arrivalDate")
+    @Column(name="arrival_date")
     private LocalDate arrivalDate;
-    @Column(name="departureTime")
+    @Column(name="departure_time")
     private LocalTime departureTime;
-    @Column(name="arrivalTime")
+    @Column(name="arrival_time")
     private LocalTime arrivalTime;
     @Column(name="price")
     private double price;
@@ -37,28 +37,28 @@ public class Flight {
     @Column(name="arrival_airport_code")
     private String arrivalAirportCode; // Use code instead of ID
 
-    @Column(name="availableSeats")
+    @Column(name="available_seats")
     private Integer availableSeats;
 
-    @Column(name="canAddNewDashPass")
+    @Column(name="can_add_new_dash_pass")
     private Boolean canAddNewDashPass;
 
-    @Column(name="canUseExistingDashPass")
+    @Column(name="can_use_existing_dash_pass")
     private Boolean canUseExistingDashPass;
 
-    @Column(name="maxNumberOfDashPassesForFlight")
+    @Column(name="max_number_of_dash_passes_for_flight")
     private Integer maxNumberOfDashPassesForFlight;
 
-    @Column(name="numberOfDashPassesAvailable")
+    @Column(name="number_of_dash_passes_available")
     private Integer numberOfDashPassesAvailable;
 
-    @Column(name="numberOfSeatsAvailable")
+    @Column(name="number_of_seats_available")
     private Integer numberOfSeatsAvailable;
 
-    @Column(name="seatsSold")
+    @Column(name="seats_sold")
     private Integer seatsSold;
 
-    @Column(name="returnDate")
+    @Column(name="return_date")
     private LocalDate returnDate;
 
     @OneToOne
