@@ -23,6 +23,9 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
 
     List<Flight> findFlightsByDepartureDateBefore(LocalDate departureDate);
 
+    @Query("SELECT f.flightNumber FROM Flight f")
+    List<String> findAllFlightNumbers();
+
 
     // For one-way and outbound flights
     List<Flight> findByDepartureAirportCodeAndArrivalAirportCodeAndDepartureDateAndTripType(

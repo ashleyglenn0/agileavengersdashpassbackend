@@ -8,16 +8,12 @@ import agileavengers.southwest_dashpass.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 @Component
 public class FlightDataPopulator {
-    NumberFormat currency = NumberFormat.getCurrencyInstance();
-
     @Autowired
     private FlightRepository flightRepository;
 
@@ -54,6 +50,9 @@ public class FlightDataPopulator {
     public void populateFlights(int count) {
         Random random = new Random();
 
+        // Fetch existing flight numbers once and store them in a Set for fast lookup
+        Set<String> existingFlightNumbers = new HashSet<>(flightRepository.findAllFlightNumbers());
+
         for (int i = 0; i < count; i++) {
             String tripId = UUID.randomUUID().toString();
             String departureCode = getRandomAirportCode(random);
@@ -63,6 +62,10 @@ public class FlightDataPopulator {
                 arrivalCode = getRandomAirportCode(random);
             }
 
+            // Fetch or create departure and arrival airports
+            Airport departureAirport = createOrFetchAirport(departureCode);
+            Airport arrivalAirport = createOrFetchAirport(arrivalCode);
+
             boolean isRoundTrip = random.nextBoolean();
             TripType tripType = isRoundTrip ? TripType.ROUND_TRIP : TripType.ONE_WAY;
 
@@ -70,7 +73,7 @@ public class FlightDataPopulator {
             int outboundFlightsOnSameDay = random.nextInt(4) + 2;
 
             for (int j = 0; j < outboundFlightsOnSameDay; j++) {
-                String flightNumber = generateUniqueFlightNumber(random);
+                String flightNumber = generateUniqueFlightNumber(existingFlightNumbers, random);
                 LocalDateTime departureTime = outboundDate.atStartOfDay()
                         .plusHours(random.nextInt(12) + 6)
                         .plusMinutes(random.nextInt(60));
@@ -85,8 +88,8 @@ public class FlightDataPopulator {
                 // Create Outbound Flight
                 Flight outboundFlight = new Flight();
                 outboundFlight.setFlightNumber(flightNumber);
-                outboundFlight.setDepartureAirportCode(departureCode);
-                outboundFlight.setArrivalAirportCode(arrivalCode);
+                outboundFlight.setDepartureAirportCode(departureAirport.getAirportCode());
+                outboundFlight.setArrivalAirportCode(arrivalAirport.getAirportCode());
                 outboundFlight.setDepartureDate(departureTime.toLocalDate());
                 outboundFlight.setArrivalDate(arrivalTime.toLocalDate());
                 outboundFlight.setDepartureTime(departureTime.toLocalTime());
@@ -122,9 +125,9 @@ public class FlightDataPopulator {
 
                         // Create Return Flight
                         Flight returnFlight = new Flight();
-                        returnFlight.setFlightNumber(generateUniqueFlightNumber(random));
-                        returnFlight.setDepartureAirportCode(arrivalCode);
-                        returnFlight.setArrivalAirportCode(departureCode);
+                        returnFlight.setFlightNumber(generateUniqueFlightNumber(existingFlightNumbers, random));
+                        returnFlight.setDepartureAirportCode(arrivalAirport.getAirportCode());
+                        returnFlight.setArrivalAirportCode(departureAirport.getAirportCode());
                         returnFlight.setDepartureDate(returnDepartureTime.toLocalDate());
                         returnFlight.setArrivalDate(returnArrivalTime.toLocalDate());
                         returnFlight.setDepartureTime(returnDepartureTime.toLocalTime());
@@ -150,59 +153,33 @@ public class FlightDataPopulator {
     }
 
 
-
-
-
-
-    // Helper method to generate a random airport code
     private String getRandomAirportCode(Random random) {
         return AIRPORTS.keySet().toArray(new String[0])[random.nextInt(AIRPORTS.size())];
     }
 
-    // Fetch or create an airport by its code
     private Airport createOrFetchAirport(String airportCode) {
-        // Try to find the airport in the database
         Airport airport = airportRepository.findByAirportCode(airportCode);
         if (airport == null) {
             airport = new Airport();
             airport.setAirportCode(airportCode);
-            airport.setAirportName(AIRPORTS.get(airportCode)); // Use name from the map
-            airportRepository.save(airport); // Save the airport to the database
+            airport.setAirportName(AIRPORTS.get(airportCode));
+            airportRepository.save(airport);
         }
         return airport;
     }
 
-    // Generate a random flight number (e.g., AB1234)
-    private String generateRandomFlightNumber(Random random) {
-        return "" + (char) ('A' + random.nextInt(26)) + (char) ('A' + random.nextInt(26)) +
-                (1000 + random.nextInt(9000)); // Example: AB1234
+    private String generateUniqueFlightNumber(Set<String> existingFlightNumbers, Random random) {
+        String flightNumber;
+        do {
+            flightNumber = "FL" + (random.nextInt(9000) + 1000);
+        } while (existingFlightNumbers.contains(flightNumber));
+        existingFlightNumbers.add(flightNumber); // Add to the set after ensuring uniqueness
+        return flightNumber;
     }
 
     public void populateFlightsIfEmpty() {
-        // Check if the flights table is empty
-        List<Flight> existingFlights = flightRepository.findAll();
-        if (existingFlights.isEmpty()) {
-            System.out.println("No flights found. Populating flight data...");
-            populateFlights(200); // Only populate if no flights exist
-        } else {
-            System.out.println("Flights already populated. Skipping flight population.");
+        if (flightRepository.findAll().isEmpty()) {
+            populateFlights(50);
         }
-    }
-
-    private String generateUniqueFlightNumber(Random random) {
-        String flightNumber;
-        boolean isUnique = false;
-
-        // Loop until a unique flight number is found
-        do {
-            // Generate a random flight number
-            flightNumber = "FL" + (random.nextInt(9000) + 1000); // Generates numbers between FL1000 to FL9999
-
-            // Check if flight number already exists in the database
-            isUnique = !flightRepository.existsByFlightNumber(flightNumber);
-
-        } while (!isUnique);
-
-        return flightNumber;
     }
 }
