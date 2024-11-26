@@ -67,7 +67,7 @@ public class Flight {
     private Flight returnFlight;
 
     @ManyToOne
-    @JoinColumn(name = "reservation_id", referencedColumnName = "reservationId") // Use appropriate foreign key column name
+    @JoinColumn(name = "reservation_id", referencedColumnName = "reservation_id") // Use appropriate foreign key column name
     private Reservation reservation;  // Add this field
     @OneToMany(mappedBy = "flight")
     private List<DashPassReservation> dashPassReservations;
