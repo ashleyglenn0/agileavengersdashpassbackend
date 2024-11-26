@@ -31,10 +31,10 @@ public class Flight {
     @Column(name="price")
     private double price;
 
-    @Column(name="departureAirportCode")
+    @Column(name="departure_airport_code")
     private String departureAirportCode; // Use code instead of ID
 
-    @Column(name="arrivalAirportCode")
+    @Column(name="arrival_airport_code")
     private String arrivalAirportCode; // Use code instead of ID
 
     @Column(name="availableSeats")
