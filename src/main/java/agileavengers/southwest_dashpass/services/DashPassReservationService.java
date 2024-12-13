@@ -184,7 +184,6 @@ public class DashPassReservationService {
         System.out.println("Final DashPass list size: " + customer.getDashPasses().size());
         System.out.println("Final DashPass list: " + customer.getDashPasses());
         System.out.println("Final DashPassReservations list: " + customer.getDashPassReservations());
-        System.out.println("Test");
 
         return dashPassReservation;
     }
