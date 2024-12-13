@@ -31,7 +31,7 @@ public class Customer {
     private Boolean canFly = true;
     private Boolean canPurchaseFlight = true;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.PERSIST)
     private List<DashPass> dashPasses = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
@@ -143,25 +143,36 @@ public class Customer {
 
     // Methods to calculate based on DashPass data
     public void updateDashPassSummary() {
-        // Count unattached DashPasses
-        int unattachedDashPassCount = dashPasses.size();
+        System.out.println("Updating DashPass summary...");
+        System.out.println("DashPasses Before Update: " + dashPasses.stream()
+                .map(DashPass::getDashpassId)
+                .collect(Collectors.toList()));
+        System.out.println("DashPassReservations Before Update: " + dashPassReservations.stream()
+                .map(DashPassReservation::getId)
+                .collect(Collectors.toList()));
 
-        // Count DashPasses attached to validated reservations
+        // Count unattached DashPasses
+        int unattachedDashPassCount = (int) dashPasses.stream()
+                .filter(dp -> !dp.isPendingValidation())
+                .count();
+
+        // Count validated DashPassReservations
         this.dashPassInUseCount = (int) dashPassReservations.stream()
                 .filter(DashPassReservation::getValidated)
                 .count();
 
-        // Total DashPass count includes unattached and validated in-use DashPasses
-        this.totalDashPassCount = unattachedDashPassCount + dashPassInUseCount;
+        // Include DashPasses pending validation in the total
+        int pendingDashPassCount = (int) dashPasses.stream()
+                .filter(DashPass::isPendingValidation)
+                .count();
 
-        // Available DashPass count based on maximum limit
+        // Calculate total and available counts
+        this.totalDashPassCount = unattachedDashPassCount + dashPassInUseCount + pendingDashPassCount;
         this.availableDashPassCount = MAX_DASHPASSES - totalDashPassCount;
 
-        // Debug output to check calculations
-        System.out.println("Unattached DashPass Count: " + unattachedDashPassCount);
-        System.out.println("DashPass In Use Count: " + dashPassInUseCount);
-        System.out.println("Total DashPass Count: " + totalDashPassCount);
-        System.out.println("Available DashPass Count: " + availableDashPassCount);
+        System.out.println("Updated Counts -> Total: " + totalDashPassCount +
+                ", Available: " + availableDashPassCount + ", In Use: " + dashPassInUseCount +
+                ", Pending Validation: " + pendingDashPassCount);
     }
 
 
@@ -174,13 +185,16 @@ public class Customer {
     }
 
     public void addDashPass(DashPass dashPass) {
-        dashPasses.add(dashPass);       // Add the DashPass to unattached list
-        dashPass.setCustomer(this);      // Link the DashPass to this customer
-        updateDashPassSummary();         // Recalculate DashPass counts
+        if (!dashPasses.contains(dashPass) && !dashPass.isPendingValidation()) {
+            dashPasses.add(dashPass);
+            dashPass.setCustomer(this); // Maintain bidirectional relationship
+        }
     }
 
 
+
     public void addDashPassReservation(DashPassReservation dashPassReservation) {
+        System.out.println("Adding DashPassReservation with ID: " + dashPassReservation.getId());
         dashPassReservations.add(dashPassReservation);
         dashPassReservation.setCustomer(this);
 
@@ -189,8 +203,9 @@ public class Customer {
             dashPassInUseCount++;
         }
 
-        // Update summary based on new counts
-        updateDashPassSummary();
+        System.out.println("DashPassReservations After Add: " + dashPassReservations.stream()
+                .map(DashPassReservation::getId)
+                .collect(Collectors.toList()));
     }
 
     public void incrementDashPassInUseCount() {
@@ -204,4 +219,11 @@ public class Customer {
     public void setBags(List<Bag> bags) {
         this.bags = bags;
     }
+
+//    public List<DashPass> getValidDashPasses() {
+//        return this.dashPasses.stream()
+//                .filter(dashPass -> dashPass.getStatus() != DashPassStatus.UNTRACKED)
+//                .collect(Collectors.toList());
+//    }
+
 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>DashPass List</title>
+  <link rel="stylesheet" th:href="@{/styles/dashpasslist.css}" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <!-- Left: Logo -->
+    <div class="navbar-left">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+      </a>
+    </div>
+
+    <!-- Right: Links and Logout Button -->
+    <div class="navbar-right">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>DashPass List for Customer: <span th:text="${customer.user.firstName}"></span></h1>
+
+  <!-- DashPasses Without Reservation -->
+  <div th:if="${unattachedDashPasses.size() > 0}">
+    <h2>DashPasses Without Reservation</h2>
+    <table class="reservations-table">
+      <thead>
+      <tr>
+        <th>DashPass ID</th>
+        <th>Date of Purchase</th>
+        <th>Date of Expiration</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="dashPass : ${unattachedDashPasses}">
+        <td th:text="${dashPass.dashpassId}"></td>
+        <td th:text="${dashPass.dateOfPurchase}"></td>
+        <td th:text="${dashPass.expirationDate}"></td>
+        <td>
+          <a th:href="@{/customer/{customerId}/reservations/add-dashpass(customerId=${customer.id},dashPassId=${dashPass.dashpassId})}" class="button">
+            Add to Reservation
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DashPasses With Reservation -->
+  <div th:if="${attachedDashPasses.size() > 0}">
+    <h2>DashPasses With Reservation</h2>
+    <table class="reservations-table">
+      <thead>
+      <tr>
+        <th>DashPass ID</th>
+        <th>Date of Purchase</th>
+        <th>Date of Expiration</th>
+        <th>Reservation ID</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="dashPass : ${attachedDashPasses}">
+        <td th:text="${dashPass.dashpassId}"></td>
+        <td th:text="${dashPass.dateOfPurchase}"></td>
+        <td th:text="${dashPass.expirationDate}"></td>
+        <td th:text="${dashPass.dashPassReservation.reservation.reservationId}"></td>
+        <td>
+          <a th:href="@{/customer/{customerId}/reservation-details(reservationId=${dashPass.dashPassReservation.reservation.reservationId})}" class="button">
+            View Details
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- No DashPasses Available -->
+  <div th:if="${unattachedDashPasses.size() == 0 && attachedDashPasses.size() == 0}">
+    <p>No DashPasses available for this customer.</p>
+  </div>
+</div>
+</body>
+</html>

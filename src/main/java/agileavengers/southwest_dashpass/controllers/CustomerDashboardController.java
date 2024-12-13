@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Controller
@@ -232,6 +233,24 @@ public class CustomerDashboardController {
         model.addAttribute("flight", reservation != null && !reservation.getFlights().isEmpty() ? reservation.getFlights().get(0) : null);
 
         return "trackbag";
+    }
+
+    @GetMapping("/customer/{customerId}/dashpasses")
+    public String viewDashPassList(@PathVariable Long customerId, Model model) {
+
+        Customer customer = customerService.findCustomerById(customerId);
+        if (customer == null) {
+            throw new RuntimeException("Customer not found with ID: " + customerId);
+        }
+
+        // Get DashPasses organized into attached and unattached
+        Map<String, List<DashPass>> dashPasses = dashPassService.getDashPassListByStatus(customer);
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("unattachedDashPasses", dashPasses.get("unattached"));
+        model.addAttribute("attachedDashPasses", dashPasses.get("attached"));
+
+        return "dashpass-list"; // Return Thymeleaf template
     }
 
 }

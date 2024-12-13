@@ -11,10 +11,10 @@ public class DashPassReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="ID")
     private Long id;
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne
     @JoinColumn(name = "dashpassID", referencedColumnName = "dashPassID", nullable = false)
     private DashPass dashPass;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "customerID", referencedColumnName = "ID", nullable = false)
     private Customer customer;
     @Column(name="bookingDate")

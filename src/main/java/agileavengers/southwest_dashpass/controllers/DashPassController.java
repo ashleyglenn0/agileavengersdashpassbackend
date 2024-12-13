@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -169,8 +170,14 @@ public class DashPassController {
                                            BindingResult bindingResult,
                                            Model model) throws InterruptedException, ExecutionException {
 
-        // Check for validation errors only if using new payment details
+        System.out.println("Entering completeDashPassPurchase for customer: " + customerID + " at " + LocalDateTime.now());
+        System.out.println("Processing DashPass purchase for customer: " + customerID + " at " + LocalDateTime.now());
+        System.out.println("DashPass Quantity: " + dashPassQuantity);
+        System.out.println("Selected Reservation ID: " + reservationId);
+
+        // Check for validation errors
         if ("new".equals(selectedPaymentMethodId) && bindingResult.hasErrors()) {
+            System.out.println("Validation errors detected in payment details.");
             return handleDashPassPaymentError(model, customerID, reservationId, dashPassQuantity, totalPrice, userSelectedStatus);
         }
 
@@ -180,18 +187,20 @@ public class DashPassController {
                 throw new IllegalStateException("Customer not found for ID: " + customerID);
             }
 
+            System.out.println("Customer Retrieved: " + customer.getId());
+            System.out.println("Total DashPass Count Before Purchase: " + customer.getTotalDashPassCount());
+
             // Determine which payment details to use
             PaymentDetailsDTO paymentDetailsToUse;
             if (selectedPaymentMethodId != null && !"new".equals(selectedPaymentMethodId)) {
-                // Use the saved payment method, convert ID to Long
                 Long paymentMethodId = Long.parseLong(selectedPaymentMethodId);
                 paymentDetailsToUse = paymentDetailsService.findPaymentDetailsById(paymentMethodId);
                 if (paymentDetailsToUse == null) {
                     model.addAttribute("errorMessage", "Selected payment method not found.");
                     return "paymentmethoddetails";
                 }
+                System.out.println("Using saved payment method with ID: " + paymentMethodId);
             } else {
-                // Use new payment details from paymentDetailsDTO
                 paymentDetailsToUse = paymentDetailsDTO;
                 if (savePaymentDetails) {
                     PaymentDetails newPaymentDetails = new PaymentDetails(
@@ -203,31 +212,37 @@ public class DashPassController {
                             encryptionUtils.encrypt(paymentDetailsDTO.getCardName())
                     );
                     paymentDetailsRepository.save(newPaymentDetails);
+                    System.out.println("New payment details saved for customer: " + customerID);
                 }
             }
 
-            // Process the payment asynchronously with the correct payment details
+            // Process payment asynchronously
+            System.out.println("Processing payment...");
             CompletableFuture<PaymentStatus> futurePaymentStatus = paymentService.processPaymentAsync(paymentDetailsToUse, userSelectedStatus);
             PaymentStatus paymentStatus = futurePaymentStatus.get();
 
-            // If payment is successful, proceed to complete purchase
             if (paymentStatus == PaymentStatus.PAID) {
                 Reservation reservation = reservationId != null ? reservationService.findById(reservationId) : null;
 
-                String confirmationNumber = dashPassService.purchaseDashPass(customer, reservation, dashPassQuantity, paymentStatus, null);
+                System.out.println("Payment successful. Proceeding with DashPass purchase.");
+                System.out.println("Reservation ID: " + (reservation != null ? reservation.getReservationId() : "No Reservation"));
 
-                // Redirect to confirmation page with required parameters
+                // Call purchaseDashPass and log the confirmation number
+                String confirmationNumber = dashPassService.purchaseDashPass(customer, reservation, dashPassQuantity, paymentStatus, null);
+                System.out.println("DashPass purchase completed. Confirmation Number: " + confirmationNumber);
+
                 return "redirect:/customer/" + customerID + "/dashpasspurchasecomplete?confirmationNumber=" + confirmationNumber +
                         "&dashPassQuantity=" + dashPassQuantity + "&totalPrice=" + totalPrice;
             } else {
-                // If payment fails, handle the error
+                System.out.println("Payment failed. Returning to payment method details page.");
                 model.addAttribute("errorMessage", "Payment failed. Please try again.");
                 return handleDashPassPaymentError(model, customerID, reservationId, dashPassQuantity, totalPrice, userSelectedStatus);
             }
 
-        } catch (ExecutionException | InterruptedException e) {
-            // Handle general exceptions or failed payment process
-            model.addAttribute("errorMessage", "Payment processing error. Please try again.");
+        } catch (Exception e) {
+            System.out.println("Error during DashPass purchase: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("errorMessage", "An error occurred while processing your DashPass purchase.");
             return handleDashPassPaymentError(model, customerID, reservationId, dashPassQuantity, totalPrice, userSelectedStatus);
         }
     }
@@ -318,7 +333,7 @@ public class DashPassController {
             DashPass dashPass = dashPassService.findDashPassById(dashPassId);
 
             // Redeem the DashPass
-            dashPassReservationService.redeemDashPass(customer, reservation, dashPass, null);
+            dashPassReservationService.addDashPassToExistingFlightReservation(customer, reservation, dashPass, null);
 
             // Set success alert in model
             model.addAttribute("dashPassAdded", true);

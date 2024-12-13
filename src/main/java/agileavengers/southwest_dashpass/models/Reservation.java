@@ -13,6 +13,7 @@ import java.util.Map;
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="reservationId")
     private Long reservationId;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="customerID", referencedColumnName = "ID", nullable = false)

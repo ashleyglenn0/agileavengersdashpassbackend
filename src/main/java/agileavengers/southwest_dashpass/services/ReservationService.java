@@ -2,6 +2,7 @@ package agileavengers.southwest_dashpass.services;
 
 import agileavengers.southwest_dashpass.models.*;
 import agileavengers.southwest_dashpass.repository.BagRepository;
+import agileavengers.southwest_dashpass.repository.DashPassRepository;
 import agileavengers.southwest_dashpass.repository.DashPassReservationRepository;
 import agileavengers.southwest_dashpass.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
@@ -20,14 +21,16 @@ public class ReservationService {
 
     private CustomerService customerService;
     private BagRepository bagRepository;
+    private DashPassRepository dashPassRepository;
 
     @Autowired
     public ReservationService(ReservationRepository reservationRepository, DashPassReservationRepository dashPassReservationRepository,
-                              CustomerService customerService, BagRepository bagRepository) {
+                              CustomerService customerService, BagRepository bagRepository, DashPassRepository dashPassRepository) {
         this.reservationRepository = reservationRepository;
         this.dashPassReservationRepository = dashPassReservationRepository;
         this.customerService = customerService;
         this.bagRepository = bagRepository;
+        this.dashPassRepository = dashPassRepository;
     }
 
     public List<Reservation> getReservationsForCustomer(Long customerId) {
@@ -122,14 +125,14 @@ public class ReservationService {
         boolean hasDashPass = reservation.getDashPassReservations() != null && !reservation.getDashPassReservations().isEmpty();
 
         if (hasDashPass) {
-            // Iterate through attached DashPass reservations
             for (DashPassReservation dashPassReservation : reservation.getDashPassReservations()) {
-                // Only update if DashPass reservation isn't already validated
                 if (!dashPassReservation.getValidated()) {
-                    dashPassReservation.setValidated(true); // Mark DashPass reservation as validated
+                    DashPass dashPass = dashPassReservation.getDashPass();
+                    dashPass.setPendingValidation(false); // Remove from pending validation
+                    dashPassReservation.setValidated(true); // Mark reservation as validated
 
-                    // Save the updated DashPass reservation
-                    dashPassReservationRepository.save(dashPassReservation);
+                    dashPassRepository.save(dashPass); // Save updated DashPass
+                    dashPassReservationRepository.save(dashPassReservation); // Save updated DashPassReservation
                 }
             }
         }

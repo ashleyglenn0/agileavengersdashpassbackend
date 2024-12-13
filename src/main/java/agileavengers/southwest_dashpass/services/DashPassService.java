@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DashPassService {
@@ -52,6 +55,8 @@ public class DashPassService {
 
     @Transactional
     public String purchaseDashPass(Customer customer, Reservation reservation, int dashPassQuantity, PaymentStatus paymentStatus, Employee employeeId) {
+        System.out.println("purchaseDashPass called for customer: " + customer.getId() + " with DashPassQuantity: " + dashPassQuantity);
+
         if (paymentStatus != PaymentStatus.PAID) {
             throw new RuntimeException("Payment was not successful. DashPass purchase cannot be processed.");
         }
@@ -59,81 +64,107 @@ public class DashPassService {
         String confirmationNumber = "";
 
         for (int i = 0; i < dashPassQuantity; i++) {
+            System.out.println("Iteration: " + (i + 1) + " / " + dashPassQuantity);
+
             // Check if customer has reached the maximum number of DashPasses
             if (customer.getTotalDashPassCount() >= customer.getMaxDashPasses()) {
                 throw new RuntimeException("Customer has reached the maximum number of DashPasses.");
             }
 
-            DashPass dashPass = new DashPass();
-            dashPass.setDateOfPurchase(LocalDate.now());
-            dashPass.setRedeemed(false); // Not redeemed yet
-
-            // Generate a unique confirmation number
-            confirmationNumber = confirmationNumberGenerator.generateConfirmationNumber();
-            dashPass.setConfirmationNumber(confirmationNumber);
-
             if (reservation == null) {
-                // DashPass is not linked to a reservation, add to unattached list
+                // Create a DashPass for unattached use
+                System.out.println("Creating DashPass for unattached use.");
+                DashPass dashPass = new DashPass();
+                dashPass.setDateOfPurchase(LocalDate.now());
+                dashPass.setCustomer(customer); // Set relationship with Customer
+                confirmationNumber = confirmationNumberGenerator.generateConfirmationNumber();
+                dashPass.setConfirmationNumber(confirmationNumber);
+
+                // Add DashPass to customer's unattached list
                 customer.addDashPass(dashPass);
-                System.out.println("DashPass added to customer's unattached DashPass list.");
+                System.out.println("DashPass added to unattached list. DashPass ID: " + dashPass.getDashpassId());
+                System.out.println("Customer's DashPass list after addition: " + customer.getDashPasses().stream()
+                        .map(DashPass::getDashpassId)
+                        .toList());
+
+                // Log the purchase
+                if (employeeId != null) {
+                    Employee employee = employeeService.findEmployeeById(employeeId.getId());
+                    salesRecordService.logDashPassSaleByEmployee(dashPass, customer, employee);
+                    auditTrailService.logAction("New unattached DashPass purchased by customer.", dashPass.getDashpassId(), customer.getId(), employee.getId());
+                } else {
+                    salesRecordService.logCustomerDashPassSale(dashPass, customer);
+                    auditTrailService.logAction("New unattached DashPass purchased by customer.", dashPass.getDashpassId(), customer.getId(), null);
+                }
+
             } else {
-                // Attach DashPass to reservation flights, checking limits
+                // Create a DashPass for reservation
+                System.out.println("Creating DashPass for reservation.");
+                DashPass dashPass = new DashPass();
+                dashPass.setDateOfPurchase(LocalDate.now());
+                dashPass.setCustomer(customer); // Set relationship with Customer
+                confirmationNumber = confirmationNumberGenerator.generateConfirmationNumber();
+                dashPass.setConfirmationNumber(confirmationNumber);
+                dashPass.setPendingValidation(true); // Mark as pending validation
+
+                DashPassReservation dashPassReservation = new DashPassReservation();
+                dashPassReservation.setDashPass(dashPass);
+                dashPassReservation.setReservation(reservation);
+                dashPassReservation.setBookingDate(LocalDate.now());
+                dashPassReservation.setValidated(false);
+                dashPassReservation.setCustomer(customer);
+
+                // Link DashPassReservation to flights
                 for (Flight flight : reservation.getFlights()) {
-                    if (flight.getDashPassReservations().size() >= flight.getMaxNumberOfDashPassesForFlight()) {
-                        throw new RuntimeException("No more DashPasses can be added to flight: " + flight.getFlightNumber());
-                    }
-
-                    // Check if DashPass is already attached to this reservation
-                    if (reservation.hasDashPass()) {
-                        throw new RuntimeException("This reservation already has a DashPass attached.");
-                    }
-
-                    // Create and associate a new DashPassReservation
-                    DashPassReservation dashPassReservation = new DashPassReservation();
-                    dashPassReservation.setDashPass(dashPass);
-                    dashPassReservation.setReservation(reservation);
-                    dashPassReservation.setFlight(flight);
-                    dashPassReservation.setBookingDate(LocalDate.now());
-                    dashPassReservation.setValidated(false);
-
-                    customer.addDashPassReservation(dashPassReservation); // Move to reservations list
                     flight.getDashPassReservations().add(dashPassReservation);
-
-                    // Update flight's DashPass availability count
                     flight.setNumberOfDashPassesAvailable(flight.getNumberOfDashPassesAvailable() - 1);
+                }
 
-                    // Save DashPassReservation and flight
-                    dashPassReservationRepository.save(dashPassReservation);
-                    flightRepository.save(flight);
+                customer.addDashPassReservation(dashPassReservation);
+                System.out.println("DashPass linked to reservation. DashPass ID: " + dashPass.getDashpassId());
+                System.out.println("Customer's DashPassReservation list after addition: " + customer.getDashPassReservations().stream()
+                        .map(DashPassReservation::getId)
+                        .toList());
 
-                    System.out.println("DashPass linked to flight " + flight.getFlightNumber());
+                // Log the purchase
+                if (employeeId != null) {
+                    Employee employee = employeeService.findEmployeeById(employeeId.getId());
+                    salesRecordService.logDashPassSaleByEmployee(dashPass, customer, employee);
+                    auditTrailService.logAction("New DashPass linked to reservation.", dashPass.getDashpassId(), customer.getId(), employee.getId());
+                } else {
+                    salesRecordService.logCustomerDashPassSale(dashPass, customer);
+                    auditTrailService.logAction("New DashPass linked to reservation.", dashPass.getDashpassId(), customer.getId(), null);
                 }
             }
 
-            // Save the new DashPass
-            dashPassRepository.save(dashPass);
-            if (employeeId != null) {
-                Employee employee = employeeService.findEmployeeById(employeeId.getId());
-                salesRecordService.logDashPassSaleByEmployee(dashPass, customer, employee);
-                auditTrailService.logAction("New DashPass linked to reservation.", dashPass.getDashpassId(), customer.getId(), employee.getId());
-            } else {
-                salesRecordService.logCustomerDashPassSale(dashPass, customer);
-                auditTrailService.logAction("New DashPass purchased by customer.", dashPass.getDashpassId(), customer.getId(), null);
-            }
+            // Log current customer state
+            System.out.println("Customer DashPass list after iteration: " + customer.getDashPasses().stream()
+                    .map(DashPass::getDashpassId)
+                    .toList());
         }
 
-        // Save updated customer information and summary
+        // Final update of DashPass counts
+        System.out.println("Finalizing DashPass counts...");
         customer.updateDashPassSummary();
+        System.out.println("Customer DashPass summary after update:");
+        System.out.println("Total DashPass Count: " + customer.getTotalDashPassCount());
+        System.out.println("Available DashPass Count: " + customer.getAvailableDashPassCount());
+        System.out.println("DashPass In Use Count: " + customer.getDashPassInUseCount());
+
+        // Save the customer and cascade changes to DashPass and DashPassReservation
         customerRepository.save(customer);
 
+        System.out.println("Final DashPass Count: " + customer.getTotalDashPassCount());
         return confirmationNumber;
     }
 
 
 
-
     public DashPass save(DashPass dashPass) {
-        return dashPassRepository.save(dashPass);  // This is where repository interaction happens
+        System.out.println("Saving DashPass with ID: " + dashPass.getDashpassId());
+        DashPass savedDashPass = dashPassRepository.save(dashPass);
+        System.out.println("Saved DashPass with ID: " + savedDashPass.getDashpassId());
+        return savedDashPass;
     }
 
     public DashPass findDashPassById(Long dashpassId) {
@@ -155,6 +186,22 @@ public class DashPassService {
 
     public DashPass findDashPassByIdWithCustomerUserAndReservation(Long dashPassId) {
         return dashPassRepository.findDashPassByIdWithCustomerUserAndReservation(dashPassId);
+    }
+
+    public Map<String, List<DashPass>> getDashPassListByStatus(Customer customer) {
+        List<DashPass> unattachedDashPasses = customer.getDashPasses().stream()
+                .filter(dashPass -> dashPass.getDashPassReservation() == null)
+                .collect(Collectors.toList());
+
+        List<DashPass> attachedDashPasses = customer.getDashPasses().stream()
+                .filter(dashPass -> dashPass.getDashPassReservation() != null)
+                .collect(Collectors.toList());
+
+        Map<String, List<DashPass>> dashPassMap = new HashMap<>();
+        dashPassMap.put("unattached", unattachedDashPasses);
+        dashPassMap.put("attached", attachedDashPasses);
+
+        return dashPassMap;
     }
 
 }

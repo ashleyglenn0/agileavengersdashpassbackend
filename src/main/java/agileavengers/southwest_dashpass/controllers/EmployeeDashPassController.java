@@ -407,7 +407,7 @@ public class EmployeeDashPassController {
             DashPass dashPass = dashPassService.findDashPassById(dashPassId);
 
             // Redeem the DashPass
-            dashPassReservationService.redeemDashPass(customer, reservation, dashPass, employee);
+            dashPassReservationService.addDashPassToExistingFlightReservation(customer, reservation, dashPass, employee);
 
             // Set success alert in model
             model.addAttribute("dashPassAdded", true);

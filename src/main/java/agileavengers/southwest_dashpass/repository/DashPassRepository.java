@@ -23,5 +23,4 @@ public interface DashPassRepository extends JpaRepository<DashPass, Long > {
     @Query("SELECT d FROM DashPass d WHERE d.customer = :customer")
     List<DashPass> findByCustomer(@Param("customer") Customer customer);
 
-
 }

@@ -3,6 +3,7 @@ package agileavengers.southwest_dashpass.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name="dashPass")
@@ -18,13 +19,21 @@ public class DashPass {
     LocalDate expirationDate;
     @Column(name="isRedeemed", nullable = false)
     boolean isRedeemed;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "customerID", referencedColumnName = "ID")
     private Customer customer;
     @OneToOne(mappedBy = "dashPass", cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER)
     private DashPassReservation dashPassReservation;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private DashPassStatus status = DashPassStatus.VALID;
+
     @Column(name = "confirmation_number")
     private String confirmationNumber;
+
+    private boolean isPendingValidation;
+
 
     public DashPass() {
         this.dashpassId = 0L;
@@ -46,6 +55,10 @@ public class DashPass {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+        // Only add to dashPasses if NOT linked to a reservation
+        if (customer != null && !customer.getDashPasses().contains(this) && this.dashPassReservation == null) {
+            customer.getDashPasses().add(this);
+        }
     }
 
     public Long getDashpassId() {
@@ -100,6 +113,37 @@ public class DashPass {
     }
     public boolean isExpired() {
         return expirationDate != null && LocalDate.now().isAfter(expirationDate);
+    }
+
+    public boolean isPendingValidation() {
+        return isPendingValidation;
+    }
+
+    public void setPendingValidation(boolean pendingValidation) {
+        isPendingValidation = pendingValidation;
+    }
+
+    public DashPassStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DashPassStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        System.out.println("Equals called!");
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DashPass dashPass = (DashPass) o;
+        return Objects.equals(dashpassId, dashPass.dashpassId);
+    }
+
+    @Override
+    public int hashCode() {
+        System.out.println("HashCode called!");
+        return Objects.hash(dashpassId);
     }
 }
 

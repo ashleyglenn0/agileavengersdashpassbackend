@@ -62,7 +62,7 @@
                 <div th:if="${customer.dashPasses.size() > 0}">
                     <p>You have DashPasses available to add to a reservation.</p>
                     <a th:href="@{/customer/{customerId}/redeem(customerId=${customer.id})}">
-                        <button class="button southwest-blue-bg text-white rounded-button">Redeem DashPass</button>
+                        <button class="button southwest-blue-bg text-white rounded-button">Add DashPass to Existing Reservation</button>
                     </a>
                 </div>
                 <div th:if="${customer.dashPasses.size() == 0}">
@@ -75,6 +75,12 @@
                 <p>Need more DashPasses? Purchase one below!</p>
                 <a th:href="@{/customer/{customerId}/purchasedashpass(customerId=${customer.id})}">
                     <button class="button southwest-blue-bg text-white rounded-button">Purchase DashPass</button>
+                </a>
+            </div>
+            <div class="dashboard-card white-bg rounded-container">
+                <h3>View Dash Passes</h3>
+                <a th:href="@{/customer/{customerId}/dashpasses(customerId=${customer.id})}">
+                    <button class="button southwest-blue-bg text-white rounded-button">View All Dash Passes</button>
                 </a>
             </div>
         </div>

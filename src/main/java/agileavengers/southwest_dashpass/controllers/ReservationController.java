@@ -93,7 +93,7 @@ public class ReservationController {
         reservationService.validateReservation(customerId, reservationId);
 
         // Redirect back to the reservation list or dashboard after validation
-        return "redirect:/employee/" + employeeId + "/customer/" + customerId + "/reservations/reservationlist";
+        return "redirect:/employee/" + employeeId + "/employeedashboard";
     }
 
     @GetMapping("/employee/{employeeId}/customer/{customerId}/reservations/reservationlist")

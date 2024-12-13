@@ -87,13 +87,13 @@ public class FlightController {
         Customer customer = customerService.findCustomerById(customerID);
 
         Flight flight = new Flight();
-        DashPass dashPass = new DashPass();
+//        DashPass dashPass = new DashPass();
         List<Airport> airports = airportService.getAllAirports();
 
         model.addAttribute("customer", customer);
         model.addAttribute("customerID", customerID);
         model.addAttribute("flight", flight);
-        model.addAttribute("dashPass", dashPass);
+//        model.addAttribute("dashPass", dashPass);
         model.addAttribute("airports", airports);
 
         return "searchflight";
