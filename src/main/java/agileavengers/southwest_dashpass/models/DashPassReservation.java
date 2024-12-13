@@ -26,7 +26,7 @@ public class DashPassReservation {
 
     // Many-to-One relationship with Reservation
     @ManyToOne
-    @JoinColumn(name = "reservation_id")
+    @JoinColumn(name = "reservation_id", referencedColumnName = "reservation_id", nullable = true)
     private Reservation reservation;
     @Column(name = "confirmation_number")
     private String confirmationNumber;

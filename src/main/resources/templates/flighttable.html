@@ -70,6 +70,9 @@
                         </div>
                         <div th:if="${flight.numberOfDashPassesAvailable == 0}">
                             <p class="no-dashpass-message">No DashPasses available for this flight.</p>
+                            <div>
+                                <input type="radio" name="dashPassOption" value="none"> Do not use DashPass
+                            </div>
                         </div>
                     </div>
 
