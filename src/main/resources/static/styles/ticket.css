@@ -1,0 +1,101 @@
+/* Southwest Colors */
+:root {
+    --southwest-blue: #004680;
+    --southwest-yellow: #FFD200;
+    --southwest-gray: #F3F4F6;
+    --text-dark: #333;
+    --text-light: #FFF;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--southwest-blue);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.navbar {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.navbar-logo img {
+    height: 40px;
+}
+
+.navbar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.ticket-container {
+    background-color: var(--southwest-gray);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.qr-code-section {
+    margin-bottom: 20px;
+}
+
+.qr-code {
+    width: 150px;
+    height: 150px;
+}
+
+.reservation-details {
+    margin: 20px 0;
+    color: var(--southwest-blue);
+}
+
+.reservation-details h2,
+.reservation-details h3 {
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.reservation-details p {
+    margin: 5px 0;
+}
+
+.back-button-container {
+    margin-top: 20px;
+}
+
+.back-button {
+    text-decoration: none;
+    background-color: var(--southwest-yellow);
+    color: var(--text-dark);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #E6B800;
+}
+
+.footer {
+    background-color: var(--southwest-blue);
+    color: var(--text-light);
+    padding: 10px 20px;
+    text-align: center;
+    width: 100%;
+    font-size: 0.9rem;
+}

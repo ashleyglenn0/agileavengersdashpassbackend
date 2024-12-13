@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sales List</title>
+    <link rel="stylesheet" type="text/css" href="/styles/saleslist.css"/>
+</head>
+<body>
+<!-- Navbar -->
+<header>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <!-- Page Title -->
+    <h2 th:text="${salesType == 'flight' ? 'All Flight Sales' :
+                          (salesType == 'dashPass' ? 'All DashPass Sales' :
+                          (salesType == 'all' ? 'All Sales' : 'My Sales'))}"></h2>
+
+    <!-- Sales Table -->
+    <table class="sales-table">
+        <thead>
+        <tr>
+            <th>Sale ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Flight</th>
+            <th>DashPass</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sale : ${salesRecords}">
+            <td th:text="${sale.id}">1</td>
+            <td th:text="${sale.customer.user.firstName + ' ' + sale.customer.user.lastName}">John Doe</td>
+            <td th:text="${salesDateMap[sale.id]}">2024-11-07</td>
+            <td th:if="${sale.flight != null}" th:text="${sale.flight.flightNumber}">FL123</td>
+            <td th:if="${sale.flight == null}">N/A</td>
+            <td th:if="${sale.dashPass != null}" th:text="${sale.dashPass.dashpassId}">123</td>
+            <td th:if="${sale.dashPass == null}">N/A</td>
+            <td class="actions">
+                <button class="button"
+                        th:onclick="'window.location.href=\'/employee/' + ${employeeId} + '/sale/' + ${sale.id} + '/details\''">
+                    View Details
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Back Button -->
+    <div class="back-button">
+        <button type="button" class="button" onclick="window.history.back();">Back</button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2024 Southwest DashPass. All rights reserved.</p>
+</footer>
+</body>
+</html>

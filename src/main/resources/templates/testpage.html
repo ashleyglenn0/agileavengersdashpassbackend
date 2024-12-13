@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      margin: 50px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Test Thymeleaf Page</h1>
+  <p>This is a simple test page to ensure Thymeleaf is working properly.</p>
+  <p th:text="'Current Customer ID: ' + ${customer.id}"></p>
+  <p th:text="'Number of Reservations: ' + ${reservations.size()}"></p>
+
+  <!-- Back to Dashboard Button -->
+  <button type="button" onclick="window.history.back();">Back</button>
+</div>
+
+</body>
+</html>

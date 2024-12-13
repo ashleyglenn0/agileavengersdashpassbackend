@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bags</title>
+    <link rel="stylesheet" href="/styles/addBag.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<!-- Add Bags Form -->
+<div class="add-bag-container">
+    <h1>Add Bags</h1>
+    <form id="addBagForm" th:action="@{/employee/{employeeId}/customer/{customerID}/employeeaddbags(customerID=${customerID}, employeeId=${employee.id})}" method="POST">
+        <input type="hidden" name="employeeId" th:value="${employeeId}" />
+        <input type="hidden" name="customerID" th:value="${customerID}" />
+        <input type="hidden" name="tripType" th:value="${tripType}" />
+        <input type="hidden" name="outboundFlightId" th:value="${outboundFlightId}" />
+        <input type="hidden" name="returnFlightId" th:value="${returnFlightId}" />
+        <input type="hidden" name="dashPassOption" th:value="${dashPassOption}" />
+        <input type="hidden" name="totalPrice" th:value="${totalPrice}" />
+
+        <!-- New Hidden Input for Bag Cost -->
+        <input type="hidden" id="bagCost" name="bagCost" value="0" />
+
+        <!-- Bag Quantity Selection -->
+        <label for="bagQuantity">Do you want to add bags?</label>
+        <input type="number" id="bagQuantity" name="bagQuantity" min="0" max="4" value="1" onchange="updateTotalCost()" required />
+        <small>(First bag is free, second bag is $35, additional bags are $35 each, up to 4 bags)</small>
+
+        <!-- Total Cost Display -->
+        <div class="total-cost-display">
+            <p>Total Bag Cost: <span id="totalCost">$0</span></p>
+        </div>
+
+        <!-- Confirmation Section -->
+        <div class="confirmation">
+            <p>Is the total number of bags and cost correct?</p>
+            <p><strong>Bags:</strong> <span id="confirmBags">1</span> | <strong>Cost:</strong> <span id="confirmCost">$0</span></p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <button type="button" onclick="window.history.back()" class="back-button">Back</button>
+            <button type="submit" class="proceed-button">Proceed</button>
+        </div>
+    </form>
+
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Southwest Airlines. For educational purposes only.</p>
+</footer>
+<script>
+    function updateTotalCost() {
+        const bagQuantity = parseInt(document.getElementById("bagQuantity").value);
+        const costDisplay = document.getElementById("totalCost");
+        const confirmBags = document.getElementById("confirmBags");
+        const confirmCost = document.getElementById("confirmCost");
+        const bagCostInput = document.getElementById("bagCost");
+
+        let totalCost = 0;
+
+        if (bagQuantity > 1) {
+            totalCost = (bagQuantity - 1) * 35; // First bag is free, additional bags cost $35 each
+        }
+
+        // Update total cost display and confirmation section
+        costDisplay.textContent = `$${totalCost}`;
+        confirmBags.textContent = bagQuantity;
+        confirmCost.textContent = `$${totalCost}`;
+
+        // Update hidden input for bag cost
+        bagCostInput.value = totalCost;
+    }
+</script>
+</body>
+</html>

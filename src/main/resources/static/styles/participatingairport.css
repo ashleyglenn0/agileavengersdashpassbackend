@@ -1,0 +1,124 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Southwest Theme Colors */
+.southwest-blue-bg {
+    background-color: #004c97;
+    color: #ffffff;
+}
+
+.southwest-yellow-bg {
+    background-color: #ffbf27;
+}
+
+.southwest-yellow-text {
+    color: #ffbf27;
+}
+
+.text-dark {
+    color: #333333;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    height: 70px;
+}
+
+.navbar-brand {
+    text-decoration: none;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+/* Card */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.airport-list {
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+    color: #333333;
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.airport-list li {
+    margin-bottom: 8px;
+}
+
+.more-info {
+    font-style: italic;
+    font-size: 1.1rem;
+    margin-top: 15px;
+}
+
+/* Buttons */
+.button {
+    background-color: #004c97;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #003366;
+}
+
+/* Rounded Button */
+.rounded-button {
+    border-radius: 20px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #333333;
+    background-color: #ffbf27;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}

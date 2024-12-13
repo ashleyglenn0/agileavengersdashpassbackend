@@ -1,0 +1,185 @@
+/* Navbar */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue */
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    position: fixed; /* Ensure navbar is fixed */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    z-index: 1000; /* Ensure navbar stays on top */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navbar Links */
+.navbar-link {
+    font-size: 1.0rem; /* Match size in the first picture */
+    font-weight: bold;
+    color: #00338D; /* Southwest Blue */
+    text-decoration: none;
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Add hover effect */
+}
+
+/* Optional: Adjust spacing if needed */
+.navbar-link {
+    margin-right: 20px; /* Space between links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #FFFFFF; /* White text */
+    font-size: 1.0rem; /* Match size of navbar text */
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Slightly darker blue on hover */
+}
+
+
+/* Add spacing to account for fixed navbar */
+body {
+    padding-top: 80px; /* Adjust for navbar height */
+    background-color: #00338D; /* Southwest Blue */
+    font-family: Arial, sans-serif;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+/* Main Content Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto; /* Center align content */
+    padding: 20px;
+    background-color: #00338D; /* Southwest Blue */
+    border-radius: 8px;
+}
+
+/* Section Titles */
+.section-title {
+    color: #FFC72C; /* Southwest Yellow */
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+/* Flight Card Container */
+.card-container {
+    margin: 20px 0; /* Add spacing above and below */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Flight Card Styling */
+.flight-card {
+    background-color: #FFFFFF;
+    color: #00338D; /* Southwest Blue */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Add spacing between cards */
+    border: 1px solid #E5E7EB;
+    text-align: left;
+}
+
+/* Flight Details */
+.flight-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Add spacing between details */
+}
+
+.flight-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+/* Section Titles */
+.section-title {
+    color: #FFC72C; /* Southwest Yellow */
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* DashPass Messages */
+.no-dashpass-message {
+    color: red;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* Seat Warning */
+.seat-warning {
+    color: red;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Buttons for Selection */
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+.button-group button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue */
+}
+
+.button-group button:hover {
+    background-color: #FFD56E; /* Slightly lighter yellow */
+}
+
+/* Return Flights Section */
+.return-flights {
+    margin-top: 30px; /* Space above return flights */
+}
+
+.return-flights .flight-card {
+    padding: 15px;
+    margin-bottom: 20px; /* Space between return flight cards */
+    background-color: #F9FAFB; /* Light background for contrast */
+    border: 1px solid #E5E7EB;
+}
+
+/* Footer */
+.footer {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: #FFC72C; /* Southwest Yellow */
+    text-align: center;
+    color: #00338D;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .flight-card {
+        padding: 15px;
+    }
+}

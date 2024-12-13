@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Confirm Flight</title>
+  <link rel="stylesheet" href="/styles/confirmpurchase.css" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+
+<!-- Confirmation Card -->
+<div class="container">
+  <h2>Confirm Your Flight</h2>
+
+  <form th:action="@{/employee/{employeeId}/customer/{customerID}/employeepaymentmethoddetails(customerID=${customer.id}, employeeId=${employee.id})}" method="GET">
+    <!-- Hidden Fields -->
+    <input type="hidden" name="tripType" th:value="${tripType}">
+    <input type="hidden" name="outboundFlightId" th:value="${outboundFlight.flightID}">
+    <input type="hidden" name="returnFlightId" th:value="${returnFlight != null} ? ${returnFlight.flightID} : ''" />
+    <input type="hidden" name="dashPassOption" th:value="${dashPassOption}">
+    <input type="hidden" name="bagQuantity" th:value="${bagQuantity}">
+    <input type="hidden" name="bagCost" th:value="${bagCost}">
+    <input type="hidden" name="totalPrice" th:value="${totalPrice}">
+
+    <!-- Outbound Flight Details -->
+    <div class="section">
+      <h3>Outbound Flight</h3>
+      <p><strong>Flight Number:</strong> <span th:text="${outboundFlight.flightNumber}"></span></p>
+      <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(outboundFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+      <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outboundFlight.departureTime, 'hh:mm a')}">Time</span></p>
+      <p><strong>Departure Airport:</strong> <span th:text="${outboundFlight.departureAirportCode}"></span></p>
+      <p><strong>Arrival Airport:</strong> <span th:text="${outboundFlight.arrivalAirportCode}"></span></p>
+      <!-- More outbound flight details if needed -->
+    </div>
+
+    <!-- Return Flight Details (if applicable) -->
+    <div class="section" th:if="${returnFlight != null}">
+      <h3>Return Flight</h3>
+      <p><strong>Return Flight Number:</strong> <span th:text="${returnFlight.flightNumber}"></span></p>
+      <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+      <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
+      <p><strong>Return Departure Airport:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
+      <p><strong>Return Arrival Airport:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
+      <!-- More return flight details -->
+    </div>
+
+    <!-- DashPass Option -->
+    <div class="section">
+      <h3>DashPass Option</h3>
+      <div th:if="${dashPassOption == 'existing'}">
+        <p><strong>Using Existing DashPass:</strong></p>
+        <p>DashPass ID: <span th:text="${dashPass.dashpassId}">[DashPass ID]</span></p>
+        <p>Expiration Date: <span th:text="${#temporals.format(dashPass.expirationDate, 'MM-dd-yyyy')}">[Expiration Date]</span></p>
+        <div class="dashpass-terms">
+          <h4>DashPass Terms and Conditions</h4>
+          <ul>
+            <strong><li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li></strong>
+            <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+            <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+            <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+            <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+          </ul>
+        </div>
+      </div>
+      <div th:if="${dashPassOption == 'new'}">
+        <p><strong>Purchasing New DashPass:</strong></p>
+        <p><strong>DashPass Price:</strong> $<span>50.00</span></p>
+        <div class="dashpass-terms">
+          <h4>DashPass Terms and Conditions</h4>
+          <ul>
+            <strong><li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li></strong>
+            <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+            <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+            <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+            <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+          </ul>
+        </div>
+      </div>
+      <div th:if="${dashPassOption == 'none'}">
+        <p><strong>No DashPass will be used for this trip.</strong></p>
+      </div>
+    </div>
+
+    <!-- Bag Section -->
+    <div class="section">
+      <h3>Bags</h3>
+      <p><strong>Number of Bags:</strong> <span th:text="${bagQuantity}">[Bag Quantity]</span></p>
+      <p><strong>Bag Cost:</strong> $<span th:text="${bagCost != null ? #numbers.formatDecimal(bagCost, 1, 'COMMA', 2, 'POINT') : '0.00'}">[Bag Cost]</span></p>
+    </div>
+
+    <!-- Total Price -->
+    <div class="section">
+      <p><strong>Total Price:</strong> $<span th:text="${totalPrice != null ? #numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT') : 'N/A'}"></span></p>
+    </div>
+
+    <!-- Buttons -->
+    <button type="submit">Confirm Booking</button>
+    <button type="button" class="cancel-button" onclick="window.history.back();">Cancel</button>
+  </form>
+</div>
+
+</body>
+</html>

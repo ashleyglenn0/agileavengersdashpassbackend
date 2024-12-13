@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Review DashPass Order</title>
+    <link rel="stylesheet" href="/styles/confirmpurchase.css" />
+</head>
+<body>
+
+<!-- Navbar -->
+<header>
+    <nav class="navbar">
+        <!-- Left: Logo -->
+        <div class="navbar-left">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+            </a>
+        </div>
+
+        <!-- Right: Links and Logout Button -->
+        <div class="navbar-right">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<!-- Review Order Card -->
+<div class="container">
+    <h1>Review Your DashPass Order</h1>
+
+    <!-- Customer Information -->
+    <div class="section">
+        <h2>Customer Information</h2>
+        <p><strong>Name:</strong> <span th:text="${customer.user.firstName} + ' ' + ${customer.user.lastName}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${customer.user.email}"></span></p>
+    </div>
+
+    <!-- DashPass Details -->
+    <div class="section">
+        <h2>DashPass Details</h2>
+        <p><strong>Quantity:</strong> <span th:text="${dashPassQuantity}"></span></p>
+        <p><strong>Total Price:</strong> $<span th:text="${totalPrice}"></span></p>
+    </div>
+
+    <!-- Conditional rendering for reservation -->
+    <div class="section" th:if="${reservation != null}">
+        <h2>Reservation Details</h2>
+        <p><strong>Reservation ID:</strong> <span th:text="${reservation.reservationId}"></span></p>
+
+        <div th:each="flight : ${reservation.flights}">
+            <h3>Flight Details</h3>
+            <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}"></span></p>
+            <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(flight.departureDate, 'yyyy-MM-dd')}"></span></p>
+            <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}"></span></p>
+            <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}"></span></p>
+        </div>
+        <div class="dashpass-terms">
+            <h4>DashPass Terms and Conditions</h4>
+            <ul>
+                <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+                <li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li>
+                <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+                <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+                <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section" th:if="${reservation == null}">
+        <h2>Reservation</h2>
+        <p>No reservation attached.</p>
+        <div class="dashpass-terms">
+            <h4>DashPass Terms and Conditions</h4>
+            <ul>
+                <li>DashPass is subject to availability and is offered on a first-come, first-served basis.</li>
+                <li>All DashPass sales are final. Refunds are not available for purchased DashPasses.</li>
+                <li>If a DashPass is added to a flight reservation, it can only be returned to the customer if the flight reservation is cancelled.</li>
+                <li>DashPass cannot be transferred to another reservation once it is attached to an existing booking.</li>
+                <li>DashPass availability may vary by flight and cannot be guaranteed until confirmed.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Continue to payment method details -->
+    <form th:action="${employee != null ?
+                  '/employee/' + employee.id + '/customer/' + customer.id + '/dashpasspaymentmethoddetails?customerID=' + customer.id + '&employeeId=' + employee.id :
+                  '/customer/' + customer.id + '/dashpasspaymentmethoddetails?customerID=' + customer.id}"
+          method="get">
+    <input type="hidden" name="dashPassQuantity" th:value="${dashPassQuantity}">
+        <input type="hidden" name="employeeId" th:value="${employee != null ? employee.id : null}">
+        <input type="hidden" name="totalPrice" th:value="${totalPrice}">
+        <input type="hidden" name="selectedReservationId" th:value="${reservation != null ? reservation.reservationId : null}">
+
+        <!-- Proceed and Cancel Buttons -->
+        <div class="button-group">
+            <button type="submit" class="confirm-button">Proceed to Payment</button>
+            <button type="button" class="cancel-button" onclick="window.history.back();">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<!-- Footer -->
+<footer class="navbar">
+    <p>For educational purposes only. All trademarks are the property of their respective owners.</p>
+</footer>
+
+</body>
+</html>

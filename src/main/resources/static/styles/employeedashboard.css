@@ -1,0 +1,224 @@
+/* Southwest theme colors */
+:root {
+    --southwest-blue: #00338D;
+    --southwest-yellow: #FFC72C;
+    --white: #FFFFFF;
+    --light-gray: #F3F4F6;
+}
+
+/* General Page Styling */
+body.southwest-blue-bg {
+    background-color: var(--southwest-blue);
+    font-family: Arial, sans-serif;
+    color: var(--southwest-blue);
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Section Headers */
+h1, h3 {
+    color: var(--southwest-blue);
+    margin-bottom: 10px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+/* Cards and Sections */
+.card-section {
+    background-color: var(--white);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.rounded-container {
+    border-radius: 8px;
+}
+
+/* Shifts Section */
+.shifts-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.shifts-section li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+/* Announcements Section */
+.announcements-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.announcements-section li {
+    margin-bottom: 8px;
+}
+
+/* Dashboard Actions */
+.actions, .additional-actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.actions .button, .additional-actions .button {
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.actions .button:hover, .additional-actions .button:hover {
+    background-color: #e6b82c;
+}
+
+/* Footer */
+footer {
+    padding: 10px 20px;
+    text-align: center;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    border-radius: 8px;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+/* Button */
+.button {
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.button:hover {
+    background-color: #e6b82c;
+}
+
+.southwest-yellow-bg {
+    background-color: var(--southwest-yellow);
+}
+
+.text-white {
+    color: white;
+}
+
+.rounded-button {
+    padding: 12px 20px; /* Consistent padding */
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+.team-sales-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Adds space between each item */
+    justify-content: space-between; /* Aligns items to utilize available space */
+     margin-bottom: 20px; /* Adds space between sales data and buttons */
+}
+
+.sales-metric {
+    flex: 1 1 22%; /* Adjusts the width of each item, allowing flexibility */
+    min-width: 180px; /* Sets a minimum width to ensure readability */
+    padding: 10px;
+    background-color: #f9f9f9; /* Optional: Adds background color for styling */
+    border-radius: 8px; /* Optional: Adds rounded corners */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds subtle shadow */
+}
+
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .actions, .additional-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar {
+        flex-direction: column;
+    }
+}

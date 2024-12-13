@@ -1,0 +1,137 @@
+/* General Styles */
+.southwest-blue-bg {
+    background-color: #00338D;
+    color: #FFFFFF;
+}
+
+.southwest-yellow-bg {
+    background-color: #FFCC00;
+}
+
+.text-dark {
+    color: #00338D;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Main Content */
+.main-content {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Card Styling */
+.card {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    color: #00338D; /* Southwest blue for text color */
+    text-align: center;
+}
+
+/* Centered Customer Details Text */
+.customer-details {
+    color: #00338D;
+    text-align: center;
+}
+
+.customer-details p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+/* Action Buttons */
+.bottom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-button {
+    background-color: #FF6347;
+    color: #FFFFFF;
+}
+
+/* Footer */
+.footer {
+    background-color: #FFCC00;
+    color: #00338D;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+}
+
+body {
+    font-family: Arial;
+}

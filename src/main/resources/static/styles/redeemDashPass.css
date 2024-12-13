@@ -1,0 +1,163 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.content-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #004287; /* Southwest Blue */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    text-align: center;
+}
+
+/* Title Styling */
+h2 {
+    color: #ffbf27; /* Southwest Yellow */
+    margin-bottom: 20px;
+}
+
+/* Alerts */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.alert.success {
+    background-color: #28a745; /* Success Green */
+    color: white;
+}
+
+.alert.failure {
+    background-color: #dc3545; /* Failure Red */
+    color: white;
+}
+
+/* Table Styling */
+.reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.reservation-table th,
+.reservation-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ffbf27; /* Southwest Yellow */
+}
+
+.reservation-table th {
+    background-color: #ffbf27;
+    color: #004287; /* Southwest Blue */
+    font-weight: bold;
+}
+
+.reservation-table td {
+    background-color: #ffffff;
+    color: #004287; /* Southwest Blue */
+}
+
+.reservation-table ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reservation-table li {
+    padding: 5px 0;
+}
+
+/* Buttons */
+.button {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #004287; /* Southwest Blue */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.button:hover {
+    background-color: #e0a500; /* Darken on hover */
+}
+
+.button:focus {
+    outline: none;
+    box-shadow: 0 0 5px 2px #ffbf27;
+}
+
+/* Radio Button Styling */
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+

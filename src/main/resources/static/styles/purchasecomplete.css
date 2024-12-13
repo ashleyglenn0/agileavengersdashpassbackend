@@ -1,0 +1,119 @@
+/* General Page Styling */
+body {
+    background-color: #00338D; /* Southwest Blue */
+    font-family: Arial, sans-serif;
+    color: #004687; /* Slightly lighter blue for text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Confirmation Container Styling */
+.confirmation-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 20px; /* Add spacing to prevent clipping issues */
+}
+
+.confirmation-container h1 {
+    color: #004687; /* Southwest Blue */
+    margin-bottom: 1rem;
+}
+
+.confirmation-container h2 {
+    color: #004687;
+    margin-bottom: 1rem;
+}
+
+.confirmation-details p {
+    font-size: 1.1em;
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+/* Button Styling */
+.confirm-button {
+    background-color: #FFB612; /* Southwest Yellow */
+    color: #004687; /* Blue text */
+    font-size: 1em;
+    padding: 0.8em 1.5em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.confirm-button:hover {
+    background-color: #FFCD41; /* Slightly lighter yellow */
+}
+
+.confirm-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #004687; /* Focus outline in blue */
+}
+
+/* Navbar */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    width: 100%; /* Stretch navbar across the screen */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-left img {
+    height: 40px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px;
+    }
+}

@@ -1,0 +1,153 @@
+/* Southwest Theme Colors */
+:root {
+    --southwest-blue: #004687;
+    --southwest-yellow: #ffb612;
+    --southwest-red: #c8102e;
+    --text-color: #ffffff;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--southwest-blue);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styling */
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Add Bag Container */
+.add-bag-container {
+    background-color: #ffffff;
+    margin: 2rem auto;
+    padding: 2rem;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: var(--southwest-blue);
+}
+
+.add-bag-container h1 {
+    color: var(--southwest-blue);
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid var(--southwest-blue);
+    border-radius: 4px;
+}
+
+.small {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.total-cost-display, .confirmation {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    color: var(--southwest-blue);
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.back-button {
+    background-color: var(--southwest-blue);
+    color: #ffffff;
+}
+
+.proceed-button {
+    background-color: var(--southwest-yellow);
+    color: var(--southwest-blue);
+}
+
+/* Footer Styling */
+footer {
+    background-color: var(--southwest-yellow);
+    padding: 1rem;
+    text-align: center;
+    color: var(--southwest-blue);
+    font-size: 0.9rem;
+}

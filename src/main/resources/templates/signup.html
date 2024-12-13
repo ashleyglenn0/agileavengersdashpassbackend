@@ -1,50 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Sign Up</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="signup.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Sign Up</title>
+    <meta name="description" content="Sign up for Southwest Airlines Dash Pass">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/styles/signup.css}" rel="stylesheet">
 </head>
 <body>
 <header>
-  <nav class="navbar">
-    <img class="logo" src="./Southwest-Airlines-Logo-2014-present.jpg" alt="SouthWest Logo" />
-    <ul>
-      <li><a href="../landingPage/landingPage.html">Home</a></li>
-      <li><a href="../signup/signup.html">Sign Up</a></li>
-    </ul>
-  </nav>
+    <nav class="navbar">
+        <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Logo"/>
+        <ul>
+            <li><a th:href="@{/landingpage}">Home</a></li>
+            <li><a th:href="@{/login}">Log in</a></li>
+        </ul>
+    </nav>
 </header>
 <div class="container">
-  <div class="signup-box">
-    <h1>Signup for Southwest Airlines Dash Pass</h1>
-    <form>
-      <label>First Name:</label><br />
-      <input type="text" name="firstName" required><br />
-      <label>Last Name:</label><br />
-      <input type="text" name="lastName" required><br />
-      <label>Username:</label><br />
-      <input type="text" name="username" required><br />
-      <label>Email:</label><br />
-      <input type="email" name="email" required><br />
-      <label>Password:</label><br />
-      <input type="password" name="password" required><br /><br />
-      <div class="radio">
-        <label>Customer</label>
-        <input type="radio" name="userType" value="customer" required>
-        <label>Employee</label>
-        <input type="radio" name="userType" value="employee" required>
-      </div>
-      <input class="button" type="submit" value="Sign Up">
-    </form>
-    <div>
-    </div>
-  </div>
-</div>
-    <script src="" async defer></script>
-</body>
+    <div class="signup-box">
+        <h1>Sign up for Southwest Airlines Dash Pass</h1>
+        <div th:if="${error}">
+            <p class="error-message" th:text="${error}"></p>
+        </div>
 
+        <form th:action="@{/signup}" th:object="${user}" method="post">
+            <label>First Name:</label><br />
+            <input type="text" name="firstName" th:field="*{firstName}" required><br />
+            <label>Last Name:</label><br />
+            <input type="text" name="lastName" th:field="*{lastName}" required><br />
+            <label>Username:</label><br />
+            <input type="text" name="username" th:field="*{username}" required><br />
+            <label>Email:</label><br />
+            <input type="email" name="email" th:field="*{email}" required><br />
+            <label>Password:</label><br />
+            <input type="password" name="password" th:field="*{password}" required><br /><br />
+            <!-- User Type Radio Buttons -->
+            <div class="radio">
+                <label>Customer</label>
+                <input type="radio" id="customer" name="userType" value="CUSTOMER" th:field="*{userType}" required onchange="toggleRoleDropdown()">
+                <label>Employee</label>
+                <input type="radio" id="employee" name="userType" value="EMPLOYEE" th:field="*{userType}" required onchange="toggleRoleDropdown()">
+            </div>
+            <br />
+            <!-- Role Select for Employee -->
+            <div id="roleContainer" style="display: none;">
+                <label>Role (If Employee):</label><br />
+                <select name="role" id="role">
+                    <option value="">-- Select Role --</option>
+                    <option value="SALES">Sales</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="SUPPORT">Support</option>
+                    <option value="BAGGAGE_CLAIM">Baggage Claim</option>
+                </select><br /><br />
+            </div>
+            <!-- Submit Button -->
+            <input class="button" type="submit" value="Sign Up">
+        </form>
+        <a href="/complete-registration" class="text-dark">Already a customer? Complete your registration</a>
+    </div>
+</div>
+
+<script>
+    function toggleRoleDropdown() {
+        const employeeRadio = document.getElementById('employee');
+        const roleContainer = document.getElementById('roleContainer');
+        roleContainer.style.display = employeeRadio.checked ? 'block' : 'none';
+    }
+</script>
+</body>
 </html>

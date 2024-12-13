@@ -1,0 +1,231 @@
+/* Base Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #00338D; /* Southwest blue background */
+    color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+header {
+    background-color: #FFCC00; /* Yellow header */
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #003366;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: white;
+    color: #00338D;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Search Section */
+.search-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-section label {
+    font-weight: bold;
+}
+
+.search-section input[type="text"] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #003366; /* Blue outline around input fields */
+    border-radius: 4px;
+    outline: none;
+    color: #003366;
+    background-color: #f9f9f9;
+}
+
+.search-section button {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #FFCC00; /* Yellow action button */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color 0.2s;
+}
+
+.search-section button:hover {
+    background-color: #FFD700; /* Slightly darker yellow on hover */
+}
+
+/* Back Button */
+.back-button {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #00338D; /* Blue back button */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #005BBB; /* Darker blue on hover */
+}
+
+/* Results Table */
+.results-section {
+    margin-top: 1rem;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    color: #003366;
+    background-color: #FFFFFF;
+}
+
+.results-table th,
+.results-table td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.results-table th {
+    background-color: #FFCC00;
+    color: #003366;
+    font-weight: bold;
+}
+
+.results-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.results-table button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #FFCC00; /* Yellow action button */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.results-table button:hover {
+    background-color: #FFD700; /* Slightly darker yellow on hover */
+}
+
+.no-results {
+    text-align: center;
+    color: #00338D; /* or another color that fits your theme */
+    font-weight: bold;
+    margin-top: 20px;
+}
+.status-valid {
+    color: green;
+    font-weight: bold;
+}
+
+.status-invalid {
+    color: red;
+    font-weight: bold;
+}
+
+.validate-button {
+    background-color: #28a745; /* Green color for validation */
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.validate-button:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+    .search-section {
+        flex-direction: column;
+    }
+    .navbar-right {
+            flex-direction: column; /* Stack links and button vertically */
+            gap: 10px; /* Space between stacked elements */
+        }
+}

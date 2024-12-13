@@ -1,0 +1,147 @@
+/* Southwest Theme Colors */
+:root {
+    --southwest-blue: #004687;
+    --southwest-yellow: #ffb612;
+    --southwest-red: #c8102e;
+    --text-color: #ffffff;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--southwest-blue);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styling */
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Bag Tracking Container */
+.bag-tracking-container {
+    background-color: #ffffff;
+    margin: 2rem auto;
+    padding: 2rem;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: var(--southwest-blue);
+}
+
+.bag-tracking-container h1 {
+    color: var(--southwest-blue);
+}
+
+/* Status Indicator Styling */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  background-color: #f4f4f4; /* Light background for the entire bar */
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.status-step {
+  width: 15%;
+  text-align: center;
+  padding: 10px;
+  border: 2px solid #1e2d97; /* Southwest blue for borders */
+  border-radius: 5px;
+  background-color: #ffffff; /* Default background for uncompleted steps */
+  color: #1e2d97; /* Southwest blue for text */
+  font-weight: bold;
+}
+
+.status-step.completed {
+  background-color: #FFD700; /* Example: Gold */
+  color: #ffffff; /* Example: Black text */
+  border: 2px solid #000; /* Example: Black border */
+}
+
+.status-step.delayed {
+  background-color: #c8102e; /* Southwest red for delays */
+  color: #ffffff; /* White text for contrast */
+}
+
+/* Optional: Hover effect for better user interaction */
+.status-step:hover {
+  background-color: #1e2d97; /* Southwest blue on hover */
+  color: #ffffff; /* White text */
+  cursor: pointer;
+}
+
+
+/* ETA Styling */
+.eta {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    color: var(--southwest-blue);
+}
+
+/* Footer Styling */
+footer {
+    background-color: var(--southwest-yellow);
+    padding: 1rem;
+    text-align: center;
+    color: var(--southwest-blue);
+    font-size: 0.9rem;
+}

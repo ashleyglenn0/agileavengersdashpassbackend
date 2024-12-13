@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmation</title>
+  <link rel="stylesheet" href="/styles/purchasecomplete.css" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <!-- Left: Logo -->
+    <div class="navbar-left">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+      </a>
+    </div>
+
+    <!-- Right: Links and Logout Button -->
+    <div class="navbar-right">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+<!-- Confirmation Container -->
+<div class="confirmation-container">
+  <h1>Booking Confirmation</h1>
+
+  <!-- Reservation Details -->
+  <div class="confirmation-details">
+    <!-- Show who the reservation is for -->
+    <h2>Reservation for: <span th:text="${reservation.customer.user.firstName} + ' ' + ${reservation.customer.user.lastName}"></span></h2>
+    <p>Email: <span th:text="${reservation.customer.user.email}"></span></p>
+
+    <!-- Flight Details -->
+    <h2>Flight Details</h2>
+    <div th:each="flight : ${reservation.flights}">
+      <p>Flight Number: <span th:text="${flight.flightNumber}"></span></p>
+      <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+      <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Time</span></p>
+      <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}"></span></p>
+      <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}"></span></p>
+      <p><strong>Outbound Flight Terminal:</strong> <span th:text="${reservation.getFlightTerminal(outboundFlight.flightID)}"></span></p>
+      <p><strong>Outbound Flight Gate:</strong> <span th:text="${reservation.getFlightGate(outboundFlight.flightID)}"></span></p>
+    </div>
+
+    <!-- Return Flight Details (if applicable) -->
+    <div th:if="${returnFlight != null}">
+      <h2>Return Flight Details</h2>
+      <p>Flight Number: <span th:text="${returnFlight.flightNumber}"></span></p>
+      <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+      <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
+      <p><strong>Departure Airport:</strong> <span th:text="${returnFlight.departureAirportCode}"></span></p>
+      <p><strong>Arrival Airport:</strong> <span th:text="${returnFlight.arrivalAirportCode}"></span></p>
+      <p><strong>Return Flight Terminal:</strong> <span th:text="${reservation.getFlightTerminal(returnFlight.flightID)}"></span></p>
+      <p><strong>Return Flight Gate:</strong> <span th:text="${reservation.getFlightGate(returnFlight.flightID)}"></span></p>
+
+    </div>
+
+    <!-- DashPass Reservation Details -->
+    <h2>DashPass</h2>
+    <div th:if="${#lists.isEmpty(reservation.dashPassReservations)}">
+      No Dash Pass Reservation Added to this Reservation. You may purchase a Dash Pass or add a Dash Pass from the dashboard.
+    </div>
+    <div th:if="${not #lists.isEmpty(reservation.dashPassReservations)}">
+      <h3>DashPass Reservations:</h3>
+      <ul>
+        <li th:each="dashPassReservation : ${reservation.dashPassReservations}">
+          DashPass ID: <span th:text="${dashPassReservation.dashPass.dashpassId}"></span> <br/>
+          Reservation ID: <span th:text="${dashPassReservation.id}"></span> <br/>
+          Date of Purchase: <span th:text="${dashPassReservation.bookingDate}"></span> <br/>
+          Flight ID: <span th:text="${dashPassReservation.flight.flightID}"></span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Bag Information -->
+    <h2>Bags</h2>
+    <div th:if="${bags != null and !bags.isEmpty()}">
+      <ul>
+        <li th:each="bag, iterStat : ${bags}">
+          <strong>Bag ID:</strong> <span th:text="${bag.id}">N/A</span><br/>
+          <strong>Associated Flight ID:</strong> <span th:text="${bag.flight.flightID}">N/A</span><br/>
+          <strong>Status:</strong> <span th:text="${bag.status.displayName}">N/A</span><br/>
+          <strong>Bag Cost:</strong>
+          <span th:text="${iterStat.index == 0 ? 0.00 : 35.00}">0.00</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${bags == null or bags.isEmpty()}">
+      <p>No bags added to this reservation.</p>
+    </div>
+
+    <!-- Total Price -->
+    <h2>Total Price</h2>
+    <p>$<span th:text="${#numbers.formatDecimal(reservation.totalPrice, 1, 'COMMA', 2, 'POINT')}"></span></p>
+
+    <!-- Button to return to the customer dashboard -->
+    <button class="confirm-button" type="button"
+            th:onclick="'window.location.href=\'/customer/' + ${reservation.customer.id} + '/customerdashboard\''">
+      Return to Dashboard
+    </button>
+  </div>
+</div>
+
+</body>
+</html>

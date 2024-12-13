@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Available Flights (Employee View)</title>
+  <link rel="stylesheet" href="/styles/employeeflightinfo.css" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+
+<div class="container southwest-blue-bg">
+  <h3 class="section-title southwest-yellow-text">Available Flights (For Internal Personnel Only)</h3>
+
+  <!-- Message if no flights are found -->
+  <div th:if="${#lists.isEmpty(outboundFlights) && #lists.isEmpty(roundTripFlights)}" class="no-flights-message">
+    <p>No flights match your search criteria.</p>
+    <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Back</button>
+  </div>
+
+  <!-- Outbound Flights Section -->
+  <div th:if="${!#lists.isEmpty(outboundFlights)}" class="card-container">
+    <h3 class="section-title southwest-yellow-text">Available Outbound Flights</h3>
+    <div class="flight-card" th:each="flight : ${outboundFlights}">
+      <div class="flight-details">
+        <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">FL0000</span></p>
+        <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}">Location</span></p>
+        <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}">Location</span></p>
+        <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(flight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+        <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(flight.departureTime, 'hh:mm a')}">Time</span></p>
+        <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(flight.arrivalTime, 'hh:mm a')}">Time</span></p>
+        <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(flight.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
+
+        <!-- Additional Information -->
+        <p><strong>Available Seats:</strong> <span th:text="${flight.numberOfSeatsAvailable}">0</span></p>
+        <p><strong>DashPasses Available:</strong> <span th:text="${flight.numberOfDashPassesAvailable}">0</span></p>
+
+        <!-- Button to Search for Customer -->
+        <button class="back-button southwest-yellow-bg rounded-button"
+                th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/search-customer\''">
+          Search Customer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round-Trip Flights Section -->
+  <div th:if="${!#lists.isEmpty(roundTripFlights)}" class="card-container">
+    <h3 class="section-title southwest-yellow-text">Available Round Trip Flights</h3>
+    <div th:each="roundTrip : ${roundTripFlights}">
+      <h4 class="section-header" th:text="'Trip ID: ' + ${roundTrip.tripId}">Trip ID</h4>
+
+      <!-- Outbound Flights for Round Trip -->
+      <div class="flight-card">
+        <h5 class="section-title">Outbound Flight</h5>
+        <div class="flight-details" th:each="outbound : ${roundTrip.outboundFlights}">
+          <p><strong>Flight Number:</strong> <span th:text="${outbound.flightNumber}">FL0000</span></p>
+          <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(outbound.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+          <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(outbound.departureTime, 'hh:mm a')}">Time</span></p>
+          <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(outbound.arrivalTime, 'hh:mm a')}">Time</span></p>
+          <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(outbound.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
+
+          <!-- Seat Availability Flag -->
+          <p><strong>Available Seats:</strong> <span th:text="${outbound.numberOfSeatsAvailable}">0</span></p>
+          <p><strong>DashPasses Available:</strong> <span th:text="${outbound.numberOfDashPassesAvailable}">0</span></p>
+        </div>
+      </div>
+
+      <!-- Return Flights for Round Trip -->
+      <div class="flight-card">
+        <h5 class="section-title">Return Flights</h5>
+        <div class="flight-details" th:each="returnFlight : ${roundTrip.returnFlights}">
+          <p><strong>Flight Number:</strong> <span th:text="${returnFlight.flightNumber}">FL0000</span></p>
+          <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(returnFlight.departureDate, 'MM-dd-yyyy')}">Date</span></p>
+          <p><strong>Departure Time:</strong> <span th:text="${#temporals.format(returnFlight.departureTime, 'hh:mm a')}">Time</span></p>
+          <p><strong>Arrival Time:</strong> <span th:text="${#temporals.format(returnFlight.arrivalTime, 'hh:mm a')}">Time</span></p>
+          <p><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(returnFlight.price, 1, 'COMMA', 2, 'POINT')}">0.00</span></p>
+
+          <!-- Seat Availability Flag -->
+          <p><strong>Available Seats:</strong> <span th:text="${returnFlight.numberOfSeatsAvailable}">0</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button class="back-button southwest-yellow-bg rounded-button" onclick="window.history.back();">Back</button>
+  </div>
+</div>
+
+<footer class="southwest-yellow-bg footer">
+  For educational purposes only. All Trademarks are the property of their respective owners.
+</footer>
+</body>
+</html>

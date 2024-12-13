@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Reservation Details</title>
+  <link rel="stylesheet" th:href="@{/styles/reservationDetails.css}" />
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <!-- Left: Logo -->
+    <div class="navbar-left">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+      </a>
+    </div>
+
+    <!-- Right: Links and Logout Button -->
+    <div class="navbar-right">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+<button type="button" onclick="window.history.back();">Back</button>
+<div class="container">
+  <h2>Reservation Details</h2>
+
+  <!-- Display Reservation Information -->
+  <div th:each="flight : ${reservation.flights}" class="reservation-info">
+    <p><strong>Reservation ID:</strong> <span th:text="${reservation.reservationId}">12345</span></p>
+    <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">FL1234</span></p>
+    <p><strong>Departure Airport:</strong> <span th:text="${flight.departureAirportCode}">JFK</span></p>
+    <p><strong>Arrival Airport:</strong> <span th:text="${flight.arrivalAirportCode}">LAX</span></p>
+    <p><strong>Outbound Flight Terminal:</strong> <span th:text="${reservation.getFlightTerminal(flight.flightID)}">1A</span></p>
+    <p><strong>Outbound Flight Gate:</strong> <span th:text="${reservation.getFlightGate(flight.flightID)}">20</span></p>
+  </div>
+
+  <!-- DashPass Information -->
+  <div th:if="${!#lists.isEmpty(reservation.dashPassReservations)}">
+    <h3>DashPass Information</h3>
+    <div th:each="dashPassReservation : ${reservation.dashPassReservations}">
+      <div th:if="${dashPassReservation.dashPass != null}">
+        <p><strong>DashPass Reservation ID:</strong>
+          <span th:text="${dashPassReservation.id}">DashPass Information Not Available to Display</span>
+        </p>
+        <p><strong>DashPass ID:</strong>
+          <span th:text="${dashPassReservation.dashPass.dashpassId}">DashPass Information Not Available to Display</span>
+        </p>
+        <p><strong>DashPass Redeemed:</strong>
+          <span th:text="${dashPassReservation.dashPass.redeemed ? 'Yes' : 'No'}">Yes</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div th:if="${#lists.isEmpty(reservation.dashPassReservations)}">
+    <h3>No Dash Pass Information to Show</h3>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <a th:href="@{/customer/{customerId}/reservation/edit/{reservationId}(customerId=${reservation.customer.id}, reservationId=${reservation.reservationId})}">
+      <button class="button">Edit Reservation</button>
+    </a>
+    <!-- Delete Reservation Button -->
+    <form th:action="@{/customer/{customerId}/reservation/deletereservation/{reservationId}(customerId=${reservation.customer.id}, reservationId=${reservation.reservationId})}" method="post">
+      <button type="submit" class="button delete-button">Delete Reservation</button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>

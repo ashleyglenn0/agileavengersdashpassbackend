@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Search Customer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/styles/searchcustomer.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<!-- Navigation Bar -->
+<header>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+      </a>
+    </div>
+    <div class="navbar-right">
+      <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button">Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="container">
+    <h2>Search Customer</h2>
+
+    <!-- Search Form Card -->
+    <div class="card search-container">
+      <form th:action="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" method="GET">
+        <input type="text" name="name" placeholder="Enter Customer Name" th:value="${customerName}">
+        <button type="submit" class="button southwest-yellow-bg text-dark">Search by Customer Name</button>
+      </form>
+      <!-- Back Button -->
+      <button class="back-button" onclick="history.back()">Back</button>
+    </div>
+
+    <!-- Conditional Rendering of Results Table in Card -->
+    <div th:if="${customers != null}">
+      <div th:if="${customers.isEmpty()}">
+        <p>No customers found for the given name.</p>
+      </div>
+
+      <div th:if="${!customers.isEmpty()}" class="card results-container">
+        <table class="search-results">
+          <thead>
+          <tr>
+            <th>Customer Name</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="customer : ${customers}">
+            <td th:text="${customer.user.firstName + ' ' + customer.user.lastName}"></td>
+            <td>
+              <!-- View Button -->
+              <button
+                      class="button"
+                      th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/viewcustomer/customer/' + ${customer.id} + '/details\''">
+                View Customer Details
+              </button>
+
+              <!-- Delete Button -->
+              <button
+                      class="button delete-button"
+                      th:onclick="'window.location.href=\'/employee/' + ${employee.id} + '/deletecustomer/customer/' + ${customer.id} + '\''">
+                Delete
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  Educational purposes only. All trademarks are the property of their respective owners.
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Complete Registration</title>
+  <meta name="description" content="Southwest Airlines Complete Registration Form">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/styles/completeregistration.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<!-- Navigation Bar -->
+<nav class="navbar southwest-yellow-bg">
+  <a href="/" class="navbar-brand text-dark">Home</a>
+</nav>
+
+<!-- Main Content (Centered Form) -->
+<div class="main-content">
+  <div class="container">
+    <h2>Complete Registration</h2>
+    <p>Please set up your username and password to complete your registration.</p>
+    <form class="complete-registration-form" th:action="@{/complete-registration}" method="post">
+      <div class="form-group">
+        <label for="email">Registered Email</label>
+        <input type="email" id="email" name="email" required placeholder="Enter your registered email">
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Choose a username">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Create a password">
+      </div>
+      <button type="submit" class="button southwest-yellow-bg text-dark">Complete Registration</button>
+    </form>
+  </div>
+</div>
+
+<!-- Footer (Fixed at Bottom) -->
+<footer class="footer">
+  For educational purposes only. All Trademarks are the property of their respective owners.
+</footer>
+
+</body>
+</html>

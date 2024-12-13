@@ -1,0 +1,223 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #004287; /* Darker Southwest Blue */
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #ffbf27; /* Southwest Yellow */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #f0f4fa; /* Light background for contrast */
+    color: #004287; /* Southwest Blue text */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sales-table thead {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D; /* Southwest Dark Blue */
+}
+
+.sales-table th,
+.sales-table td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.sales-table th {
+    font-weight: bold;
+}
+
+.sales-table tbody tr:nth-child(even) {
+    background-color: #e1e7f1; /* Slightly lighter than the table background for row contrast */
+}
+
+.sales-table tbody tr:nth-child(odd) {
+    background-color: #f0f4fa;
+}
+
+.sales-table tbody tr:hover {
+    background-color: #cfe0f3; /* Light blue for hover effect */
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 2px 0;
+}
+
+/* Button Styling */
+.button {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.button:hover {
+    background-color: #ffd966; /* Lighter yellow on hover */
+}
+
+/* Back Button */
+button[type="button"] {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+button[type="button"]:hover {
+    background-color: #ffd966;
+}
+
+/* Align buttons side by side in Actions column */
+.actions {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    justify-content: center;
+    align-items: center;
+}
+
+.actions a {
+    text-decoration: none;
+}
+
+/* Button Styling for Action Buttons */
+.actions .button {
+    display: inline-block;
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+}
+
+.actions .button:hover {
+    background-color: #ffd966; /* Lighter yellow on hover */
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Footer Styling */
+.footer {
+    background-color: #ffbf27;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+}
+
+/* Back Button Styling */
+.back-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.back-button .button {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.back-button .button:hover {
+    background-color: #ffd966; /* Lighter yellow on hover */
+}

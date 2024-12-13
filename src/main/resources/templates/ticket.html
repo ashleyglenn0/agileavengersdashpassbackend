@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Reservation Validation</title>
+    <link rel="stylesheet" th:href="@{/styles/employeereservationvalidation.css}">
+</head>
+<body>
+
+<!-- Navbar Header -->
+<header>
+    <nav class="navbar">
+        <!-- Left: Logo -->
+        <div class="navbar-left">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+            </a>
+        </div>
+
+        <!-- Right: Links and Logout Button -->
+        <div class="navbar-right">
+            <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<!-- Reservation Content Container -->
+<div class="reservation-container">
+    <div class="qr-code-section">
+        <img th:src="@{/qr-code/{customerId}/{reservationId}(customerId=${customer.id}, reservationId=${reservation.reservationId})}"
+             alt="QR Code" class="qr-code"/>
+    </div>
+
+    <div class="reservation-details">
+        <h2>Flight Reservation Details</h2>
+
+        <!-- Loop through each flight in the flights list -->
+        <div th:each="flight : ${reservation.flights}">
+            <p><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">FL1234</span></p>
+            <p><strong>Departure:</strong> <span th:text="${flight.departureAirportCode}">STL</span> at
+                <span th:text="${flight.departureTime}">10:00 AM</span></p>
+            <p><strong>Arrival:</strong> <span th:text="${flight.arrivalAirportCode}">LAX</span> at
+                <span th:text="${flight.arrivalTime}">12:00 PM</span></p>
+            <hr />
+        </div>
+        <p><strong>Reservation Status:</strong> <span th:text="${reservation.validated ? 'Validated' : 'Not Validated'}"></span></p>
+
+        <!-- DashPass Reservation Details -->
+        <div th:if="${!#lists.isEmpty(reservation.dashPassReservations)}">
+            <h3>DashPass Reservation Details</h3>
+
+            <!-- Loop through each DashPass reservation in the dashPassReservations list -->
+            <div th:each="dashPass : ${reservation.dashPassReservations}">
+                <p><strong>DashPass ID:</strong> <span th:text="${dashPass.id}">12345</span></p>
+                <p>
+                    Status: <span th:text="${#bools.isTrue(reservation.validated) ? 'Validated' : 'Not Validated'}"
+                                  th:style="${#bools.isTrue(reservation.validated) ? 'color: green;' : 'color: red;'}">
+    </span>
+                </p>
+                <hr />
+            </div>
+        </div>
+    </div>
+
+    <div class="back-button-container">
+        <a href="#" onclick="history.back()" class="back-button">Back</a>
+    </div>
+</div>
+
+<!-- Footer for Educational Purposes -->
+<footer class="footer">
+    <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

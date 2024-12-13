@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title></title>
-    <meta name="description" content="">
+    <title>Dash Pass Landing</title>
+    <meta name="description" content="Dash Pass by Southwest Airlines">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./styles/landingPage.css">
+    <link th:href="@{/styles/landingPage.css}" rel="stylesheet" />
 </head>
 
 <body>
@@ -16,10 +16,10 @@
 <![endif]-->
 <header>
     <nav class="navbar">
-        <img class="logo" src="./Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo"/>
+        <img class="logo" th:src="@{/images/Southwest-Airlines-Logo-2014-present.jpg}" alt="Southwest Logo"/>
         <ul>
             <li>
-                <a href="../login/login.html">Login</a>
+                <a th:href="@{/login}">Login</a>
             </li>
         </ul>
     </nav>
@@ -35,10 +35,11 @@
             <li>Cancellation flight reschedule support</li>
             <li>Available at several airport locations</li>
         </ul>
+        <button class="button" th:onclick="'window.location.href=\'' + @{/participatingairports} + '\''">See Participating Airports</button>
     </div>
     <div class="action">
         <p>For the love of travel, get back to the fun parts. Sign up for Dash Pass today!</p>
-        <button class="button">Sign up for Dash Pass</button>
+        <button class="button" th:onclick="'window.location.href=\'' + @{/signup} + '\''">Sign up for Dash Pass</button>
     </div>
 </div>
 <footer>For educational purposes only. All Trademarks are the property of their respective owners</footer>

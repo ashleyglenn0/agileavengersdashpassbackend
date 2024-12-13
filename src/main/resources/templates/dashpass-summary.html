@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DashPass Summary</title>
+  <link rel="stylesheet" th:href="@{/styles/dashpass-summary.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<header>
+  <nav class="navbar">
+    <!-- Left: Logo -->
+    <div class="navbar-left">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+      </a>
+    </div>
+
+    <!-- Right: Links and Logout Button -->
+    <div class="navbar-right">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="card dashpass-summary-card">
+    <h3 class="title">DashPass Summary</h3>
+    <p>Total DashPasses: <span th:text="${dashPassSummary.totalDashPassCount}"></span></p>
+    <p>In Use DashPasses: <span th:text="${dashPassSummary.dashPassInUseCount}"></span></p>
+    <p>Available for Purchase: <span th:text="${dashPassSummary.availableDashPassCount}"></span></p>
+
+    <!-- Back Button -->
+    <button type="button" class="button southwest-blue-bg text-white rounded-button" onclick="window.history.back();">Back</button>
+
+    <!-- Purchase DashPass Button (conditionally rendered) -->
+    <button type="button" class="button southwest-yellow-bg text-blue rounded-button"
+            th:if="${dashPassSummary.availableDashPassCount > 0}"
+            th:onclick="'window.location.href=\'/customer/' + ${customer.id} + '/purchasedashpass\''">
+      Purchase Dash Pass
+    </button>
+  </div>
+</div>
+
+<footer>
+  <p>For educational purposes only.</p>
+</footer>
+
+</body>
+</html>

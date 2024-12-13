@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Customer Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/styles/customerdetails.css}">
+</head>
+<body class="southwest-blue-bg">
+
+<!-- Navigation Bar -->
+<header>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}">
+                <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <a th:href="@{/employee/{employeeId}/employeedashboard(employeeId=${employee.id})}" class="navbar-link">Dashboard</a>
+            <a th:href="@{/employee/{employeeId}/search-customer(employeeId=${employee.id})}" class="navbar-link">Search Customer</a>
+            <form action="/perform_logout" method="post" style="display: inline;">
+                <button type="submit" class="button">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="card container">
+        <h2 class="center-text">Customer Details</h2>
+
+        <!-- Customer Details Display (Centered Text) -->
+        <div id="customerDetailsView" class="customer-details">
+            <p><strong>First Name:</strong> <span th:text="${customerUpdateDTO.firstName}">John</span></p>
+            <p><strong>Last Name:</strong> <span th:text="${customerUpdateDTO.lastName}">Doe</span></p>
+            <p><strong>Email:</strong> <span th:text="${customerUpdateDTO.email}">john.doe@example.com</span></p>
+            <p><strong>Username:</strong> <span th:text="${customerUpdateDTO.username}">johndoe</span></p>
+        </div>
+
+        <!-- Customer Details Form (Hidden Initially) -->
+        <form id="customerDetailsForm" th:action="@{/employee/{employeeId}/customer/{customerId}/update(employeeId=${employee.id}, customerId=${customer.id})}"
+              th:object="${customerUpdateDTO}" method="post" style="display: none;">
+            <div class="customer-details">
+                <p><strong>First Name:</strong>
+                    <input type="text" th:field="*{firstName}" th:readonly="${!canEdit}">
+                </p>
+                <p><strong>Last Name:</strong>
+                    <input type="text" th:field="*{lastName}" th:readonly="${!canEdit}">
+                </p>
+                <p th:if="${canEditUsernameAndEmail}">
+                    <strong>Email:</strong>
+                    <input type="text" th:field="*{email}" th:readonly="${!canEditUsernameAndEmail}">
+                </p>
+                <p th:if="${canEditUsernameAndEmail}">
+                    <strong>Username:</strong>
+                    <input type="text" th:field="*{username}" th:readonly="${!canEditUsernameAndEmail}">
+                </p>
+            </div>
+            <button type="submit" class="button southwest-yellow-bg text-dark">Save</button>
+        </form>
+
+        <!-- All Buttons in a Row at the Bottom -->
+        <div class="bottom-buttons">
+            <button class="button southwest-yellow-bg text-dark" onclick="window.history.back();">Go Back</button>
+            <button id="editButton" class="button southwest-yellow-bg text-dark" onclick="toggleEditMode()">Edit</button>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/purchaseDashPass(employeeId=${employee.id}, customerId=${customer.id})}">
+                <button class="button southwest-yellow-bg text-dark">Add DashPass</button>
+            </a>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/searchflight(employeeId=${employee.id}, customerId=${customer.id})}">
+                <button class="button southwest-yellow-bg text-dark">Add Flight</button>
+            </a>
+            <a th:href="@{/employee/{employeeId}/customer/{customerId}/reservations(employeeId=${employee.id}, customerId=${customer.id})}"
+               class="button southwest-yellow-bg text-dark">
+                Search Reservations
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    Educational purposes only. All trademarks are the property of their respective owners.
+</footer>
+
+<!-- JavaScript to Toggle Edit Mode -->
+<script>
+  function toggleEditMode() {
+    const editButton = document.getElementById("editButton");
+    const saveButton = document.getElementById("saveButton");
+    const customerDetailsView = document.getElementById("customerDetailsView");
+    const customerDetailsForm = document.getElementById("customerDetailsForm");
+
+    // Toggle visibility of form and view-only mode
+    customerDetailsView.style.display = customerDetailsView.style.display === "none" ? "block" : "none";
+    customerDetailsForm.style.display = customerDetailsForm.style.display === "none" ? "block" : "none";
+
+    // Toggle Edit and Save buttons
+    editButton.style.display = editButton.style.display === "none" ? "inline-block" : "none";
+    saveButton.style.display = saveButton.style.display === "none" ? "inline-block" : "none";
+
+    // Use backend-defined permissions to enable fields
+    const canEdit = /*[[${canEdit}]]*/ true;
+    const canEditUsernameAndEmail = /*[[${canEditUsernameAndEmail}]]*/ true;
+
+    // Enable input fields based on permissions
+    if (customerDetailsForm.style.display === "block") {
+        customerDetailsForm.querySelectorAll("input").forEach(input => {
+            if (input.name === "firstName" || input.name === "lastName") {
+                input.removeAttribute("readonly");
+            } else if ((input.name === "email" || input.name === "username") && canEditUsernameAndEmail) {
+                input.removeAttribute("readonly");
+            }
+        });
+    } else {
+        // Disable editing when exiting edit mode
+        customerDetailsForm.querySelectorAll("input").forEach(input => {
+            input.setAttribute("readonly", "readonly");
+        });
+    }
+}
+
+</script>
+
+</body>
+</html>

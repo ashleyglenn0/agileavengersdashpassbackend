@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Up Expired Flights</title>
+</head>
+<body>
+
+<h1>Admin: Clean Up Expired Flights</h1>
+
+<!-- Thymeleaf form that submits a POST request -->
+<form th:action="@{/admin/cleanupFlights}" method="post">
+  <!-- Optional hidden inputs or parameters could be added here if needed -->
+
+  <!-- Button that submits the form -->
+  <button type="submit">Clean Up Expired Flights</button>
+</form>
+
+</body>
+</html>

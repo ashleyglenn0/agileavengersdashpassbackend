@@ -1,0 +1,193 @@
+/* General styles */
+.southwest-blue-bg {
+    background-color: #00338D;
+    color: #FFFFFF;
+}
+
+.southwest-yellow-bg {
+    background-color: #FFCC00;
+}
+
+.text-dark {
+    color: #00338D;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Main Content Styling */
+.main-content {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Search Form Card */
+.card {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Results Container Card */
+.results-container {
+    margin-top: 20px;
+}
+
+/* Form and Table */
+.search-container form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.search-container input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 70%;
+    border-radius: 4px;
+    border: 1px solid #CCCCCC;
+}
+
+.search-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+}
+
+.back-button {
+    margin-top: 10px;
+    background-color: #FFCC00;
+    color: #00338D;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Results Table */
+.search-results {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #FFFFFF;
+    color: #00338D;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.search-results th, .search-results td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.search-results th {
+    background-color: #FFCC00;
+    color: #00338D;
+}
+
+.search-results td {
+    text-align: center;
+}
+
+/* Buttons */
+.button {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #FFCC00;
+    color: #00338D;
+    margin-right: 5px;
+}
+
+.delete-button {
+    background-color: #FF6347;
+    color: #FFFFFF;
+}
+
+/* Footer */
+.footer {
+    background-color: #FFCC00;
+    color: #00338D;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+}
+body {
+    font-family: Arial;
+}

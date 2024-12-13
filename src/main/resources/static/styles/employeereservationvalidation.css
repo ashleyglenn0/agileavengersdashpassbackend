@@ -1,0 +1,162 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #00338D; /* Southwest Blue */
+    color: #004287;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #FFC72C; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue for text */
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+/* Navbar Left (Logo) */
+.navbar-left img {
+    height: 40px; /* Size of the Southwest logo */
+}
+
+/* Navbar Right (Links and Logout Button) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between links and button */
+}
+
+/* Navbar Links */
+.navbar-link {
+    text-decoration: none;
+    color: #00338D; /* Southwest Blue */
+    font-weight: bold;
+    margin-right: 15px; /* Add space to the right of each link */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Hover effect for links */
+}
+
+/* Logout Button */
+.button {
+    background-color: #00338D; /* Southwest Blue */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #00255A; /* Darker blue for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .navbar-right {
+        flex-direction: column; /* Stack links and button vertically */
+        gap: 10px; /* Space between stacked elements */
+    }
+}
+
+
+/* Reservation Content Container */
+.reservation-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff; /* White background for contrast */
+    color: #00338D; /* Southwest Blue text color */
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center align text in the container */
+}
+
+/* QR Code Section */
+.qr-code-section {
+    text-align: center; /* Center align QR code */
+    margin-bottom: 20px;
+}
+
+.qr-code {
+    width: 150px;
+    height: 150px;
+    border: 2px solid #ffbf27; /* Southwest Yellow border */
+    border-radius: 8px;
+}
+
+/* Reservation and Flight Details */
+.reservation-details h2,
+.reservation-details h3 {
+    color: #00338D; /* Southwest Blue */
+    margin-top: 0;
+}
+
+.reservation-details p {
+    margin: 8px 0;
+    color: #00338D; /* Southwest Blue */
+}
+
+/* Separator */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ffbf27; /* Southwest Yellow */
+    margin: 20px 0;
+}
+
+/* Validate Button */
+.validate-button {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+}
+
+.validate-button:hover {
+    background-color: #ffd966; /* Lighter yellow on hover */
+}
+
+/* Back Button */
+.back-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-button {
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background-color: #ffd966; /* Lighter yellow on hover */
+}
+
+/* Footer Styling */
+.footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #ffbf27; /* Southwest Yellow */
+    color: #00338D; /* Southwest Blue text */
+    font-size: 14px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}

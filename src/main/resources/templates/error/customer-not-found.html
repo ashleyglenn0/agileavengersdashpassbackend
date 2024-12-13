@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Not Found</title>
+  <link rel="stylesheet" th:href="@{/styles/error.css}">
+</head>
+<body>
+<div class="container">
+  <h1>Customer Not Found</h1>
+  <p th:text="'We could not find a customer with ID: ' + ${error}"></p>
+  <p>Sorry, the customer you are looking for does not exist or you do not have access to view this customer.</p>
+  <a th:href="@{/}" class="btn">Go to Home</a>
+</div>
+</body>
+</html>

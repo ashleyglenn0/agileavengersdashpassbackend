@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Payment Methods</title>
+  <link rel="stylesheet" th:href="@{/styles/managePaymentMethods.css}">
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <!-- Left: Logo -->
+    <div class="navbar-left">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}">
+        <img src="/images/Southwest-Airlines-Logo-2014-present.jpg" alt="Southwest Logo" style="height: 40px;">
+      </a>
+    </div>
+
+    <!-- Right: Links and Logout Button -->
+    <div class="navbar-right">
+      <a th:href="@{/customer/{customerId}/customerdashboard(customerId=${customer.id})}" class="navbar-link">Dashboard</a>
+      <a th:href="@{/customer/{customerId}/send-support-request(customerId=${customer.id})}" class="navbar-link">Support</a>
+      <form action="/perform_logout" method="post" style="display: inline;">
+        <button type="submit" class="button" southwest-blue-bg text-white rounded-button>Logout</button>
+      </form>
+    </div>
+  </nav>
+</header>
+<div class="container">
+  <!-- Header with "Add Payment Method" and "Cancel" buttons -->
+  <div class="header">
+    <h1>Manage Payment Methods</h1>
+    <div class="button-group">
+      <a th:href="@{/customer/{customerID}/addpaymentmethod(customerID=${customer.id})}" class="btn btn-add">Add Payment Method</a>
+      <button type="button" class="btn btn-cancel" onclick="window.history.back();">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Payment Methods List -->
+  <div th:if="${paymentMethods != null && !paymentMethods.isEmpty()}">
+    <div th:each="paymentMethod, iterStat : ${paymentMethods}" class="payment-method">
+      <!-- Use iterStat.index to access the corresponding masked card number -->
+      <span>Card ending in <span th:text="${maskedCardNumbers[iterStat.index]}">****</span></span>
+
+      <!-- Delete button with confirmation -->
+      <form th:action="@{/customer/{customerID}/deletepaymentmethod/{id}(customerID=${customer.id}, id=${paymentMethod.id})}"  method="post"
+            th:onsubmit="return confirm('Are you sure you want to delete this payment method?');">
+        <button type="submit" class="btn btn-delete">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- No Payment Methods Message -->
+  <div th:if="${paymentMethods == null || paymentMethods.isEmpty()}" class="no-payment-methods">
+    <p>No payment methods available.</p>
+  </div>
+</div>
+</body>
+</html>
